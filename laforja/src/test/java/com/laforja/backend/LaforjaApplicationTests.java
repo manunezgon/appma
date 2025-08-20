@@ -1,0 +1,13 @@
+package com.laforja.backend;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class LaforjaApplicationTests {
+
+	@Test
+	void contextLoads() {
+	}
+
+}
