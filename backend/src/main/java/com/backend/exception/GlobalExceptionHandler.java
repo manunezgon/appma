@@ -30,11 +30,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errors);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, String>> handleOtherExceptions(Exception ex) {
-        return ResponseEntity.status(500).body(Map.of("error", "An unexpected error occurred"));
-    }
-
     @ExceptionHandler(PaymentTypeNotFoundException.class)
     public ResponseEntity<Map<String, String>> handlePaymentTypeNotFound(PaymentTypeNotFoundException ex) {
         return ResponseEntity.status(404).body(Map.of("error", ex.getMessage()));
@@ -43,5 +38,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EmailNotRegisteredException.class)
     public ResponseEntity<Map<String, String>> handleEmailNotRegistered(EmailNotRegisteredException ex) {
         return ResponseEntity.status(404).body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleResourceNotFound(ResourceNotFoundException ex) {
+        return ResponseEntity.status(404).body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidScheduleException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidSchedule(InvalidScheduleException ex) {
+        return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+    }
+
+    // CATCH-ALL
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> handleOtherExceptions(Exception ex) {
+        return ResponseEntity.status(500).body(Map.of("error", "An unexpected error occurred"));
     }
 }
