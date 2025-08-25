@@ -90,7 +90,7 @@ public class UserService {
     }
 
     @Transactional
-    public void changePassword(Long userId, String oldPassword, String newPassword) {
+    public void updatePassword(Long userId, String oldPassword, String newPassword) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 

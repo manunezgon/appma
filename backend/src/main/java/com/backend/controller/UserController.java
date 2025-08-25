@@ -64,10 +64,10 @@ public class UserController {
         return ResponseEntity.ok(toDTO(user));
     }
 
-    @PostMapping("/{id}/change-password")
-    public ResponseEntity<Void> changePassword(@PathVariable Long id,
+    @PostMapping("/{id}/update-password")
+    public ResponseEntity<Void> updatePassword(@PathVariable Long id,
                                                @RequestBody UpdatePasswordDTO dto) {
-        userService.changePassword(id, dto.getOldPassword(), dto.getNewPassword());
+        userService.updatePassword(id, dto.getOldPassword(), dto.getNewPassword());
         return ResponseEntity.noContent().build();
     }
 
