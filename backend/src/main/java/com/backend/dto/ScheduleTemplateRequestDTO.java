@@ -12,5 +12,8 @@ public record ScheduleTemplateRequestDTO(
         LocalTime startTime,
 
         @NotNull(message = "End time is required")
-        LocalTime endTime
+        LocalTime endTime,
+
+        @NotNull(message = "Lesson ID is required")
+        Long lessonId
 ) {}

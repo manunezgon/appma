@@ -21,9 +21,13 @@ public class ScheduleTemplateController {
     // --- Helpers ---
     private ScheduleTemplateResponseDTO toDTO(ScheduleTemplate scheduleTemplate) {
         return new ScheduleTemplateResponseDTO(
+                scheduleTemplate.getId(),
                 scheduleTemplate.getDayOfWeek(),
                 scheduleTemplate.getStartTime(),
-                scheduleTemplate.getEndTime()
+                scheduleTemplate.getEndTime(),
+                scheduleTemplate.getLesson().getId(),
+                scheduleTemplate.getLesson().getLessonName(),
+                scheduleTemplate.getLesson().getProfessorName()
         );
     }
 
