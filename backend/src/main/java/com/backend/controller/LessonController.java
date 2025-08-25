@@ -1,6 +1,7 @@
 package com.backend.controller;
 
-import com.backend.dto.*;
+import com.backend.dto.LessonRequestDTO;
+import com.backend.dto.LessonResponseDTO;
 import com.backend.model.Lesson;
 import com.backend.service.LessonService;
 import jakarta.validation.Valid;
@@ -30,23 +31,40 @@ public class LessonController {
     // --- Endpoints ---
     @PostMapping("/register")
     public ResponseEntity<LessonResponseDTO> registerLesson(
-            @Valid @RequestBody LessonRegisterDTO dto) {
+            @Valid @RequestBody LessonRequestDTO dto) {
 
         Lesson lesson = lessonService.registerLesson(dto.lessonName(), dto.professorName());
         return ResponseEntity.ok(toDTO(lesson));
     }
 
-    @GetMapping("/{lessonId}")
+    @GetMapping("/id/{lessonId}")
     public ResponseEntity<LessonResponseDTO> getLessonById(@PathVariable Long lessonId) {
         Lesson lesson = lessonService.getLessonById(lessonId);
         return ResponseEntity.ok(toDTO(lesson));
     }
 
-    @GetMapping("/{professorName}")
+    @GetMapping("/professor/{professorName}")
     public ResponseEntity<List<LessonResponseDTO>> getLessonsByProfessorName(@PathVariable String professorName) {
         List<LessonResponseDTO> lessonsByProfessor = lessonService.getLessonByProfessorName(professorName)
                 .stream().map(this::toDTO).collect(Collectors.toList());
         return ResponseEntity.ok(lessonsByProfessor);
+    }
+
+    @PutMapping("/{lessonId}")
+    public ResponseEntity<LessonResponseDTO> updateLesson(
+            @PathVariable Long lessonId,
+            @Valid @RequestBody LessonRequestDTO dto) {
+
+        lessonService.updateLesson(lessonId, dto);
+        Lesson updatedLesson = lessonService.getLessonById(lessonId);
+
+        return ResponseEntity.ok(toDTO(updatedLesson));
+    }
+
+    @DeleteMapping("/{lessonId}")
+    public ResponseEntity<Void> deleteLesson(@PathVariable Long lessonId) {
+        lessonService.deleteLesson(lessonId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping()

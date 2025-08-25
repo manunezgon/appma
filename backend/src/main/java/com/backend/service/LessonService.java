@@ -1,5 +1,6 @@
 package com.backend.service;
 
+import com.backend.dto.LessonRequestDTO;
 import com.backend.model.Lesson;
 import com.backend.repository.LessonRepository;
 import jakarta.transaction.Transactional;
@@ -7,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -49,11 +49,11 @@ public class LessonService {
     }
 
     @Transactional
-    public void updateLesson(Long lessonId, Lesson updatedLesson) {
+    public void updateLesson(Long lessonId, LessonRequestDTO dto) {
         Lesson oldLesson = getLessonById(lessonId);
 
-        oldLesson.setLessonName(updatedLesson.getLessonName());
-        oldLesson.setProfessorName(updatedLesson.getProfessorName());
+        oldLesson.setLessonName(dto.lessonName());
+        oldLesson.setProfessorName(dto.professorName());
     }
 
     public List<Lesson> validateLessonName(String lessonName, String professorName) {
