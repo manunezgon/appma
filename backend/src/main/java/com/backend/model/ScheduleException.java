@@ -31,5 +31,7 @@ public class ScheduleException {
     @NotNull
     private Boolean cancelled = false;
 
-    // AÑADIR RELACION CON LESSON
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lesson_id", nullable = false)
+    private Lesson lesson;
 }

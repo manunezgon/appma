@@ -4,6 +4,7 @@ import com.backend.dto.ScheduleTemplateRequestDTO;
 import com.backend.exception.InvalidScheduleException;
 import com.backend.exception.ResourceNotFoundException;
 import com.backend.model.ScheduleTemplate;
+import com.backend.repository.LessonRepository;
 import com.backend.repository.ScheduleTemplateRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ScheduleTemplateService {
     private final ScheduleTemplateRepository scheduleTemplateRepository;
+    private final LessonRepository lessonRepository;
 
     public List<ScheduleTemplate> getAllScheduleTemplates() {
         return scheduleTemplateRepository.findAll();
@@ -28,11 +30,15 @@ public class ScheduleTemplateService {
 
     @Transactional
     public ScheduleTemplate createScheduleTemplate(ScheduleTemplateRequestDTO dto) {
+        var lesson = lessonRepository.findById(dto.lessonId())
+                .orElseThrow(() -> new ResourceNotFoundException("Lesson not found with id " + dto.lessonId()));
+
         ScheduleTemplate scheduleTemplate = new ScheduleTemplate(
                 null,
                 dto.dayOfWeek(),
                 dto.startTime(),
-                dto.endTime()
+                dto.endTime(),
+                lesson
         );
         validateScheduleTemplate(scheduleTemplate);
         return scheduleTemplateRepository.save(scheduleTemplate);
@@ -43,9 +49,14 @@ public class ScheduleTemplateService {
         validateId(id);
         ScheduleTemplate existing = getScheduleTemplateById(id);
 
+        var lesson = lessonRepository.findById(dto.lessonId())
+                .orElseThrow(() -> new ResourceNotFoundException("Lesson not found with id " + dto.lessonId()));
+
+
         existing.setDayOfWeek(dto.dayOfWeek());
         existing.setStartTime(dto.startTime());
         existing.setEndTime(dto.endTime());
+        existing.setLesson(lesson);
 
         validateScheduleTemplate(existing);
         return scheduleTemplateRepository.save(existing);
@@ -80,6 +91,9 @@ public class ScheduleTemplateService {
         }
         if (scheduleTemplate.getEndTime().isBefore(scheduleTemplate.getStartTime())) {
             throw new InvalidScheduleException("End time must be after start time");
+        }
+        if (scheduleTemplate.getLesson() == null) {
+            throw new InvalidScheduleException("Lesson cannot be null");
         }
     }
 }

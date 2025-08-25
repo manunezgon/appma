@@ -1,7 +1,6 @@
 package com.backend.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,5 +29,7 @@ public class ScheduleTemplate {
     @NotNull(message = "End time is required")
     private LocalTime endTime;
 
-    // AÑADIR RELACION CON LESSON
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lesson_id", nullable = false)
+    private Lesson lesson;
 }

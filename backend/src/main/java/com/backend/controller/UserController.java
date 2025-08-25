@@ -1,6 +1,6 @@
 package com.backend.controller;
 
-import com.backend.dto.ChangePasswordDTO;
+import com.backend.dto.UpdatePasswordDTO;
 import com.backend.dto.UserLoginDTO;
 import com.backend.dto.UserRegisterDTO;
 import com.backend.dto.UserResponseDTO;
@@ -66,7 +66,7 @@ public class UserController {
 
     @PostMapping("/{id}/change-password")
     public ResponseEntity<Void> changePassword(@PathVariable Long id,
-                                               @RequestBody ChangePasswordDTO dto) {
+                                               @RequestBody UpdatePasswordDTO dto) {
         userService.changePassword(id, dto.getOldPassword(), dto.getNewPassword());
         return ResponseEntity.noContent().build();
     }
