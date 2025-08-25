@@ -2,7 +2,7 @@ package com.backend.dto;
 
 import jakarta.validation.constraints.NotNull;
 
-public record LessonRegisterDTO(
+public record LessonRequestDTO(
         @NotNull String lessonName,
         @NotNull String professorName
 ) {}

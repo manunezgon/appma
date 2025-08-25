@@ -1,6 +1,7 @@
 package com.backend.controller;
 
-import com.backend.dto.*;
+import com.backend.dto.LessonRequestDTO;
+import com.backend.dto.LessonResponseDTO;
 import com.backend.model.Lesson;
 import com.backend.service.LessonService;
 import jakarta.validation.Valid;
@@ -30,7 +31,7 @@ public class LessonController {
     // --- Endpoints ---
     @PostMapping("/register")
     public ResponseEntity<LessonResponseDTO> registerLesson(
-            @Valid @RequestBody LessonRegisterDTO dto) {
+            @Valid @RequestBody LessonRequestDTO dto) {
 
         Lesson lesson = lessonService.registerLesson(dto.lessonName(), dto.professorName());
         return ResponseEntity.ok(toDTO(lesson));
@@ -52,7 +53,7 @@ public class LessonController {
     @PutMapping("/{lessonId}")
     public ResponseEntity<LessonResponseDTO> updateLesson(
             @PathVariable Long lessonId,
-            @Valid @RequestBody UpdateLessonDTO dto) {
+            @Valid @RequestBody LessonRequestDTO dto) {
 
         lessonService.updateLesson(lessonId, dto);
         Lesson updatedLesson = lessonService.getLessonById(lessonId);

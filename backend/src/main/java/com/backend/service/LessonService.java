@@ -1,6 +1,6 @@
 package com.backend.service;
 
-import com.backend.dto.UpdateLessonDTO;
+import com.backend.dto.LessonRequestDTO;
 import com.backend.model.Lesson;
 import com.backend.repository.LessonRepository;
 import jakarta.transaction.Transactional;
@@ -49,7 +49,7 @@ public class LessonService {
     }
 
     @Transactional
-    public void updateLesson(Long lessonId, UpdateLessonDTO dto) {
+    public void updateLesson(Long lessonId, LessonRequestDTO dto) {
         Lesson oldLesson = getLessonById(lessonId);
 
         oldLesson.setLessonName(dto.lessonName());
