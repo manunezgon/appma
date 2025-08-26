@@ -1,63 +1,19 @@
-import { Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+// app/(tabs)/_layout.jsx
+'use client';
 
-export default function TabLayout() {
+import { Stack } from 'expo-router';
+import RootGuard from '../RootGuard';
+
+export default function TabsLayout() {
   return (
-    <Tabs screenOptions={{ headerShown: false }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="sessions"
-        options={{
-          title: 'Clases',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="fitness" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="ranking"
-        options={{
-          title: 'Ranking',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="trophy" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="news"
-        options={{
-          title: 'Noticias',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="newspaper" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="payments"
-        options={{
-          title: 'Pagos',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="card" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: 'Perfil',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person" size={size} color={color} />
-          ),
-        }}
-      />
-    </Tabs>
+    <RootGuard>
+      <Stack>
+        <Stack.Screen name="index" options={{ title: 'Inicio' }} />
+        <Stack.Screen name="news" />
+        <Stack.Screen name="profile" />
+        <Stack.Screen name="ranking" />
+        <Stack.Screen name="sessions" />
+      </Stack>
+    </RootGuard>
   );
 }
