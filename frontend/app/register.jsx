@@ -19,7 +19,7 @@ export default function Register() {
     }
 
     try {
-      const response = await fetch('http://localhost:8080/users/register', {
+      const response = await fetch('http://192.168.1.8:8080/users/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, phone }),
