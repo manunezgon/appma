@@ -21,5 +21,8 @@ public class UserRegisterDTO {
     @NotBlank
     @Size(min = 6)
     private String password;
+
+    @Size(min = 9)
+    private String phone;
 }
 
