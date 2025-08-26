@@ -1,15 +1,13 @@
-// app/_layout.jsx
-'use client';
-
-import { UserProvider } from './context/usercontext';
-import { Stack } from 'expo-router';
+import { Stack } from "expo-router";
+import { UserProvider } from "./context/usercontext"; // tu provider
 
 export default function RootLayout() {
   return (
     <UserProvider>
-      <Stack>
+      <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
+        <Stack.Screen name="login" options={{ headerShown: false }} />
+        <Stack.Screen name="register" options={{ headerShown: false }} />
       </Stack>
     </UserProvider>
   );

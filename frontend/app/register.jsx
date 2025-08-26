@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet, Alert } from 'react-native';
+import { View, TextInput, Button, Text, Image, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 
 export default function Register() {
@@ -41,6 +41,11 @@ export default function Register() {
 
   return (
     <View style={styles.container}>
+      <Image 
+        source={require("./assets/images/la_forja_logo.png")} 
+        style={styles.logo} 
+        resizeMode="contain"
+      />
       <Text style={styles.title}>Registrarse</Text>
       <TextInput placeholder="Nombre" value={name} onChangeText={setName} style={styles.input} />
       <TextInput placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" style={styles.input} />
@@ -52,7 +57,50 @@ export default function Register() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 20 },
-  title: { fontSize: 24, marginBottom: 20, textAlign: 'center' },
-  input: { borderWidth: 1, borderColor: '#ccc', padding: 10, marginBottom: 15, borderRadius: 5 },
+  container: {
+    flex: 1,
+    backgroundColor: "#cac5c5ff", // gris oscuro de fondo
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+  },
+  logo: {
+    width: 120,
+    height: 120,
+    marginBottom: 25,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#000000ff", // blanco sobre fondo oscuro
+    marginBottom: 20,
+  },
+  input: {
+    width: "80%", // más pequeño, centrado
+    borderWidth: 1,
+    borderColor: "#888", // gris medio
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 12,
+    backgroundColor: "#bdb7b7ff", // gris un poco más claro que el fondo
+    color: "#fff", // texto blanco
+  },
+  button: {
+    backgroundColor: "#4B0082", // violeta
+    padding: 12,
+    borderRadius: 8,
+    width: "80%", // más estrecho
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  linkText: {
+    color: "#000000ff", // gris claro
+    marginTop: 10,
+    textDecorationLine: "underline",
+  },
 });
+
