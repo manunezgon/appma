@@ -51,7 +51,7 @@ export default function Login() {
       keyboardShouldPersistTaps="handled"
     >
       <Image 
-        source={require("./assets/images/la_forja_logo.png")} 
+        source={require("./assets/images/black_logo.png")} 
         style={styles.logo} 
         resizeMode="contain"
       />

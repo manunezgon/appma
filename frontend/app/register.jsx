@@ -41,14 +41,14 @@ export default function Register() {
 
   return (
     <KeyboardAwareScrollView
-      style={{ flex: 1, backgroundColor: '#EAE4ED' }}
+      style={{ flex: 1, backgroundColor: '#564D58' }}
       contentContainerStyle={styles.container}
       enableOnAndroid={true}
       extraHeight={Platform.OS === 'android' ? 80 : 0}
       keyboardShouldPersistTaps="handled"
     >
       <Image 
-        source={require("./assets/images/la_forja_logo.png")} 
+        source={require("./assets/images/white_logo.png")} 
         style={styles.logo} 
         resizeMode="contain"
       />
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     color: "#000000ff", 
   },
   button: {
-    backgroundColor: "#69188E", 
+    backgroundColor: "#1F0025", 
     padding: 12,
     borderRadius: 8,
     alignItems: "center",
