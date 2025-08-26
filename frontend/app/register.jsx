@@ -1,9 +1,9 @@
-// app/register.jsx
 'use client';
 
-import { useState } from 'react';
-import { View, TextInput, Button, Text, Image, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import { Alert, Image, Platform, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 export default function Register() {
   const [name, setName] = useState('');
@@ -40,67 +40,58 @@ export default function Register() {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAwareScrollView
+      style={{ flex: 1, backgroundColor: '#EAE4ED' }}
+      contentContainerStyle={styles.container}
+      enableOnAndroid={true}
+      extraHeight={Platform.OS === 'android' ? 80 : 0}
+      keyboardShouldPersistTaps="handled"
+    >
       <Image 
         source={require("./assets/images/la_forja_logo.png")} 
         style={styles.logo} 
         resizeMode="contain"
       />
-      <Text style={styles.title}>Registrarse</Text>
       <TextInput placeholder="Nombre" value={name} onChangeText={setName} style={styles.input} />
       <TextInput placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" style={styles.input} />
       <TextInput placeholder="Contraseña" value={password} onChangeText={setPassword} secureTextEntry style={styles.input} />
       <TextInput placeholder="Teléfono" value={phone} onChangeText={setPhone} style={styles.input} />
-      <Button title="Registrarse" onPress={handleRegister} />
-    </View>
+      <TouchableOpacity onPress={handleRegister} style={styles.button}>
+        <Text style={styles.buttonText}>REGISTRARSE</Text>
+      </TouchableOpacity>
+    </KeyboardAwareScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#cac5c5ff", // gris oscuro de fondo
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
   },
   logo: {
-    width: 120,
-    height: 120,
+    width: 200,
+    height: 200,
     marginBottom: 25,
   },
-  title: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#000000ff", // blanco sobre fondo oscuro
-    marginBottom: 20,
-  },
   input: {
-    width: "80%", // más pequeño, centrado
+    width: "90%", 
     borderWidth: 1,
-    borderColor: "#888", // gris medio
+    borderColor: "#ffffffff",
     borderRadius: 8,
     padding: 10,
-    marginBottom: 12,
-    backgroundColor: "#bdb7b7ff", // gris un poco más claro que el fondo
-    color: "#fff", // texto blanco
+    marginBottom: 10,
+    backgroundColor: "#ffffffff", 
+    color: "#000000ff", 
   },
   button: {
-    backgroundColor: "#4B0082", // violeta
+    backgroundColor: "#69188E", 
     padding: 12,
     borderRadius: 8,
-    width: "80%", // más estrecho
     alignItems: "center",
-    marginBottom: 15,
   },
   buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  linkText: {
-    color: "#000000ff", // gris claro
-    marginTop: 10,
-    textDecorationLine: "underline",
+    color: "#ffffffff",
   },
 });
-

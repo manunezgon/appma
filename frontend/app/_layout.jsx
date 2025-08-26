@@ -1,9 +1,10 @@
 'use client';
 
+import { useFonts } from 'expo-font';
+import { Stack, usePathname, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { useRouter, Stack, Slot, usePathname } from 'expo-router';
-import { UserProvider, useUser } from './context/usercontext';
-import { Text } from 'react-native';
+import { ActivityIndicator, Text, TextInput, View } from 'react-native';
+import { UserProvider, useUser } from '../context/usercontext';
 
 
 function RootGuard({ children }) {
@@ -26,6 +27,24 @@ function RootGuard({ children }) {
 }
 
 export default function RootLayout() {
+  const [fontsLoaded] = useFonts({
+    'Heebo-Medium': require('./assets/fonts/Heebo-Medium.ttf'),
+  });
+
+  if (!fontsLoaded) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  Text.defaultProps = Text.defaultProps || {};
+  Text.defaultProps.style = { fontFamily: 'Heebo-Medium' };
+
+  TextInput.defaultProps = TextInput.defaultProps || {};
+  TextInput.defaultProps.style = { fontFamily: 'Heebo-Medium' };
+  
   return (
     <UserProvider>
       <RootGuard>
