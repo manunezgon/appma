@@ -6,10 +6,13 @@ export default function ClassList({ classes }) {
       <Text style={styles.sectionTitle}>Clases del día</Text>
       <FlatList
         data={classes}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.classCard}>
-            <Text style={styles.className}>{item.name}</Text>
+            <View>
+              <Text style={styles.className}>{item.lessonName}</Text>
+              <Text style={styles.professorName}>{item.professorName}</Text>
+            </View>
             <Text style={styles.classTime}>{item.time}</Text>
           </View>
         )}
@@ -31,8 +34,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#f8f8f8",
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
   },
   className: { fontSize: 16, fontWeight: "600" },
+  professorName: { fontSize: 14, color: "#555" },
   classTime: { fontSize: 14, color: "#555" },
   noClasses: { textAlign: "center", marginTop: 20, fontSize: 16, color: "#999" },
 });

@@ -31,18 +31,34 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
   // Semana visible
   const [currentWeekIndex, setCurrentWeekIndex] = useState(10);
 
-  const formatDate = (date) => date.toISOString().split("T")[0];
+  // Estado del mes/año mostrado
+  const [currentMonthName, setCurrentMonthName] = useState(
+    weeks[currentWeekIndex][0].toLocaleDateString("es-ES", { month: "long", year: "numeric" })
+  );
 
-  // El título siempre es el mes/año del día seleccionado
-  const currentMonthName = selectedDay.toLocaleDateString("es-ES", {
-    month: "long",
-    year: "numeric",
-  });
+  const formatDate = (date) => date.toISOString().split("T")[0];
 
   const goToToday = () => {
     setSelectedDay(today);
     setCurrentWeekIndex(10);
     flatListRef.current?.scrollToIndex({ index: 10, animated: true });
+    // Actualiza también el mes/año al ir a hoy
+    setCurrentMonthName(
+      today.toLocaleDateString("es-ES", { month: "long", year: "numeric" })
+    );
+  };
+
+  const handleMomentumScrollEnd = (event) => {
+    const index = Math.round(event.nativeEvent.contentOffset.x / SCREEN_WIDTH);
+    setCurrentWeekIndex(index);
+
+    // Actualiza el mes/año según la primera fecha de la semana visible
+    const firstDayOfWeek = weeks[index][0];
+    const newMonthName = firstDayOfWeek.toLocaleDateString("es-ES", {
+      month: "long",
+      year: "numeric",
+    });
+    setCurrentMonthName(newMonthName);
   };
 
   return (
@@ -69,10 +85,7 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
           offset: SCREEN_WIDTH * index,
           index,
         })}
-        onMomentumScrollEnd={(event) => {
-          const index = Math.round(event.nativeEvent.contentOffset.x / SCREEN_WIDTH);
-          setCurrentWeekIndex(index);
-        }}
+        onMomentumScrollEnd={handleMomentumScrollEnd}
         renderItem={({ item: week }) => (
           <View style={[styles.weekContainer, { width: SCREEN_WIDTH }]}>
             {week.map((day, index) => {
