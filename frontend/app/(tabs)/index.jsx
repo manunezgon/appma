@@ -15,14 +15,16 @@ export default function HomeScreen() {
   useEffect(() => {
     const fetchClasses = async () => {
       try {
-        const response = await fetch("http://192.168.1.86:8080/scheduleTemplates");
+        const dateStr = selectedDay.toISOString().split("T")[0];
+        const response = await fetch(`http://192.168.1.86:8080/scheduleTemplates/day?date=${dateStr}`);
+
         const data = await response.json();
-
-        const dayOfWeek = getDayOfWeek(selectedDay);
-
-        const filtered = data.filter(item => item.dayOfWeek === dayOfWeek);
-
-        const mapped = filtered.map(item => ({
+        if (!Array.isArray(data)) {
+          console.warn("⚠️ Backend returned unexpected data:", data);
+          setClasses([]);
+          return;
+        }
+        const mapped = data.map(item => ({
           id: item.id.toString(),
           lessonName: item.lessonName,
           professorName: item.professorName,
@@ -32,17 +34,15 @@ export default function HomeScreen() {
         mapped.sort((a, b) => {
           const [hourA, minuteA] = a.time.split(' - ')[0].split(':').map(Number);
           const [hourB, minuteB] = b.time.split(' - ')[0].split(':').map(Number);
-
-          if (hourA !== hourB) return hourA - hourB;
-          return minuteA - minuteB;
+          return hourA !== hourB ? hourA - hourB : minuteA - minuteB;
         });
-
 
         setClasses(mapped);
       } catch (error) {
         console.error("Error fetching classes:", error);
       }
     };
+
 
     fetchClasses();
   }, [selectedDay]);

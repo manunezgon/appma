@@ -6,9 +6,11 @@ import com.backend.model.ScheduleTemplate;
 import com.backend.service.ScheduleTemplateService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,6 +49,14 @@ public class ScheduleTemplateController {
         return ResponseEntity.ok(
                 toDTO(scheduleTemplateService.getScheduleTemplateById(id))
         );
+    }
+
+    @GetMapping("/day")
+    public ResponseEntity<List<ScheduleTemplateResponseDTO>> getScheduleForDay(
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+
+        List<ScheduleTemplateResponseDTO> schedule = scheduleTemplateService.getScheduleForDay(date);
+        return ResponseEntity.ok(schedule);
     }
 
     @PostMapping
