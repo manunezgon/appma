@@ -6,6 +6,7 @@ import com.backend.exception.EmailNotRegisteredException;
 import com.backend.exception.UserNotFoundException;
 import com.backend.model.User;
 import com.backend.repository.UserRepository;
+import com.backend.security.JwtUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,6 +20,7 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
 
     @Transactional
     public List<User> getAllUsers() {
@@ -29,6 +31,12 @@ public class UserService {
     public User getUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
+    }
+
+    @Transactional
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email.toLowerCase().trim())
+                .orElseThrow(() -> new EmailNotRegisteredException(email));
     }
 
     // --- Write operations ---
@@ -49,24 +57,25 @@ public class UserService {
 
         User user = new User();
         user.setName(dto.getName());
-        user.setEmail(dto.getEmail());
+        user.setEmail(dto.getEmail().toLowerCase().trim());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setPhone(dto.getPhone());
+        user.setRole(User.Role.MEMBER);
 
         return userRepository.save(user);
     }
 
     @Transactional
-    public User updateUser(Long id, UserRegisterDTO dto) {
+    public User updateUser(Long id, UserRegisterDTO dto, User.Role currentUserRole) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
         validateName(dto.getName());
 
-        if (!user.getEmail().equals(dto.getEmail())) {
+        if (!user.getEmail().equals(dto.getEmail().toLowerCase().trim())) {
             validateEmail(dto.getEmail());
             checkEmailNotUsed(dto.getEmail());
-            user.setEmail(dto.getEmail());
+            user.setEmail(dto.getEmail().toLowerCase().trim());
         }
 
         user.setName(dto.getName());
@@ -76,8 +85,13 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(dto.getPassword()));
         }
 
+        if (dto.getRole() != null && currentUserRole == User.Role.ADMIN) {
+            user.setRole(dto.getRole());
+        }
+
         return userRepository.save(user);
     }
+
 
     public User login(String email, String password) {
         User user = userRepository.findByEmail(email)
@@ -88,6 +102,11 @@ public class UserService {
         }
 
         return user;
+    }
+
+    public String loginAndGetToken(String email, String password) {
+        User user = login(email, password);
+        return jwtUtil.generateToken(user.getId(), user.getEmail(), user.getRole());
     }
 
     @Transactional
@@ -124,8 +143,9 @@ public class UserService {
     }
 
     private void checkEmailNotUsed(String email) {
-        userRepository.findByEmail(email).ifPresent(u -> {
-            throw new EmailAlreadyRegisteredException(email);
-        });
+        userRepository.findByEmail(email.toLowerCase().trim())
+                .ifPresent(u -> {
+                    throw new EmailAlreadyRegisteredException(email);
+                });
     }
 }

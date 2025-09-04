@@ -2,9 +2,11 @@ package com.backend.controller;
 
 import com.backend.dto.UpdatePasswordDTO;
 import com.backend.dto.UserLoginDTO;
+import com.backend.dto.UserLoginResponseDTO;
 import com.backend.dto.UserRegisterDTO;
 import com.backend.dto.UserResponseDTO;
 import com.backend.model.User;
+import com.backend.security.JwtUtil;
 import com.backend.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +20,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
+
     private final UserService userService;
+    private final JwtUtil jwtUtil;
 
     // --- Helpers ---
     private UserResponseDTO toDTO(User user) {
-        return new UserResponseDTO(user.getId(), user.getName(), user.getEmail());
+        return new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRole());
     }
 
     // --- Endpoints ---
@@ -40,6 +44,15 @@ public class UserController {
         return ResponseEntity.ok(toDTO(user));
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<UserResponseDTO> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        String email = jwtUtil.extractEmail(token);
+        User user = userService.getUserByEmail(email);
+        return ResponseEntity.ok(new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRole()));
+    }
+
+
     @PostMapping("/register")
     public ResponseEntity<UserResponseDTO> registerUser(@Valid @RequestBody UserRegisterDTO dto) {
         User user = userService.registerUser(dto);
@@ -47,8 +60,16 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @Valid @RequestBody UserRegisterDTO dto) {
-        User updatedUser = userService.updateUser(id, dto);
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id,
+                                                      @Valid @RequestBody UserRegisterDTO dto,
+                                                      @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        User.Role currentUserRole = User.Role.MEMBER; // default
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            currentUserRole = jwtUtil.extractRole(token);
+        }
+
+        User updatedUser = userService.updateUser(id, dto, currentUserRole);
         return ResponseEntity.ok(toDTO(updatedUser));
     }
 
@@ -59,16 +80,25 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponseDTO> login(@RequestBody UserLoginDTO dto) {
-        User user = userService.login(dto.getEmail(), dto.getPassword());
-        return ResponseEntity.ok(toDTO(user));
+    public ResponseEntity<UserLoginResponseDTO> login(@RequestBody UserLoginDTO dto) {
+        String token = userService.loginAndGetToken(dto.getEmail(), dto.getPassword());
+        User user = userService.getUserByEmail(dto.getEmail());
+
+        UserLoginResponseDTO response = new UserLoginResponseDTO(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getRole(),
+                token
+        );
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/{id}/update-password")
     public ResponseEntity<Void> updatePassword(@PathVariable Long id,
-                                               @RequestBody UpdatePasswordDTO dto) {
+                                               @Valid @RequestBody UpdatePasswordDTO dto) {
         userService.updatePassword(id, dto.getOldPassword(), dto.getNewPassword());
         return ResponseEntity.noContent().build();
     }
-
 }
