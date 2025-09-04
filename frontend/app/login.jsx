@@ -1,16 +1,49 @@
 'use client';
 
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { Alert, Image, Platform, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
+import { useState, useEffect } from 'react';
+import { Alert, Image, Platform, StyleSheet, Text, TextInput, TouchableOpacity, ActivityIndicator, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useUser } from '../context/usercontext';
+import * as SecureStore from 'expo-secure-store';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [userToLogin, setUserToLogin] = useState(null);
   const router = useRouter();
-  const { login } = useUser();
+  const { user, login, loading } = useUser();
+
+  // Redirigir automáticamente si ya hay usuario
+  useEffect(() => {
+    if (user) {
+      router.replace('/(tabs)');
+    }
+  }, [user]);
+
+  // Guardar token y actualizar contexto cuando userToLogin cambia
+  useEffect(() => {
+    if (userToLogin) {
+      (async () => {
+        try {
+          await SecureStore.setItemAsync('userToken', userToLogin.token);
+          login(userToLogin);
+        } catch (error) {
+          console.error('Error guardando token:', error);
+          Alert.alert('Error', 'No se pudo guardar la sesión de manera segura');
+        }
+      })();
+    }
+  }, [userToLogin]);
+
+  // Mientras cargamos la sesión inicial o el usuario ya existe, no renderizamos la pantalla de login
+  if (loading || user) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -19,7 +52,7 @@ export default function Login() {
     }
 
     try {
-      const response = await fetch('http://192.168.1.8:8080/users/login', {
+      const response = await fetch('http://192.168.1.86:8080/users/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -31,9 +64,8 @@ export default function Login() {
         return;
       }
 
-      const data = await response.json(); // UserResponseDTO
-      login(data); // guarda usuario en Context
-      router.replace('/(tabs)'); // redirige a tabs
+      const data = await response.json();
+      setUserToLogin(data); // el useEffect se encarga de guardar token y login
     } catch (error) {
       console.error(error);
       Alert.alert('Error', 'No se pudo conectar con el servidor');

@@ -2,15 +2,19 @@
 
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Image, Platform, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
+import { Alert, Image, Platform, StyleSheet, Text, TextInput, TouchableOpacity, ActivityIndicator, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { useUser } from '../context/usercontext';
+import * as SecureStore from 'expo-secure-store';
 
 export default function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
+  const [loading, setLoading] = useState(false); // indicador de carga
   const router = useRouter();
+  const { login } = useUser();
 
   const handleRegister = async () => {
     if (!name || !email || !password) {
@@ -18,8 +22,11 @@ export default function Register() {
       return;
     }
 
+    setLoading(true);
+
     try {
-      const response = await fetch('http://192.168.1.8:8080/users/register', {
+      // Registro
+      const response = await fetch('http://192.168.1.86:8080/users/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, phone }),
@@ -28,16 +35,46 @@ export default function Register() {
       if (!response.ok) {
         const errorData = await response.json();
         Alert.alert('Error', errorData.message || 'No se pudo registrar');
+        setLoading(false);
         return;
       }
 
-      Alert.alert('Éxito', 'Usuario registrado correctamente');
-      router.replace('/login'); // Redirige al login
+      // Login automático después del registro
+      const tokenResponse = await fetch('http://192.168.1.86:8080/users/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!tokenResponse.ok) {
+        Alert.alert('Registro exitoso, pero no se pudo iniciar sesión automáticamente');
+        router.replace('/login');
+        setLoading(false);
+        return;
+      }
+
+      const tokenData = await tokenResponse.json(); // { id, name, email, role, token }
+
+      // Guardar token de forma segura
+      await SecureStore.setItemAsync('userToken', tokenData.token);
+
+      login(tokenData); // guardar usuario en Context
+      router.replace('/(tabs)'); // redirige a la app principal
     } catch (error) {
       console.error(error);
       Alert.alert('Error', 'No se pudo conectar con el servidor');
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#564D58' }}>
+        <ActivityIndicator size="large" color="#fff" />
+      </View>
+    );
+  }
 
   return (
     <KeyboardAwareScrollView
