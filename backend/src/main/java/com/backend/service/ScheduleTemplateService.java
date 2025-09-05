@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -39,26 +40,22 @@ public class ScheduleTemplateService {
     public List<ScheduleTemplateResponseDTO> getScheduleForDay(LocalDate date) {
         DayOfWeek dayOfWeek = date.getDayOfWeek();
 
-        // Horarios base del día de la semana
         List<ScheduleTemplate> baseSchedules = scheduleTemplateRepository.findByDayOfWeek(dayOfWeek);
-
-        // Excepciones de la fecha concreta
         List<ScheduleException> exceptions = scheduleExceptionRepository.findByDate(date);
 
-        return baseSchedules.stream().map(schedule -> {
-                    // Buscar excepción correspondiente a esta clase
+        return baseSchedules.stream()
+                .flatMap(schedule -> {
                     Optional<ScheduleException> exception = exceptions.stream()
                             .filter(e -> e.getLesson().getId().equals(schedule.getLesson().getId()))
                             .findFirst();
 
+                    if (exception.isPresent() && Boolean.TRUE.equals(exception.get().getCancelled())) {
+                        return Stream.empty();
+                    }
+
                     if (exception.isPresent()) {
                         ScheduleException e = exception.get();
-                        if (Boolean.TRUE.equals(e.getCancelled())) {
-                            // Clase cancelada: se omite
-                            return null;
-                        }
-                        // Clase modificada por excepción
-                        return new ScheduleTemplateResponseDTO(
+                        return Stream.of(new ScheduleTemplateResponseDTO(
                                 schedule.getId(),
                                 schedule.getDayOfWeek(),
                                 e.getStartTime(),
@@ -66,21 +63,19 @@ public class ScheduleTemplateService {
                                 schedule.getLesson().getId(),
                                 schedule.getLesson().getLessonName(),
                                 schedule.getLesson().getProfessorName()
-                        );
-                    } else {
-                        // Clase normal del horario base
-                        return new ScheduleTemplateResponseDTO(
-                                schedule.getId(),
-                                schedule.getDayOfWeek(),
-                                schedule.getStartTime(),
-                                schedule.getEndTime(),
-                                schedule.getLesson().getId(),
-                                schedule.getLesson().getLessonName(),
-                                schedule.getLesson().getProfessorName()
-                        );
+                        ));
                     }
+
+                    return Stream.of(new ScheduleTemplateResponseDTO(
+                            schedule.getId(),
+                            schedule.getDayOfWeek(),
+                            schedule.getStartTime(),
+                            schedule.getEndTime(),
+                            schedule.getLesson().getId(),
+                            schedule.getLesson().getLessonName(),
+                            schedule.getLesson().getProfessorName()
+                    ));
                 })
-                .filter(Objects::nonNull) // eliminar las canceladas
                 .toList();
     }
 
