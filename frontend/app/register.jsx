@@ -12,7 +12,7 @@ export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
-  const [loading, setLoading] = useState(false); // indicador de carga
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { login } = useUser();
 
@@ -39,7 +39,6 @@ export default function Register() {
         return;
       }
 
-      // Login automático después del registro
       const tokenResponse = await fetch('http://192.168.1.86:8080/users/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -53,13 +52,12 @@ export default function Register() {
         return;
       }
 
-      const tokenData = await tokenResponse.json(); // { id, name, email, role, token }
+      const tokenData = await tokenResponse.json(); 
 
-      // Guardar token de forma segura
       await SecureStore.setItemAsync('userToken', tokenData.token);
 
-      login(tokenData); // guardar usuario en Context
-      router.replace('/(tabs)'); // redirige a la app principal
+      login(tokenData); 
+      router.replace('/(tabs)'); 
     } catch (error) {
       console.error(error);
       Alert.alert('Error', 'No se pudo conectar con el servidor');

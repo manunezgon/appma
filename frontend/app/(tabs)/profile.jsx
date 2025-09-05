@@ -8,7 +8,7 @@ export default function Profile() {
 
   const handleLogout = async () => {
     await logout();
-    router.replace('/login'); // redirige al login después de cerrar sesión
+    router.replace('/login'); 
   };
 
   return (

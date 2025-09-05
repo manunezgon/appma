@@ -14,14 +14,12 @@ export default function Login() {
   const router = useRouter();
   const { user, login, loading } = useUser();
 
-  // Redirigir automáticamente si ya hay usuario
   useEffect(() => {
     if (user) {
       router.replace('/(tabs)');
     }
   }, [user]);
 
-  // Guardar token y actualizar contexto cuando userToLogin cambia
   useEffect(() => {
     if (userToLogin) {
       (async () => {
@@ -36,7 +34,6 @@ export default function Login() {
     }
   }, [userToLogin]);
 
-  // Mientras cargamos la sesión inicial o el usuario ya existe, no renderizamos la pantalla de login
   if (loading || user) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -65,7 +62,7 @@ export default function Login() {
       }
 
       const data = await response.json();
-      setUserToLogin(data); // el useEffect se encarga de guardar token y login
+      setUserToLogin(data);
     } catch (error) {
       console.error(error);
       Alert.alert('Error', 'No se pudo conectar con el servidor');
