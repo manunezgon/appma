@@ -61,15 +61,15 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id,
-                                                      @Valid @RequestBody UserRegisterDTO dto,
-                                                      @RequestHeader(value = "Authorization", required = false) String authHeader) {
-        User.Role currentUserRole = User.Role.MEMBER; // default
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            currentUserRole = jwtUtil.extractRole(token);
-        }
+                                                      @Valid @RequestBody UserRegisterDTO dto) {
+        User updatedUser = userService.updateUser(id, dto);
+        return ResponseEntity.ok(toDTO(updatedUser));
+    }
 
-        User updatedUser = userService.updateUser(id, dto, currentUserRole);
+    @PutMapping("/{id}/role")
+    public ResponseEntity<UserResponseDTO> updateUserRole(@PathVariable Long id,
+                                                          @RequestParam User.Role newRole) {
+        User updatedUser = userService.updateUserRole(id, newRole);
         return ResponseEntity.ok(toDTO(updatedUser));
     }
 

@@ -9,6 +9,7 @@ import com.backend.repository.UserRepository;
 import com.backend.security.JwtUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,11 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
+
+    private String normalizeEmail(String email) {
+        if (email == null) return null;
+        return email.toLowerCase().trim();
+    }
 
     @Transactional
     public List<User> getAllUsers() {
@@ -35,7 +41,7 @@ public class UserService {
 
     @Transactional
     public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email.toLowerCase().trim())
+        return userRepository.findByEmail(normalizeEmail(email))
                 .orElseThrow(() -> new EmailNotRegisteredException(email));
     }
 
@@ -57,7 +63,7 @@ public class UserService {
 
         User user = new User();
         user.setName(dto.getName());
-        user.setEmail(dto.getEmail().toLowerCase().trim());
+        user.setEmail(normalizeEmail(dto.getEmail()));
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setPhone(dto.getPhone());
         user.setRole(User.Role.MEMBER);
@@ -66,7 +72,7 @@ public class UserService {
     }
 
     @Transactional
-    public User updateUser(Long id, UserRegisterDTO dto, User.Role currentUserRole) {
+    public User updateUser(Long id, UserRegisterDTO dto) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
@@ -75,7 +81,7 @@ public class UserService {
         if (!user.getEmail().equals(dto.getEmail().toLowerCase().trim())) {
             validateEmail(dto.getEmail());
             checkEmailNotUsed(dto.getEmail());
-            user.setEmail(dto.getEmail().toLowerCase().trim());
+            user.setEmail(normalizeEmail(dto.getEmail()));
         }
 
         user.setName(dto.getName());
@@ -85,16 +91,20 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(dto.getPassword()));
         }
 
-        if (dto.getRole() != null && currentUserRole == User.Role.ADMIN) {
-            user.setRole(dto.getRole());
-        }
-
         return userRepository.save(user);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    public User updateUserRole(Long id, User.Role newRole) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+        user.setRole(newRole);
+        return userRepository.save(user);
+    }
 
     public User login(String email, String password) {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(normalizeEmail(email))
                 .orElseThrow(() -> new EmailNotRegisteredException(email));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
