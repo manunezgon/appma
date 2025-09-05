@@ -38,7 +38,6 @@ public class JwtFilter extends OncePerRequestFilter {
                 String email = jwtUtil.extractEmail(token);
                 User.Role role = jwtUtil.extractRole(token);
 
-                // Colocamos el email y el rol en el SecurityContext
                 UsernamePasswordAuthenticationToken auth =
                         new UsernamePasswordAuthenticationToken(
                                 email,
