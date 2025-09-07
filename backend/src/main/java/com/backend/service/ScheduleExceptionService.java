@@ -5,6 +5,7 @@ import com.backend.exception.InvalidScheduleException;
 import com.backend.exception.ResourceNotFoundException;
 import com.backend.model.Lesson;
 import com.backend.model.ScheduleException;
+import com.backend.service.AnnouncementService;
 import com.backend.repository.LessonRepository;
 import com.backend.repository.ScheduleExceptionRepository;
 import jakarta.transaction.Transactional;
@@ -19,6 +20,7 @@ public class ScheduleExceptionService {
 
     private final ScheduleExceptionRepository scheduleExceptionRepository;
     private final LessonRepository lessonRepository;
+    private final AnnouncementService announcementService;
 
     public List<ScheduleException> getAllExceptions() {
         return scheduleExceptionRepository.findAll();
@@ -45,7 +47,21 @@ public class ScheduleExceptionService {
         );
 
         validateException(exception);
-        return scheduleExceptionRepository.save(exception);
+
+        ScheduleException saved = scheduleExceptionRepository.save(exception);
+
+        // 👇 generar anuncio automático si está cancelada
+        if (Boolean.TRUE.equals(saved.getCancelled())) {
+            String message = String.format(
+                    "La clase %s del día %s a las %s ha sido cancelada",
+                    saved.getLesson().getLessonName(),
+                    saved.getDate(),
+                    saved.getStartTime()
+            );
+            announcementService.createAutomaticAnnouncement(message);
+        }
+
+        return saved;
     }
 
     @Transactional
@@ -63,7 +79,21 @@ public class ScheduleExceptionService {
         existing.setLesson(lesson);
 
         validateException(existing);
-        return scheduleExceptionRepository.save(existing);
+
+        ScheduleException saved = scheduleExceptionRepository.save(existing);
+
+        // 👇 si se cancela tras update, generar anuncio
+        if (Boolean.TRUE.equals(saved.getCancelled())) {
+            String message = String.format(
+                    "La clase %s del día %s a las %s ha sido cancelada",
+                    saved.getLesson().getLessonName(),
+                    saved.getDate(),
+                    saved.getStartTime()
+            );
+            announcementService.createAutomaticAnnouncement(message);
+        }
+
+        return saved;
     }
 
     @Transactional
