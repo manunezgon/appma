@@ -1,5 +1,6 @@
 package com.backend.dto;
 
+import com.backend.model.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -21,5 +22,10 @@ public class UserRegisterDTO {
     @NotBlank
     @Size(min = 6)
     private String password;
+
+    @Size(min = 9)
+    private String phone;
+
+    private User.Role role;
 }
 
