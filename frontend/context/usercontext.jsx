@@ -14,7 +14,7 @@ export const UserProvider = ({ children }) => {
       try {
         const token = await SecureStore.getItemAsync('userToken');
         if (token) {
-          const response = await fetch('http://192.168.1.86:8080/users/me', {
+          const response = await fetch('http://192.168.1.91:8080/users/me', {
             headers: { Authorization: `Bearer ${token}` },
           });
           if (response.ok) {

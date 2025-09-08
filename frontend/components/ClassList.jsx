@@ -1,6 +1,6 @@
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import { View, Text, StyleSheet, FlatList, RefreshControl } from "react-native";
 
-export default function ClassList({ classes }) {
+export default function ClassList({ classes, refreshing, onRefresh }) {
   return (
     <View style={styles.container}>
       <Text style={styles.sectionTitle}>Clases del día</Text>
@@ -16,8 +16,12 @@ export default function ClassList({ classes }) {
             <Text style={styles.classTime}>{item.time}</Text>
           </View>
         )}
-        ListEmptyComponent={
-          <Text style={styles.noClasses}>No hay clases programadas.</Text>
+        ListEmptyComponent={<Text style={styles.noClasses}>No hay clases programadas.</Text>}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
         }
       />
     </View>

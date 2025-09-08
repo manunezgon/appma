@@ -10,37 +10,13 @@ import * as SecureStore from 'expo-secure-store';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [userToLogin, setUserToLogin] = useState(null);
+  const [loggingIn, setLoggingIn] = useState(false);
   const router = useRouter();
   const { user, login, loading } = useUser();
 
   useEffect(() => {
-    if (user) {
-      router.replace('/(tabs)');
-    }
+    if (user) router.replace('/(tabs)');
   }, [user]);
-
-  useEffect(() => {
-    if (userToLogin) {
-      (async () => {
-        try {
-          await SecureStore.setItemAsync('userToken', userToLogin.token);
-          login(userToLogin);
-        } catch (error) {
-          console.error('Error guardando token:', error);
-          Alert.alert('Error', 'No se pudo guardar la sesión de manera segura');
-        }
-      })();
-    }
-  }, [userToLogin]);
-
-  if (loading || user) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -48,28 +24,45 @@ export default function Login() {
       return;
     }
 
+    setLoggingIn(true);
+
     try {
-      const response = await fetch('http://192.168.1.86:8080/users/login', {
+      const response = await fetch('http://192.168.1.91:8080/users/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        Alert.alert('Error', errorData.message || 'Credenciales incorrectas');
+        Alert.alert('Error', data.message || 'Credenciales incorrectas');
+        setPassword(''); 
+        setLoggingIn(false);
         return;
       }
 
-      const data = await response.json();
-      setUserToLogin(data);
+      await SecureStore.setItemAsync('userToken', data.token);
+      login(data);
+      router.replace('/(tabs)');
+
     } catch (error) {
       console.error(error);
       Alert.alert('Error', 'No se pudo conectar con el servidor');
+    } finally {
+      setLoggingIn(false);
     }
   };
 
   const goToRegister = () => router.push('/register');
+
+  if (loading || user) {
+    return (
+      <View style={styles.loader}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
   return (
     <KeyboardAwareScrollView
@@ -98,9 +91,13 @@ export default function Login() {
         secureTextEntry 
         style={styles.input} 
       />
-      <TouchableOpacity onPress={handleLogin} style={styles.button}>
-        <Text style={styles.buttonText}>INICIAR SESIÓN</Text>
-      </TouchableOpacity>      
+      <TouchableOpacity onPress={handleLogin} style={styles.button} disabled={loggingIn}>
+        {loggingIn ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>INICIAR SESIÓN</Text>
+        )}
+      </TouchableOpacity>
       <Text style={styles.linkText} onPress={goToRegister}>
         ¿No tienes cuenta? Regístrate
       </Text>
@@ -114,6 +111,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
+  },
+  loader: {
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center'
   },
   logo: {
     width: 200,
@@ -138,6 +140,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#ffffffff",
+    fontSize: 16,
   },
   linkText: {
     color: "#1F0025", 
