@@ -6,18 +6,17 @@ import com.backend.exception.InvalidScheduleException;
 import com.backend.exception.ResourceNotFoundException;
 import com.backend.model.ScheduleException;
 import com.backend.model.ScheduleTemplate;
-import com.backend.repository.LessonRepository;
-import com.backend.repository.ScheduleExceptionRepository;
-import com.backend.repository.ScheduleTemplateRepository;
+import com.backend.model.User;
+import com.backend.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.time.LocalTime;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -26,6 +25,8 @@ public class ScheduleTemplateService {
     private final ScheduleTemplateRepository scheduleTemplateRepository;
     private final LessonRepository lessonRepository;
     private final ScheduleExceptionRepository scheduleExceptionRepository;
+    private final UserRepository userRepository;
+    private final EnrollmentRepository enrollmentRepository;
 
     public List<ScheduleTemplate> getAllScheduleTemplates() {
         return scheduleTemplateRepository.findAll();
@@ -39,7 +40,6 @@ public class ScheduleTemplateService {
 
     public List<ScheduleTemplateResponseDTO> getScheduleForDay(LocalDate date) {
         DayOfWeek dayOfWeek = date.getDayOfWeek();
-
         List<ScheduleTemplate> baseSchedules = scheduleTemplateRepository.findByDayOfWeek(dayOfWeek);
         List<ScheduleException> exceptions = scheduleExceptionRepository.findByDate(date);
 
@@ -62,7 +62,8 @@ public class ScheduleTemplateService {
                                 e.getEndTime(),
                                 schedule.getLesson().getId(),
                                 schedule.getLesson().getLessonName(),
-                                schedule.getLesson().getProfessorName()
+                                schedule.getLesson().getProfessorName(),
+                                false
                         ));
                     }
 
@@ -73,11 +74,56 @@ public class ScheduleTemplateService {
                             schedule.getEndTime(),
                             schedule.getLesson().getId(),
                             schedule.getLesson().getLessonName(),
-                            schedule.getLesson().getProfessorName()
+                            schedule.getLesson().getProfessorName(),
+                            false
                     ));
                 })
                 .toList();
     }
+
+    public List<ScheduleTemplateResponseDTO> getScheduleForDay(LocalDate date, Long userId) {
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
+        List<ScheduleTemplate> baseSchedules = scheduleTemplateRepository.findByDayOfWeek(dayOfWeek);
+        List<ScheduleException> exceptions = scheduleExceptionRepository.findByDate(date);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + userId));
+
+        Set<Long> enrolledTemplateIds = enrollmentRepository.findByUserAndDate(user, date)
+                .stream()
+                .map(e -> e.getScheduleTemplate().getId())
+                .collect(Collectors.toSet());
+
+        return baseSchedules.stream()
+                .flatMap(schedule -> {
+                    Optional<ScheduleException> exception = exceptions.stream()
+                            .filter(e -> e.getLesson().getId().equals(schedule.getLesson().getId()))
+                            .findFirst();
+
+                    if (exception.isPresent() && Boolean.TRUE.equals(exception.get().getCancelled())) {
+                        return Stream.empty();
+                    }
+
+                    LocalTime start = exception.map(ScheduleException::getStartTime).orElse(schedule.getStartTime());
+                    LocalTime end = exception.map(ScheduleException::getEndTime).orElse(schedule.getEndTime());
+
+                    boolean isEnrolled = enrolledTemplateIds.contains(schedule.getId());
+
+                    return Stream.of(new ScheduleTemplateResponseDTO(
+                            schedule.getId(),
+                            schedule.getDayOfWeek(),
+                            start,
+                            end,
+                            schedule.getLesson().getId(),
+                            schedule.getLesson().getLessonName(),
+                            schedule.getLesson().getProfessorName(),
+                            isEnrolled
+                    ));
+                })
+                .toList();
+    }
+
+
 
     @Transactional
     public ScheduleTemplate createScheduleTemplate(ScheduleTemplateRequestDTO dto) {
@@ -89,7 +135,8 @@ public class ScheduleTemplateService {
                 dto.dayOfWeek(),
                 dto.startTime(),
                 dto.endTime(),
-                lesson
+                lesson,
+                new ArrayList<>()
         );
         validateScheduleTemplate(scheduleTemplate);
         return scheduleTemplateRepository.save(scheduleTemplate);
@@ -102,7 +149,6 @@ public class ScheduleTemplateService {
 
         var lesson = lessonRepository.findById(dto.lessonId())
                 .orElseThrow(() -> new ResourceNotFoundException("Lesson not found with id " + dto.lessonId()));
-
 
         existing.setDayOfWeek(dto.dayOfWeek());
         existing.setStartTime(dto.startTime());

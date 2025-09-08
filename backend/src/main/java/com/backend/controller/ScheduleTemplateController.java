@@ -3,11 +3,15 @@ package com.backend.controller;
 import com.backend.dto.ScheduleTemplateRequestDTO;
 import com.backend.dto.ScheduleTemplateResponseDTO;
 import com.backend.model.ScheduleTemplate;
+import com.backend.model.User;
+import com.backend.security.JwtUtil;
 import com.backend.service.ScheduleTemplateService;
+import com.backend.service.UserService; // asumiendo que tienes un UserService para obtener el usuario del token
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -18,7 +22,9 @@ import java.util.stream.Collectors;
 @RequestMapping("/scheduleTemplates")
 @RequiredArgsConstructor
 public class ScheduleTemplateController {
+
     private final ScheduleTemplateService scheduleTemplateService;
+    private final JwtUtil jwtUtil;
 
     // --- Helpers ---
     private ScheduleTemplateResponseDTO toDTO(ScheduleTemplate scheduleTemplate) {
@@ -29,7 +35,8 @@ public class ScheduleTemplateController {
                 scheduleTemplate.getEndTime(),
                 scheduleTemplate.getLesson().getId(),
                 scheduleTemplate.getLesson().getLessonName(),
-                scheduleTemplate.getLesson().getProfessorName()
+                scheduleTemplate.getLesson().getProfessorName(),
+                false // default isEnrolled para endpoints globales
         );
     }
 
@@ -53,10 +60,13 @@ public class ScheduleTemplateController {
 
     @GetMapping("/day")
     public ResponseEntity<List<ScheduleTemplateResponseDTO>> getScheduleForDay(
-            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestHeader("Authorization") String authHeader) {
 
-        List<ScheduleTemplateResponseDTO> schedule = scheduleTemplateService.getScheduleForDay(date);
-        return ResponseEntity.ok(schedule);
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtUtil.extractUserId(token);
+
+        return ResponseEntity.ok(scheduleTemplateService.getScheduleForDay(date, userId));
     }
 
     @PostMapping
