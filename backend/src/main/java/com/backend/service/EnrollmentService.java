@@ -11,6 +11,7 @@ import com.backend.repository.EnrollmentRepository;
 import com.backend.repository.ScheduleExceptionRepository;
 import com.backend.repository.ScheduleTemplateRepository;
 import com.backend.repository.UserRepository;
+import com.backend.security.JwtUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,11 +28,30 @@ public class EnrollmentService {
     private final UserRepository userRepository;
     private final ScheduleTemplateRepository scheduleTemplateRepository;
     private final ScheduleExceptionRepository scheduleExceptionRepository;
+    private final JwtUtil jwtUtil;
+
+    public List<EnrollmentResponseDTO> getMyEnrollments(String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtUtil.extractUserId(token);
+        return getEnrollmentsByUser(userId);
+    }
+
+    public List<EnrollmentResponseDTO> getEnrollmentsByUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + userId));
+
+        return enrollmentRepository.findByUser(user)
+                .stream().map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
 
     @Transactional
-    public EnrollmentResponseDTO enrollUser(EnrollmentRequestDTO dto) {
-        User user = userRepository.findById(dto.userId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + dto.userId()));
+    public EnrollmentResponseDTO enrollUser(EnrollmentRequestDTO dto, String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtUtil.extractUserId(token);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + userId));
 
         ScheduleTemplate template = scheduleTemplateRepository.findById(dto.scheduleTemplateId())
                 .orElseThrow(() -> new ResourceNotFoundException("ScheduleTemplate not found with id " + dto.scheduleTemplateId()));
@@ -65,33 +85,22 @@ public class EnrollmentService {
         return mapToDTO(saved);
     }
 
-    public List<EnrollmentResponseDTO> getAllEnrollments() {
-        return enrollmentRepository.findAll().stream()
-                .map(this::mapToDTO)
-                .collect(Collectors.toList());
-    }
+    public void deleteEnrollment(Long id, String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtUtil.extractUserId(token);
 
-    public List<EnrollmentResponseDTO> getEnrollmentsByUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + userId));
-
-        return enrollmentRepository.findByUser(user).stream()
-                .map(this::mapToDTO)
-                .collect(Collectors.toList());
-    }
-
-    public void deleteEnrollment(Long id) {
         Enrollment enrollment = enrollmentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Enrollment not found with id " + id));
+
+        if (!enrollment.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("You are not allowed to delete this enrollment");
+        }
+
         enrollmentRepository.delete(enrollment);
     }
 
-    public List<EnrollmentResponseDTO> getUsersByClassAndDate(Long scheduleTemplateId, LocalDate date) {
-        ScheduleTemplate template = scheduleTemplateRepository.findById(scheduleTemplateId)
-                .orElseThrow(() -> new ResourceNotFoundException("ScheduleTemplate not found with id " + scheduleTemplateId));
-
-        return enrollmentRepository.findByScheduleTemplateAndDate(template, date)
-                .stream()
+    public List<EnrollmentResponseDTO> getAllEnrollments() {
+        return enrollmentRepository.findAll().stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }

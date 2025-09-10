@@ -1,7 +1,8 @@
-import { useEffect, useState, useCallback, useContext } from "react";
-import { Text, View, FlatList, StyleSheet, RefreshControl } from "react-native";
-import { useFocusEffect } from '@react-navigation/native'; 
-import { useUser } from '../../context/usercontext'
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback, useState } from "react";
+import { FlatList, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { useUser } from '../../context/usercontext';
+import { API_BASE_URL } from "../config"
 
 export default function News() {
   const [announcements, setAnnouncements] = useState([]);
@@ -10,7 +11,7 @@ export default function News() {
 
   const fetchAnnouncements = async () => {
     try {
-      const response = await fetch("http://192.168.1.91:8080/announcements", {
+      const response = await fetch(`${API_BASE_URL}/announcements`, {
         headers: {
           Authorization: `Bearer ${user?.token}`,
         },

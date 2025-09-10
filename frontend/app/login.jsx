@@ -1,11 +1,12 @@
 'use client';
 
 import { useRouter } from 'expo-router';
-import { useState, useEffect } from 'react';
-import { Alert, Image, Platform, StyleSheet, Text, TextInput, TouchableOpacity, ActivityIndicator, View } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, Image, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useUser } from '../context/usercontext';
-import * as SecureStore from 'expo-secure-store';
+import { API_BASE_URL } from "./config"
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -27,7 +28,7 @@ export default function Login() {
     setLoggingIn(true);
 
     try {
-      const response = await fetch('http://192.168.1.91:8080/users/login', {
+      const response = await fetch(`${API_BASE_URL}/users/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

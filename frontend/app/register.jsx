@@ -1,11 +1,12 @@
 'use client';
 
 import { useRouter } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
 import { useState } from 'react';
-import { Alert, Image, Platform, StyleSheet, Text, TextInput, TouchableOpacity, ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, Platform, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useUser } from '../context/usercontext';
-import * as SecureStore from 'expo-secure-store';
+import { API_BASE_URL } from "./config"
 
 export default function Register() {
   const [name, setName] = useState('');
@@ -26,7 +27,7 @@ export default function Register() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://192.168.1.91:8080/users/register', {
+      const response = await fetch(`${API_BASE_URL}/users/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, phone }),
@@ -40,7 +41,7 @@ export default function Register() {
         return;
       }
 
-      const loginResponse = await fetch('http://192.168.1.91:8080/users/login', {
+      const loginResponse = await fetch(`${API_BASE_URL}/users/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

@@ -21,19 +21,24 @@ public class EnrollmentController {
         return ResponseEntity.ok(enrollmentService.getAllEnrollments());
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<EnrollmentResponseDTO>> getEnrollmentsByUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(enrollmentService.getEnrollmentsByUser(userId));
+    @GetMapping("/me")
+    public ResponseEntity<List<EnrollmentResponseDTO>> getMyEnrollments(
+            @RequestHeader("Authorization") String authHeader) {
+        return ResponseEntity.ok(enrollmentService.getMyEnrollments(authHeader));
     }
 
     @PostMapping
-    public ResponseEntity<EnrollmentResponseDTO> createEnrollment(@RequestBody EnrollmentRequestDTO request) {
-        return ResponseEntity.ok(enrollmentService.enrollUser(request));
+    public ResponseEntity<EnrollmentResponseDTO> createEnrollment(
+            @RequestBody EnrollmentRequestDTO request,
+            @RequestHeader("Authorization") String authHeader) {
+        return ResponseEntity.ok(enrollmentService.enrollUser(request, authHeader));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEnrollment(@PathVariable Long id) {
-        enrollmentService.deleteEnrollment(id);
+    public ResponseEntity<Void> deleteEnrollment(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String authHeader) {
+        enrollmentService.deleteEnrollment(id, authHeader);
         return ResponseEntity.noContent().build();
     }
 }

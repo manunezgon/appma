@@ -1,9 +1,10 @@
-import { View, StyleSheet } from "react-native";
-import { useState, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import Calendar from "../../components/WeekCalendar";
+import { useCallback, useState } from "react";
+import { StyleSheet, View } from "react-native";
 import ClassList from "../../components/ClassList";
+import Calendar from "../../components/WeekCalendar";
 import { useUser } from "../../context/usercontext";
+import { API_BASE_URL } from "../config"
 
 export default function HomeScreen() {
   const [selectedDay, setSelectedDay] = useState(new Date());
@@ -15,7 +16,7 @@ export default function HomeScreen() {
     try {
       const dateStr = selectedDay.toISOString().split("T")[0];
       const response = await fetch(
-        `http://192.168.1.91:8080/scheduleTemplates/day?date=${dateStr}`,
+        `${API_BASE_URL}/scheduleTemplates/day?date=${dateStr}`,
         { headers: { Authorization: `Bearer ${user?.token}` } }
       );
 
@@ -36,7 +37,7 @@ export default function HomeScreen() {
         lessonName: item.lessonName,
         professorName: item.professorName,
         time: `${item.startTime.slice(0, 5)} - ${item.endTime.slice(0, 5)}`,
-        isEnrolled: item.isEnrolled, // ahora sí usamos la info del backend
+        isEnrolled: item.isEnrolled, 
       }));
 
       mapped.sort((a, b) => {
@@ -64,7 +65,7 @@ export default function HomeScreen() {
     try {
       const dateStr = selectedDay.toISOString().split("T")[0];
 
-      const response = await fetch(`http://192.168.1.91:8080/enrollments`, {
+      const response = await fetch(`${API_BASE_URL}/enrollments`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -72,7 +73,7 @@ export default function HomeScreen() {
         },
         body: JSON.stringify({
           scheduleTemplateId,
-          date: dateStr, // ya no enviamos userId
+          date: dateStr, 
         }),
       });
 
