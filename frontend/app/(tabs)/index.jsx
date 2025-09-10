@@ -12,46 +12,47 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const { user } = useUser();
 
-  const fetchClasses = async () => {
-    try {
-      const dateStr = selectedDay.toISOString().split("T")[0];
-      const response = await fetch(
-        `${API_BASE_URL}/scheduleTemplates/day?date=${dateStr}`,
-        { headers: { Authorization: `Bearer ${user?.token}` } }
-      );
+const formatTime = (time) => time.slice(0, 5);
 
-      if (!response.ok) {
-        console.error(`HTTP error! status: ${response.status}`);
-        setClasses([]);
-        return;
-      }
+const toMinutes = (timeString) => {
+  const [hours, minutes] = timeString.split(":").map(Number);
+  return hours * 60 + minutes;
+};
 
-      const data = await response.json();
-      if (!Array.isArray(data)) {
-        setClasses([]);
-        return;
-      }
+const mapClassData = (item) => {
+  const start = formatTime(item.startTime);
+  const end = formatTime(item.endTime);
 
-      const mapped = data.map((item) => ({
-        id: item.id.toString(),
-        lessonName: item.lessonName,
-        professorName: item.professorName,
-        time: `${item.startTime.slice(0, 5)} - ${item.endTime.slice(0, 5)}`,
-        isEnrolled: item.isEnrolled, 
-      }));
-
-      mapped.sort((a, b) => {
-        const [hA, mA] = a.time.split(" - ")[0].split(":").map(Number);
-        const [hB, mB] = b.time.split(" - ")[0].split(":").map(Number);
-        return hA !== hB ? hA - hB : mA - mB;
-      });
-
-      setClasses(mapped);
-    } catch (error) {
-      console.error("Error fetching classes:", error);
-      setClasses([]);
-    }
+  return {
+    id: String(item.id ?? ""),
+    lessonName: item.lessonName,
+    professorName: item.professorName,
+    time: `${start} - ${end}`,
+    startMinutes: toMinutes(start),
+    isEnrolled: item.isEnrolled,
   };
+};
+
+const fetchClasses = async () => {
+  try {
+    const dateStr = selectedDay.toISOString().split("T")[0];
+    const res = await fetch(`${API_BASE_URL}/scheduleTemplates/day?date=${dateStr}`, {
+      headers: { Authorization: `Bearer ${user?.token}` },
+    });
+
+    if (!res.ok) throw new Error(`HTTP status ${res.status}`);
+
+    const data = await res.json();
+    if (!Array.isArray(data)) throw new Error("Data is not an array");
+
+    const mapped = data.map(mapClassData).sort((a, b) => a.startMinutes - b.startMinutes);
+    setClasses(mapped);
+  } catch (error) {
+    console.error("Error fetching classes:", error);
+    setClasses([]);
+  }
+};
+
 
   useFocusEffect(useCallback(() => { fetchClasses(); }, [selectedDay]));
 

@@ -41,7 +41,7 @@ public class EnrollmentService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + userId));
 
         return enrollmentRepository.findByUser(user)
-                .stream().map(this::mapToDTO)
+                .stream().map(this::ToDTO)
                 .collect(Collectors.toList());
     }
 
@@ -82,7 +82,7 @@ public class EnrollmentService {
 
         Enrollment saved = enrollmentRepository.save(enrollment);
 
-        return mapToDTO(saved);
+        return ToDTO(saved);
     }
 
     public void deleteEnrollment(Long id, String authHeader) {
@@ -101,11 +101,11 @@ public class EnrollmentService {
 
     public List<EnrollmentResponseDTO> getAllEnrollments() {
         return enrollmentRepository.findAll().stream()
-                .map(this::mapToDTO)
+                .map(this::ToDTO)
                 .collect(Collectors.toList());
     }
 
-    private EnrollmentResponseDTO mapToDTO(Enrollment e) {
+    private EnrollmentResponseDTO ToDTO(Enrollment e) {
         return new EnrollmentResponseDTO(
                 e.getId(),
                 e.getUser().getId(),
