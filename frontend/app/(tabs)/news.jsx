@@ -1,22 +1,57 @@
-import { useEffect, useState } from "react";
-import { Text, View, FlatList, StyleSheet } from "react-native";
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback, useState } from "react";
+import { FlatList, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { useUser } from '../../context/usercontext';
+import { API_BASE_URL } from "../config"
 
 export default function News() {
   const [announcements, setAnnouncements] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const { user } = useUser();
 
-  useEffect(() => {
-    const fetchAnnouncements = async () => {
-      try {
-        const response = await fetch("http://192.168.1.86:8080/announcements"); // 👈 tu endpoint
-        const data = await response.json();
-        setAnnouncements(data);
-      } catch (error) {
-        console.error("Error fetching announcements:", error);
+  const fetchAnnouncements = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/announcements`, {
+        headers: {
+          Authorization: `Bearer ${user?.token}`,
+        },
+      });
+
+      if (!response.ok) {
+        console.error(`HTTP error! status: ${response.status}`);
+        setAnnouncements([]);
+        return;
       }
-    };
 
-    fetchAnnouncements();
-  }, []);
+      const text = await response.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (err) {
+        console.error("Failed to parse JSON:", text);
+        setAnnouncements([]);
+        return;
+      }
+
+      setAnnouncements(Array.isArray(data) ? data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) : []);
+
+    } catch (error) {
+      console.error("Error fetching announcements:", error);
+      setAnnouncements([]);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchAnnouncements();
+    }, [user])
+  );
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchAnnouncements();
+    setRefreshing(false);
+  };
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>
@@ -38,9 +73,11 @@ export default function News() {
           data={announcements}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
         />
       )}
-
     </View>
   );
 }

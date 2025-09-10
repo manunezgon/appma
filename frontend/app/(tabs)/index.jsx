@@ -1,56 +1,104 @@
-import { View, StyleSheet } from "react-native";
-import { useState, useEffect } from "react";
-import Calendar from "../../components/WeekCalendar";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback, useState } from "react";
+import { StyleSheet, View } from "react-native";
 import ClassList from "../../components/ClassList";
+import Calendar from "../../components/WeekCalendar";
+import { useUser } from "../../context/usercontext";
+import { API_BASE_URL } from "../config"
 
 export default function HomeScreen() {
   const [selectedDay, setSelectedDay] = useState(new Date());
   const [classes, setClasses] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const { user } = useUser();
 
-  const getDayOfWeek = (date) => {
-    const days = ["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"];
-    return days[date.getDay()];
+const formatTime = (time) => time.slice(0, 5);
+
+const toMinutes = (timeString) => {
+  const [hours, minutes] = timeString.split(":").map(Number);
+  return hours * 60 + minutes;
+};
+
+const mapClassData = (item) => {
+  const start = formatTime(item.startTime);
+  const end = formatTime(item.endTime);
+
+  return {
+    id: String(item.id ?? ""),
+    lessonName: item.lessonName,
+    professorName: item.professorName,
+    time: `${start} - ${end}`,
+    startMinutes: toMinutes(start),
+    isEnrolled: item.isEnrolled,
+  };
+};
+
+const fetchClasses = async () => {
+  try {
+    const dateStr = selectedDay.toISOString().split("T")[0];
+    const res = await fetch(`${API_BASE_URL}/scheduleTemplates/day?date=${dateStr}`, {
+      headers: { Authorization: `Bearer ${user?.token}` },
+    });
+
+    if (!res.ok) throw new Error(`HTTP status ${res.status}`);
+
+    const data = await res.json();
+    if (!Array.isArray(data)) throw new Error("Data is not an array");
+
+    const mapped = data.map(mapClassData).sort((a, b) => a.startMinutes - b.startMinutes);
+    setClasses(mapped);
+  } catch (error) {
+    console.error("Error fetching classes:", error);
+    setClasses([]);
+  }
+};
+
+
+  useFocusEffect(useCallback(() => { fetchClasses(); }, [selectedDay]));
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchClasses();
+    setRefreshing(false);
   };
 
-  useEffect(() => {
-    const fetchClasses = async () => {
-      try {
-        const dateStr = selectedDay.toISOString().split("T")[0];
-        const response = await fetch(`http://192.168.1.86:8080/scheduleTemplates/day?date=${dateStr}`);
+  const handleEnroll = async (scheduleTemplateId) => {
+    try {
+      const dateStr = selectedDay.toISOString().split("T")[0];
 
-        const data = await response.json();
-        if (!Array.isArray(data)) {
-          console.warn("⚠️ Backend returned unexpected data:", data);
-          setClasses([]);
-          return;
-        }
-        const mapped = data.map(item => ({
-          id: item.id.toString(),
-          lessonName: item.lessonName,
-          professorName: item.professorName,
-          time: `${item.startTime.slice(0,5)} - ${item.endTime.slice(0,5)}`
-        }));
+      const response = await fetch(`${API_BASE_URL}/enrollments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user?.token}`,
+        },
+        body: JSON.stringify({
+          scheduleTemplateId,
+          date: dateStr, 
+        }),
+      });
 
-        mapped.sort((a, b) => {
-          const [hourA, minuteA] = a.time.split(' - ')[0].split(':').map(Number);
-          const [hourB, minuteB] = b.time.split(' - ')[0].split(':').map(Number);
-          return hourA !== hourB ? hourA - hourB : minuteA - minuteB;
-        });
+      if (!response.ok) throw new Error("Error enrolling");
 
-        setClasses(mapped);
-      } catch (error) {
-        console.error("Error fetching classes:", error);
-      }
-    };
-
-
-    fetchClasses();
-  }, [selectedDay]);
+      setClasses((prev) =>
+        prev.map((cls) =>
+          cls.id === scheduleTemplateId ? { ...cls, isEnrolled: true } : cls
+        )
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <View style={styles.container}>
       <Calendar selectedDay={selectedDay} setSelectedDay={setSelectedDay} />
-      <ClassList classes={classes} />
+      <ClassList
+        classes={classes}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+        onEnroll={handleEnroll}
+      />
     </View>
   );
 }

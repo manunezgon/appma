@@ -1,7 +1,8 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { API_BASE_URL } from "../app/config"
 
 const UserContext = createContext();
 
@@ -14,7 +15,7 @@ export const UserProvider = ({ children }) => {
       try {
         const token = await SecureStore.getItemAsync('userToken');
         if (token) {
-          const response = await fetch('http://192.168.1.86:8080/users/me', {
+          const response = await fetch(`${API_BASE_URL}/users/me`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           if (response.ok) {

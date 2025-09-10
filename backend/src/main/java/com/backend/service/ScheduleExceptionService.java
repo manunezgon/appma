@@ -50,10 +50,9 @@ public class ScheduleExceptionService {
 
         ScheduleException saved = scheduleExceptionRepository.save(exception);
 
-        // 👇 generar anuncio automático si está cancelada
         if (Boolean.TRUE.equals(saved.getCancelled())) {
             String message = String.format(
-                    "La clase %s del día %s a las %s ha sido cancelada",
+                    "The %s class on %s at %s has been canceled.",
                     saved.getLesson().getLessonName(),
                     saved.getDate(),
                     saved.getStartTime()
@@ -82,10 +81,9 @@ public class ScheduleExceptionService {
 
         ScheduleException saved = scheduleExceptionRepository.save(existing);
 
-        // 👇 si se cancela tras update, generar anuncio
         if (Boolean.TRUE.equals(saved.getCancelled())) {
             String message = String.format(
-                    "La clase %s del día %s a las %s ha sido cancelada",
+                    "The %s class on %s at %s has been canceled.",
                     saved.getLesson().getLessonName(),
                     saved.getDate(),
                     saved.getStartTime()

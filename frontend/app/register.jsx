@@ -1,11 +1,12 @@
 'use client';
 
 import { useRouter } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
 import { useState } from 'react';
-import { Alert, Image, Platform, StyleSheet, Text, TextInput, TouchableOpacity, ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, Platform, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useUser } from '../context/usercontext';
-import * as SecureStore from 'expo-secure-store';
+import { API_BASE_URL } from "./config"
 
 export default function Register() {
   const [name, setName] = useState('');
@@ -13,6 +14,7 @@ export default function Register() {
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
+
   const router = useRouter();
   const { login } = useUser();
 
@@ -25,39 +27,39 @@ export default function Register() {
     setLoading(true);
 
     try {
-      // Registro
-      const response = await fetch('http://192.168.1.86:8080/users/register', {
+      const response = await fetch(`${API_BASE_URL}/users/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, phone }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        Alert.alert('Error', errorData.message || 'No se pudo registrar');
+        Alert.alert('Error', data.message || 'No se pudo registrar');
         setLoading(false);
         return;
       }
 
-      const tokenResponse = await fetch('http://192.168.1.86:8080/users/login', {
+      const loginResponse = await fetch(`${API_BASE_URL}/users/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
 
-      if (!tokenResponse.ok) {
+      const tokenData = await loginResponse.json();
+
+      if (!loginResponse.ok) {
         Alert.alert('Registro exitoso, pero no se pudo iniciar sesión automáticamente');
         router.replace('/login');
         setLoading(false);
         return;
       }
 
-      const tokenData = await tokenResponse.json(); 
-
       await SecureStore.setItemAsync('userToken', tokenData.token);
+      login(tokenData);
+      router.replace('/(tabs)');
 
-      login(tokenData); 
-      router.replace('/(tabs)'); 
     } catch (error) {
       console.error(error);
       Alert.alert('Error', 'No se pudo conectar con el servidor');
@@ -65,14 +67,6 @@ export default function Register() {
       setLoading(false);
     }
   };
-
-  if (loading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#564D58' }}>
-        <ActivityIndicator size="large" color="#fff" />
-      </View>
-    );
-  }
 
   return (
     <KeyboardAwareScrollView
@@ -91,8 +85,13 @@ export default function Register() {
       <TextInput placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" style={styles.input} />
       <TextInput placeholder="Contraseña" value={password} onChangeText={setPassword} secureTextEntry style={styles.input} />
       <TextInput placeholder="Teléfono" value={phone} onChangeText={setPhone} style={styles.input} />
-      <TouchableOpacity onPress={handleRegister} style={styles.button}>
-        <Text style={styles.buttonText}>REGISTRARSE</Text>
+
+      <TouchableOpacity onPress={handleRegister} style={styles.button} disabled={loading}>
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>REGISTRARSE</Text>
+        )}
       </TouchableOpacity>
     </KeyboardAwareScrollView>
   );
@@ -100,7 +99,7 @@ export default function Register() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
@@ -128,5 +127,6 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#ffffffff",
+    fontSize: 16,
   },
 });

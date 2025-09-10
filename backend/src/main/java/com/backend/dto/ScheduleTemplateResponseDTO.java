@@ -1,7 +1,6 @@
 package com.backend.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 
@@ -12,5 +11,6 @@ public record ScheduleTemplateResponseDTO(
         @JsonFormat(pattern = "HH:mm") LocalTime endTime,
         Long lessonId,
         String lessonName,
-        String professorName
+        String professorName,
+        boolean isEnrolled
 ) {}
