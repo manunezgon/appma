@@ -1,7 +1,6 @@
 package com.backend.service;
 
 import com.backend.dto.EnrollmentRequestDTO;
-import com.backend.dto.EnrollmentResponseDTO;
 import com.backend.exception.ResourceNotFoundException;
 import com.backend.model.Enrollment;
 import com.backend.model.ScheduleException;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,23 +28,21 @@ public class EnrollmentService {
     private final ScheduleExceptionRepository scheduleExceptionRepository;
     private final JwtUtil jwtUtil;
 
-    public List<EnrollmentResponseDTO> getMyEnrollments(String authHeader) {
+    public List<Enrollment> getMyEnrollments(String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         Long userId = jwtUtil.extractUserId(token);
         return getEnrollmentsByUser(userId);
     }
 
-    public List<EnrollmentResponseDTO> getEnrollmentsByUser(Long userId) {
+    public List<Enrollment> getEnrollmentsByUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + userId));
 
-        return enrollmentRepository.findByUser(user)
-                .stream().map(this::ToDTO)
-                .collect(Collectors.toList());
+        return enrollmentRepository.findByUser(user);
     }
 
     @Transactional
-    public EnrollmentResponseDTO enrollUser(EnrollmentRequestDTO dto, String authHeader) {
+    public Enrollment enrollUser(EnrollmentRequestDTO dto, String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         Long userId = jwtUtil.extractUserId(token);
 
@@ -80,9 +76,7 @@ public class EnrollmentService {
         enrollment.setScheduleTemplate(template);
         enrollment.setDate(date);
 
-        Enrollment saved = enrollmentRepository.save(enrollment);
-
-        return ToDTO(saved);
+        return enrollmentRepository.save(enrollment);
     }
 
     public void deleteEnrollment(Long id, String authHeader) {
@@ -99,22 +93,7 @@ public class EnrollmentService {
         enrollmentRepository.delete(enrollment);
     }
 
-    public List<EnrollmentResponseDTO> getAllEnrollments() {
-        return enrollmentRepository.findAll().stream()
-                .map(this::ToDTO)
-                .collect(Collectors.toList());
-    }
-
-    private EnrollmentResponseDTO ToDTO(Enrollment e) {
-        return new EnrollmentResponseDTO(
-                e.getId(),
-                e.getUser().getId(),
-                e.getUser().getName(),
-                e.getScheduleTemplate().getId(),
-                e.getScheduleTemplate().getLesson().getLessonName(),
-                e.getScheduleTemplate().getLesson().getProfessorName(),
-                e.getScheduleTemplate().getStartTime() + " - " + e.getScheduleTemplate().getEndTime(),
-                e.getDate()
-        );
+    public List<Enrollment> getAllEnrollments() {
+        return enrollmentRepository.findAll();
     }
 }
