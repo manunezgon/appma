@@ -3,11 +3,14 @@ package com.backend.service;
 import com.backend.dto.ScheduleExceptionRequestDTO;
 import com.backend.exception.InvalidScheduleException;
 import com.backend.exception.ResourceNotFoundException;
+import com.backend.model.Enrollment;
 import com.backend.model.Lesson;
 import com.backend.model.ScheduleException;
-import com.backend.service.AnnouncementService;
+import com.backend.model.ScheduleTemplate;
+import com.backend.repository.EnrollmentRepository;
 import com.backend.repository.LessonRepository;
 import com.backend.repository.ScheduleExceptionRepository;
+import com.backend.repository.ScheduleTemplateRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,8 @@ public class ScheduleExceptionService {
     private final ScheduleExceptionRepository scheduleExceptionRepository;
     private final LessonRepository lessonRepository;
     private final AnnouncementService announcementService;
+    private final EnrollmentRepository enrollmentRepository;
+    private final ScheduleTemplateRepository scheduleTemplateRepository;
 
     public List<ScheduleException> getAllExceptions() {
         return scheduleExceptionRepository.findAll();
@@ -30,6 +35,14 @@ public class ScheduleExceptionService {
         validateId(id);
         return scheduleExceptionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("ScheduleException not found with id " + id));
+    }
+
+    private void dropEnrollmentsCancelled(ScheduleException scheduleException) {
+        List<ScheduleTemplate> templates = scheduleTemplateRepository.findByStartTime(scheduleException.getStartTime());
+        for (ScheduleTemplate template : templates) {
+            List<Enrollment> enrollments = enrollmentRepository.findByScheduleTemplateAndDate(template, scheduleException.getDate());
+            enrollmentRepository.deleteAll(enrollments);
+        }
     }
 
     @Transactional
@@ -58,6 +71,7 @@ public class ScheduleExceptionService {
                     saved.getStartTime()
             );
             announcementService.createAutomaticAnnouncement(message);
+            dropEnrollmentsCancelled(saved);
         }
 
         return saved;
@@ -89,6 +103,7 @@ public class ScheduleExceptionService {
                     saved.getStartTime()
             );
             announcementService.createAutomaticAnnouncement(message);
+            dropEnrollmentsCancelled(saved);
         }
 
         return saved;
