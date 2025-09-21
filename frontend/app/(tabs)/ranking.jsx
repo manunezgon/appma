@@ -13,7 +13,7 @@ export default function Ranking() {
   useEffect(() => {
     if (!user?.id) return; 
 
-    fetch(`${API_BASE_URL}/metrics/${user.id}`, {
+    fetch(`${API_BASE_URL}/metrics/me`, {
         headers: {
           Authorization: `Bearer ${user?.token}`,
         },

@@ -21,13 +21,11 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     nativeQuery = true)
     int countByUserCurrentMonth(Long userId);
 
-    // Total class attendend on current year
     @Query(value = """
     SELECT COUNT(*) FROM enrollments e WHERE user_id = :userId AND YEAR(date) = YEAR(CURRENT_DATE)""",
     nativeQuery = true)
     int countByUserCurrentYear(Long userId);
 
-    // Lesson a la que más asistió un usuario
     @Query("""
         SELECT e.scheduleTemplate.lesson.lessonName, COUNT(e) as cnt
         FROM Enrollment e
@@ -40,7 +38,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     @Query(value = """
         SELECT e.scheduleTemplate.lesson.lessonName, COUNT(e) as cnt
         FROM Enrollment e
-        WHERE e.user.id = :userId AND
+        WHERE e.user.id = :userId
         AND FUNCTION('YEAR', e.date) = FUNCTION('YEAR', CURRENT_DATE)
         GROUP BY e.scheduleTemplate.lesson.lessonName
         ORDER BY cnt DESC

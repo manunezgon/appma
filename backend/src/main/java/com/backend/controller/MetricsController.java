@@ -13,15 +13,15 @@ public class MetricsController {
 
     private final MetricsService metricsService;
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<UserMetricsDTO> getUserMetrics(@PathVariable Long userId) {
+    @GetMapping("/me")
+    public ResponseEntity<UserMetricsDTO> getUserMetrics(@RequestHeader("Authorization") String authHeader) {
         UserMetricsDTO metrics = new UserMetricsDTO(
-                metricsService.getTotalClasses(userId),
-                metricsService.getClassesThisMonth(userId),
-                metricsService.getClassesThisYear(userId),
-                metricsService.getMostAttendedLesson(userId),
-                metricsService.getMostAttendedLessonInCurrentMonth(userId),
-                metricsService.getMostAttendedLessonInCurrentYear(userId)
+                metricsService.getTotalClasses(authHeader),
+                metricsService.getClassesThisMonth(authHeader),
+                metricsService.getClassesThisYear(authHeader),
+                metricsService.getMostAttendedLesson(authHeader),
+                metricsService.getMostAttendedLessonInCurrentMonth(authHeader),
+                metricsService.getMostAttendedLessonInCurrentYear(authHeader)
         );
         return ResponseEntity.ok(metrics);
     }
