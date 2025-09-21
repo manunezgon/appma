@@ -4,6 +4,7 @@ import com.backend.model.Enrollment;
 import com.backend.model.ScheduleTemplate;
 import com.backend.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -13,5 +14,48 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     List<Enrollment> findByUser(User user);
     List<Enrollment> findByScheduleTemplateAndDate(ScheduleTemplate template, LocalDate date);
     List<Enrollment> findByUserAndDate(User user, LocalDate date);
+
+    //METRICS//
+    @Query(value = """
+    SELECT COUNT(*) FROM enrollments e WHERE user_id = :userId AND MONTH(date) = MONTH(CURRENT_DATE) AND YEAR(date) = YEAR(CURRENT_DATE)""",
+    nativeQuery = true)
+    int countByUserCurrentMonth(Long userId);
+
+    // Total class attendend on current year
+    @Query(value = """
+    SELECT COUNT(*) FROM enrollments e WHERE user_id = :userId AND YEAR(date) = YEAR(CURRENT_DATE)""",
+    nativeQuery = true)
+    int countByUserCurrentYear(Long userId);
+
+    // Lesson a la que más asistió un usuario
+    @Query("""
+        SELECT e.scheduleTemplate.lesson.lessonName, COUNT(e) as cnt
+        FROM Enrollment e
+        WHERE e.user.id = :userId
+        GROUP BY e.scheduleTemplate.lesson.lessonName
+        ORDER BY cnt DESC
+        """)
+    List<Object[]> findMostAttendedLessonByUser(Long userId);
+
+    @Query(value = """
+        SELECT e.scheduleTemplate.lesson.lessonName, COUNT(e) as cnt
+        FROM Enrollment e
+        WHERE e.user.id = :userId AND
+        AND FUNCTION('YEAR', e.date) = FUNCTION('YEAR', CURRENT_DATE)
+        GROUP BY e.scheduleTemplate.lesson.lessonName
+        ORDER BY cnt DESC
+        """)
+    List<Object[]> findMostAttendedLessonByUserCurrentYear(Long userId);
+
+    @Query(value = """
+        SELECT e.scheduleTemplate.lesson.lessonName, COUNT(e) as cnt
+        FROM Enrollment e
+        WHERE e.user.id = :userId
+        AND FUNCTION('MONTH', e.date) = FUNCTION('MONTH', CURRENT_DATE)
+        AND FUNCTION('YEAR', e.date) = FUNCTION('YEAR', CURRENT_DATE)
+        GROUP BY e.scheduleTemplate.lesson.lessonName
+        ORDER BY cnt DESC
+        """)
+    List<Object[]> findMostAttendedLessonByUserCurrentMonth(Long userId);
 
 }
