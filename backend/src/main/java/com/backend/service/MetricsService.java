@@ -32,7 +32,7 @@ public class MetricsService {
         return enrollmentRepository.findMostAttendedLessonByUser(userId)
                 .stream()
                 .findFirst()
-                .map(r -> (String) r[0]) // el nombre de la lección
+                .map(r -> (String) r[0])
                 .orElse("No lessons attended");
     }
 
@@ -40,7 +40,7 @@ public class MetricsService {
         return enrollmentRepository.findMostAttendedLessonByUserCurrentYear(userId)
                 .stream()
                 .findFirst()
-                .map(r -> (String) r[0]) // el nombre de la lección
+                .map(r -> (String) r[0])
                 .orElse("No lessons attended");
     }
 
@@ -48,7 +48,7 @@ public class MetricsService {
         return enrollmentRepository.findMostAttendedLessonByUserCurrentMonth(userId)
                 .stream()
                 .findFirst()
-                .map(r -> (String) r[0]) // el nombre de la lección
+                .map(r -> (String) r[0])
                 .orElse("No lessons attended");
     }
 }
