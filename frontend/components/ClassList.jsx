@@ -4,7 +4,6 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 export default function ClassList({ classes, refreshing, onRefresh, onEnroll }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionTitle}>Clases del día</Text>
       <FlatList
         data={classes}
         keyExtractor={(item) => item.id.toString()}
@@ -21,13 +20,21 @@ export default function ClassList({ classes, refreshing, onRefresh, onEnroll }) 
                 <Text style={styles.classTime}>{item.time}</Text>
                 <TouchableOpacity
                   style={[styles.enrollButton, item.isEnrolled && styles.enrollButtonDisabled]}
-                  disabled={item.isEnrolled}
+                  disabled={item.isEnrolled || item.isPast}
                   onPress={handleEnroll}
                 >
                   <Ionicons
-                    name={item.isEnrolled ? "checkmark-circle" : "add"}
-                    size={24}
-                    color={item.isEnrolled ? "#28a745" : "#007AFF"}
+                    name={
+                      item.isEnrolled ? "checkmark-circle" 
+                      : item.isPast ? "time-outline"
+                      : "add-circle"
+                    }
+                    size={30}
+                    color={
+                      item.isEnrolled ? "#00923aff" 
+                      : item.isPast ? "#555555"
+                      : "#7c23b0ff"
+                    }
                   />
                 </TouchableOpacity>
               </View>
@@ -42,22 +49,45 @@ export default function ClassList({ classes, refreshing, onRefresh, onEnroll }) 
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingHorizontal: 20 },
-  sectionTitle: { fontSize: 20, fontWeight: "bold", marginBottom: 10 },
+  container: { 
+    flex: 1, 
+    paddingHorizontal: 15,
+    paddingBlock: 10 
+  },
   classCard: {
     padding: 15,
     marginBottom: 10,
     borderRadius: 10,
-    backgroundColor: "#f8f8f8",
+    backgroundColor: "#CCCCCC",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-  rightContainer: { flexDirection: "row", alignItems: "center" },
-  className: { fontSize: 16, fontWeight: "600" },
-  professorName: { fontSize: 14, color: "#555" },
-  classTime: { fontSize: 14, color: "#555", marginRight: 10 },
-  enrollButton: { padding: 5 },
-  enrollButtonDisabled: { opacity: 0.5 },
-  noClasses: { textAlign: "center", marginTop: 20, fontSize: 16, color: "#999" },
+  rightContainer: { 
+    flexDirection: "row", 
+    alignItems: "center" 
+  },
+  className: { 
+    fontSize: 16, 
+    fontWeight: "600", 
+    color:"#555555" 
+  },
+  professorName: { 
+    fontSize: 14, 
+    color: "#F5F5F5" 
+  },
+  classTime: { 
+    fontSize: 14, 
+    color: "#555555", 
+    marginRight: 10 
+  },
+  enrollButton: { 
+    padding: 5 
+  },
+  noClasses: { 
+    textAlign: "center", 
+    marginTop: 20, 
+    fontSize: 16, 
+    color: "#F5F5F5" 
+  },
 });
