@@ -23,15 +23,25 @@ const mapClassData = (item) => {
   const start = formatTime(item.startTime);
   const end = formatTime(item.endTime);
 
+  const startMinutes = toMinutes(start);
+
+  const classDateTime = new Date(selectedDay);
+  classDateTime.setHours(Math.floor(startMinutes / 60));
+  classDateTime.setMinutes(startMinutes % 60);
+
+  const isPast = classDateTime < new Date();
+
   return {
     id: String(item.id ?? ""),
     lessonName: item.lessonName,
     professorName: item.professorName,
     time: `${start} - ${end}`,
-    startMinutes: toMinutes(start),
+    startMinutes,
     isEnrolled: item.isEnrolled,
+    isPast, 
   };
 };
+
 
 const fetchClasses = async () => {
   try {
@@ -104,5 +114,5 @@ const fetchClasses = async () => {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", paddingTop: 50 },
+  container: { flex: 1, backgroundColor: "#1E1E1E", paddingTop: 50 },
 });

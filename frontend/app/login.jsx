@@ -67,14 +67,14 @@ export default function Login() {
 
   return (
     <KeyboardAwareScrollView
-      style={{ flex: 1, backgroundColor: '#EAE4ED' }}
+      style={{ flex: 1, backgroundColor: '#1E1E1E' }}
       contentContainerStyle={styles.container}
       enableOnAndroid={true}
       extraHeight={Platform.OS === 'android' ? 80 : 0}
       keyboardShouldPersistTaps="handled"
     >
       <Image 
-        source={require("./assets/images/black_logo.png")} 
+        source={require("./assets/images/white_logo.png")} 
         style={styles.logo} 
         resizeMode="contain"
       />
@@ -111,7 +111,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: "center",
     justifyContent: "center",
-    padding: 20,
   },
   loader: {
     flex: 1, 
@@ -126,25 +125,25 @@ const styles = StyleSheet.create({
   input: {
     width: "90%", 
     borderWidth: 1,
-    borderColor: "#ffffffff",
+    borderColor: "#F5F5F5",
     borderRadius: 8,
     padding: 10,
     marginBottom: 10,
-    backgroundColor: "#ffffffff", 
+    backgroundColor: "#F5F5F5", 
     color: "#000000ff", 
   },
   button: {
-    backgroundColor: "#69188E", 
+    backgroundColor: "#7c23b0ff", 
     padding: 12,
     borderRadius: 8,
     alignItems: "center",
   },
   buttonText: {
-    color: "#ffffffff",
+    color: "#F5F5F5",
     fontSize: 16,
   },
   linkText: {
-    color: "#1F0025", 
+    color: "#F5F5F5", 
     marginTop: 30,
   },
 });

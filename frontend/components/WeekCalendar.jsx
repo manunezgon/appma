@@ -9,7 +9,6 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
 
   const today = new Date();
 
-  // Genera una semana (lun–dom) a partir de un offset
   const generateWeek = (weekOffset = 0) => {
     const currentDay = today.getDay(); 
     const monday = new Date(today);
@@ -24,14 +23,11 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
     return week;
   };
 
-  // Rango de semanas
   const weeks = [];
   for (let i = -10; i <= 20; i++) weeks.push(generateWeek(i));
 
-  // Semana visible
   const [currentWeekIndex, setCurrentWeekIndex] = useState(10);
 
-  // Estado del mes/año mostrado
   const [currentMonthName, setCurrentMonthName] = useState(
     weeks[currentWeekIndex][0].toLocaleDateString("es-ES", { month: "long", year: "numeric" })
   );
@@ -42,7 +38,6 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
     setSelectedDay(today);
     setCurrentWeekIndex(10);
     flatListRef.current?.scrollToIndex({ index: 10, animated: true });
-    // Actualiza también el mes/año al ir a hoy
     setCurrentMonthName(
       today.toLocaleDateString("es-ES", { month: "long", year: "numeric" })
     );
@@ -52,7 +47,6 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
     const index = Math.round(event.nativeEvent.contentOffset.x / SCREEN_WIDTH);
     setCurrentWeekIndex(index);
 
-    // Actualiza el mes/año según la primera fecha de la semana visible
     const firstDayOfWeek = weeks[index][0];
     const newMonthName = firstDayOfWeek.toLocaleDateString("es-ES", {
       month: "long",
@@ -63,7 +57,6 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
 
   return (
     <View style={styles.container}>
-      {/* Encabezado con mes/año y botón Hoy */}
       <View style={styles.header}>
         <Text style={styles.monthTitle}>{currentMonthName}</Text>
         <TouchableOpacity style={styles.todayButton} onPress={goToToday}>
@@ -71,7 +64,6 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
         </TouchableOpacity>
       </View>
 
-      {/* FlatList de semanas */}
       <FlatList
         ref={flatListRef}
         data={weeks}
@@ -113,7 +105,9 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
 }
 
 const styles = StyleSheet.create({
-  container: { marginBottom: 10 },
+  container: { 
+    marginBottom: 10 
+  },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -121,14 +115,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginBottom: 10,
   },
-  monthTitle: { fontSize: 18, fontWeight: "bold" },
+  monthTitle: { 
+    fontSize: 15, 
+    fontWeight: "bold",
+    color:"#CCCCCC",
+    textTransform: "uppercase" 
+  },
   todayButton: {
-    backgroundColor: "#007AFF",
+    backgroundColor: "#7c23b0ff",
     paddingVertical: 6,
     paddingHorizontal: 14,
     borderRadius: 8,
   },
-  todayText: { color: "#fff", fontWeight: "600" },
+  todayText: { 
+    color: "#CCCCCC", 
+    fontWeight: "600" 
+  },
   weekContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
@@ -139,11 +141,22 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 10,
     borderRadius: 10,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#555555",
     width: 45,
   },
-  selectedBox: { backgroundColor: "#007AFF" },
-  dayText: { fontSize: 14, fontWeight: "bold", color: "#333" },
-  dateText: { fontSize: 16, color: "#333" },
-  activeText: { color: "#fff" },
+  selectedBox: { 
+    backgroundColor: "#7c23b0ff" 
+  },
+  dayText: { 
+    fontSize: 14, 
+    fontWeight: "bold", 
+    color: "#0A0A0A" 
+  },
+  dateText: { 
+    fontSize: 16, 
+    color: "#CCCCCC" 
+  },
+  activeText: { 
+    color: "#CCCCCC" 
+  },
 });
