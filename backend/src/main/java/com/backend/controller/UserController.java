@@ -26,7 +26,7 @@ public class UserController {
 
     // --- Helpers ---
     private UserResponseDTO toDTO(User user) {
-        return new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRole());
+        return new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRole(), user.getPhone());
     }
 
     // --- Endpoints ---
@@ -49,7 +49,7 @@ public class UserController {
         String token = authHeader.substring(7);
         String email = jwtUtil.extractEmail(token);
         User user = userService.getUserByEmail(email);
-        return ResponseEntity.ok(new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRole()));
+        return ResponseEntity.ok(new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRole(), user.getPhone()));
     }
 
 

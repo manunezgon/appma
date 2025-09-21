@@ -38,7 +38,7 @@ public class PaymentController {
     }
 
     private UserResponseDTO toUserDTO(User user) {
-        return new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRole());
+        return new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRole(), user.getPhone());
     }
 
     // --- Endpoints ---
