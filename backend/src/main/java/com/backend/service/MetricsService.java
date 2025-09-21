@@ -7,6 +7,8 @@ import com.backend.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class MetricsService {
@@ -58,5 +60,14 @@ public class MetricsService {
                 .findFirst()
                 .map(r -> (String) r[0])
                 .orElse("No lessons attended");
+    }
+
+    //RANKING-METRICS//
+    public List<Object[]> getMonthlyRanking() {
+        return enrollmentRepository.findRankingByCurrentMonth();
+    }
+
+    public List<Object[]> getYearlyRanking() {
+        return enrollmentRepository.findRankingByCurrentYear();
     }
 }

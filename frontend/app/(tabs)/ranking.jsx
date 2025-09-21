@@ -1,33 +1,43 @@
 import React, { useEffect, useState } from "react";
-import { View, ActivityIndicator, StyleSheet } from "react-native";
+import { View, ActivityIndicator, StyleSheet, ScrollView } from "react-native";
 import { DataTable, Text } from "react-native-paper";
-import { API_BASE_URL } from "../config"
+import { API_BASE_URL } from "../config";
 import { useUser } from '../../context/usercontext';
-
 
 export default function Ranking() {
   const { user } = useUser(); 
-  const [metrics, setMetrics] = useState(null);
+  const [monthlyRanking, setMonthlyRanking] = useState([]);
+  const [yearlyRanking, setYearlyRanking] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user?.id) return; 
+    if (!user?.token) return;
 
-    fetch(`${API_BASE_URL}/metrics/me`, {
-        headers: {
-          Authorization: `Bearer ${user?.token}`,
-        },
-      })
-      .then((res) => res.json())
-      .then((data) => {
-        setMetrics(data);
+    const fetchRanking = async () => {
+      try {
+        const [monthRes, yearRes] = await Promise.all([
+          fetch(`${API_BASE_URL}/metrics/month`, {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }),
+          fetch(`${API_BASE_URL}/metrics/year`, {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }),
+        ]);
+
+        const monthData = await monthRes.json();
+        const yearData = await yearRes.json();
+
+        setMonthlyRanking(monthData);
+        setYearlyRanking(yearData);
+      } catch (err) {
+        console.error("Error fetching ranking", err);
+      } finally {
         setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching metrics", err);
-        setLoading(false);
-      });
-  }, []);
+      }
+    };
+
+    fetchRanking();
+  }, [user?.token]);
 
   if (loading) {
     return (
@@ -37,56 +47,40 @@ export default function Ranking() {
     );
   }
 
-  if (!metrics) {
-    return (
-      <View style={styles.center}>
-        <Text>No data available</Text>
-      </View>
-    );
-  }
-
   return (
-    <View style={{ flex: 1, padding: 16 }}>
+    <ScrollView style={{ flex: 1, padding: 16 }}>
       <Text variant="titleLarge" style={{ marginBottom: 16 }}>
-        User Metrics
+        Monthly Ranking
       </Text>
       <DataTable>
         <DataTable.Header>
-          <DataTable.Title>Metric</DataTable.Title>
-          <DataTable.Title numeric>Value</DataTable.Title>
+          <DataTable.Title>User</DataTable.Title>
+          <DataTable.Title numeric>Total Classes</DataTable.Title>
         </DataTable.Header>
-
-        <DataTable.Row>
-          <DataTable.Cell>Total Classes</DataTable.Cell>
-          <DataTable.Cell numeric>{metrics.totalClasses}</DataTable.Cell>
-        </DataTable.Row>
-
-        <DataTable.Row>
-          <DataTable.Cell>Classes This Month</DataTable.Cell>
-          <DataTable.Cell numeric>{metrics.classesThisMonth}</DataTable.Cell>
-        </DataTable.Row>
-
-        <DataTable.Row>
-          <DataTable.Cell>Classes This Year</DataTable.Cell>
-          <DataTable.Cell numeric>{metrics.classesThisYear}</DataTable.Cell>
-        </DataTable.Row>
-
-        <DataTable.Row>
-          <DataTable.Cell>Most Attended Lesson</DataTable.Cell>
-          <DataTable.Cell>{metrics.mostAttendedLesson}</DataTable.Cell>
-        </DataTable.Row>
-
-        <DataTable.Row>
-          <DataTable.Cell>Most Attended Lesson (Month)</DataTable.Cell>
-          <DataTable.Cell>{metrics.mostAttendedLessonInCurrentMonth}</DataTable.Cell>
-        </DataTable.Row>
-
-        <DataTable.Row>
-          <DataTable.Cell>Most Attended Lesson (Year)</DataTable.Cell>
-          <DataTable.Cell>{metrics.mostAttendedLessonInCurrentYear}</DataTable.Cell>
-        </DataTable.Row>
+        {monthlyRanking.map((r, i) => (
+          <DataTable.Row key={i}>
+            <DataTable.Cell>{r.userName}</DataTable.Cell>
+            <DataTable.Cell numeric>{r.totalClasses}</DataTable.Cell>
+          </DataTable.Row>
+        ))}
       </DataTable>
-    </View>
+
+      <Text variant="titleLarge" style={{ marginVertical: 16 }}>
+        Yearly Ranking
+      </Text>
+      <DataTable>
+        <DataTable.Header>
+          <DataTable.Title>User</DataTable.Title>
+          <DataTable.Title numeric>Total Classes</DataTable.Title>
+        </DataTable.Header>
+        {yearlyRanking.map((r, i) => (
+          <DataTable.Row key={i}>
+            <DataTable.Cell>{r.userName}</DataTable.Cell>
+            <DataTable.Cell numeric>{r.totalClasses}</DataTable.Cell>
+          </DataTable.Row>
+        ))}
+      </DataTable>
+    </ScrollView>
   );
 }
 
