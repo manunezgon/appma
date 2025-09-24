@@ -15,7 +15,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     List<Enrollment> findByScheduleTemplateAndDate(ScheduleTemplate template, LocalDate date);
     List<Enrollment> findByUserAndDate(User user, LocalDate date);
 
-    //METRICS//
+    //METRICS-BY-USER//
     @Query(value = """
     SELECT COUNT(*) FROM enrollments e WHERE user_id = :userId AND MONTH(date) = MONTH(CURRENT_DATE) AND YEAR(date) = YEAR(CURRENT_DATE)""",
     nativeQuery = true)
@@ -55,5 +55,30 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
         ORDER BY cnt DESC
         """)
     List<Object[]> findMostAttendedLessonByUserCurrentMonth(Long userId);
+
+    //METRICS-FOR-ALL//
+
+    @Query(value = """
+        SELECT u.name, COUNT(*) as totalClasses
+        FROM enrollments e
+        INNER JOIN users u ON e.user_id = u.id
+        WHERE MONTH(e.date) = MONTH(CURRENT_DATE)
+        AND YEAR(e.date) = YEAR(CURRENT_DATE)
+        GROUP BY u.id, u.name
+        ORDER BY totalClasses DESC
+        """,
+    nativeQuery = true)
+    List<Object[]> findRankingByCurrentMonth();
+
+    @Query(value = """
+        SELECT u.name, COUNT(*) as totalClasses
+        FROM enrollments e
+        INNER JOIN users u ON e.user_id = u.id
+        WHERE YEAR(e.date) = YEAR(CURRENT_DATE)
+        GROUP BY u.id, u.name
+        ORDER BY totalClasses DESC
+        """,
+    nativeQuery = true)
+    List<Object[]> findRankingByCurrentYear();
 
 }
