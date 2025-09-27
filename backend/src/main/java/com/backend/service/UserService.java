@@ -91,6 +91,12 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(dto.getPassword()));
         }
 
+        if (dto.getPhone() != null && !dto.getPhone().isEmpty()) {
+            validatePhone(dto.getPhone());
+            user.setPhone(dto.getPhone());
+        }
+
+
         return userRepository.save(user);
     }
 
@@ -152,6 +158,17 @@ public class UserService {
         }
     }
 
+    private void validatePhone(String phone) {
+        String trimmedPhone = phone.trim();
+
+        if (trimmedPhone.length() < 9) {
+            throw new IllegalArgumentException("El teléfono debe tener al menos 9 caracteres.");
+        }
+
+        if (!trimmedPhone.matches("\\d+")) {
+            throw new IllegalArgumentException("El teléfono solo puede contener números.");
+        }
+    }
     private void checkEmailNotUsed(String email) {
         userRepository.findByEmail(email.toLowerCase().trim())
                 .ifPresent(u -> {
