@@ -1,70 +1,91 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Button, TouchableOpacity, Text } from "react-native";
 import ClassList from "../../components/ClassList";
 import Calendar from "../../components/WeekCalendar";
+import ClassModal from "../../components/ClassModal";
 import { useUser } from "../../context/usercontext";
-import { API_BASE_URL } from "../config"
+import { API_BASE_URL } from "../config";
 
 export default function HomeScreen() {
   const [selectedDay, setSelectedDay] = useState(new Date());
   const [classes, setClasses] = useState([]);
+  const [lessonsList, setLessonsList] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalData, setModalData] = useState({});
   const { user } = useUser();
 
-const formatTime = (time) => time.slice(0, 5);
+  // --- Helpers ---
+  const formatTime = (time) => time.slice(0, 5);
 
-const toMinutes = (timeString) => {
-  const [hours, minutes] = timeString.split(":").map(Number);
-  return hours * 60 + minutes;
-};
-
-const mapClassData = (item) => {
-  const start = formatTime(item.startTime);
-  const end = formatTime(item.endTime);
-
-  const startMinutes = toMinutes(start);
-
-  const classDateTime = new Date(selectedDay);
-  classDateTime.setHours(Math.floor(startMinutes / 60));
-  classDateTime.setMinutes(startMinutes % 60);
-
-  const isPast = classDateTime < new Date();
-
-  return {
-    id: String(item.id ?? ""),
-    lessonName: item.lessonName,
-    professorName: item.professorName,
-    time: `${start} - ${end}`,
-    startMinutes,
-    isEnrolled: item.isEnrolled,
-    isPast, 
+  const toMinutes = (timeString) => {
+    const [hours, minutes] = timeString.split(":").map(Number);
+    return hours * 60 + minutes;
   };
-};
 
+  const mapClassData = (item) => {
+    const start = formatTime(item.startTime);
+    const end = formatTime(item.endTime);
+    const startMinutes = toMinutes(start);
 
-const fetchClasses = async () => {
-  try {
-    const dateStr = selectedDay.toISOString().split("T")[0];
-    const res = await fetch(`${API_BASE_URL}/scheduleTemplates/day?date=${dateStr}`, {
-      headers: { Authorization: `Bearer ${user?.token}` },
-    });
+    const classDateTime = new Date(selectedDay);
+    classDateTime.setHours(Math.floor(startMinutes / 60));
+    classDateTime.setMinutes(startMinutes % 60);
 
-    if (!res.ok) throw new Error(`HTTP status ${res.status}`);
+    const isPast = classDateTime < new Date();
 
-    const data = await res.json();
-    if (!Array.isArray(data)) throw new Error("Data is not an array");
+    return {
+      id: String(item.id ?? ""),
+      lessonName: item.lessonName,
+      professorName: item.professorName,
+      time: `${start} - ${end}`,
+      startMinutes,
+      isEnrolled: item.isEnrolled,
+      isPast,
+      dayOfWeek: item.dayOfWeek,
+      lessonId: item.lessonId,
+    };
+  };
 
-    const mapped = data.map(mapClassData).sort((a, b) => a.startMinutes - b.startMinutes);
-    setClasses(mapped);
-  } catch (error) {
-    console.error("Error fetching classes:", error);
-    setClasses([]);
-  }
-};
+  // --- Fetch clases ---
+  const fetchClasses = async () => {
+    try {
+      const dateStr = selectedDay.toISOString().split("T")[0];
+      const res = await fetch(`${API_BASE_URL}/scheduleTemplates/day?date=${dateStr}`, {
+        headers: { Authorization: `Bearer ${user?.token}` },
+      });
+      if (!res.ok) throw new Error(`HTTP status ${res.status}`);
+      const data = await res.json();
+      if (!Array.isArray(data)) throw new Error("Data is not an array");
 
+      const mapped = data.map(mapClassData).sort((a, b) => a.startMinutes - b.startMinutes);
+      setClasses(mapped);
+    } catch (error) {
+      console.error("Error fetching classes:", error);
+      setClasses([]);
+    }
+  };
 
-  useFocusEffect(useCallback(() => { fetchClasses(); }, [selectedDay]));
+  const fetchLessons = async () => {
+    if (user?.role !== "ADMIN") return;
+    try {
+      const res = await fetch(`${API_BASE_URL}/lessons`, {
+        headers: { Authorization: `Bearer ${user?.token}` },
+      });
+      const data = await res.json();
+      setLessonsList(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchClasses();
+      fetchLessons();
+    }, [selectedDay, user])
+  );
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -72,22 +93,18 @@ const fetchClasses = async () => {
     setRefreshing(false);
   };
 
+  // --- Enroll ---
   const handleEnroll = async (scheduleTemplateId) => {
     try {
       const dateStr = selectedDay.toISOString().split("T")[0];
-
       const response = await fetch(`${API_BASE_URL}/enrollments`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${user?.token}`,
         },
-        body: JSON.stringify({
-          scheduleTemplateId,
-          date: dateStr, 
-        }),
+        body: JSON.stringify({ scheduleTemplateId, date: dateStr }),
       });
-
       if (!response.ok) throw new Error("Error enrolling");
 
       setClasses((prev) =>
@@ -100,6 +117,44 @@ const fetchClasses = async () => {
     }
   };
 
+  const onEditClass = (cls) => {
+    setModalData(cls);
+    setModalVisible(true);
+  };
+
+  const onDeleteClass = async (id) => {
+    try {
+      await fetch(`${API_BASE_URL}/scheduleTemplates/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${user?.token}` },
+      });
+      fetchClasses();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleModalSubmit = async ({ dayOfWeek, startTime, endTime, lessonId }) => {
+    try {
+      const method = modalData.id ? "PUT" : "POST";
+      const url = modalData.id
+        ? `${API_BASE_URL}/scheduleTemplates/${modalData.id}`
+        : `${API_BASE_URL}/scheduleTemplates`;
+
+      await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user?.token}`,
+        },
+        body: JSON.stringify({ dayOfWeek, startTime, endTime, lessonId }),
+      });
+      fetchClasses();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Calendar selectedDay={selectedDay} setSelectedDay={setSelectedDay} />
@@ -108,6 +163,17 @@ const fetchClasses = async () => {
         refreshing={refreshing}
         onRefresh={onRefresh}
         onEnroll={handleEnroll}
+        userRole={user?.role}
+        onEditClass={onEditClass}
+        onDeleteClass={onDeleteClass}
+      />
+
+      <ClassModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        onSubmit={handleModalSubmit}
+        initialData={modalData}
+        lessons={lessonsList}
       />
     </View>
   );
