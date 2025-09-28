@@ -45,10 +45,7 @@ export default function ClassList({ classes, refreshing, onRefresh, onEnroll, us
 
             {userRole === "ADMIN" && (
               <View style={styles.adminButtons}>
-                <TouchableOpacity style={styles.editButton} onPress={() => onEditClass(item)}>
-                  <Text style={styles.editButtonText}>Editar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.editButton} onPress={() => onDeleteClass(item.id)}>
+                <TouchableOpacity style={styles.editButton} onPress={() => onDeleteClass(item)}>
                   <Text style={styles.editButtonText}>Eliminar</Text>
                 </TouchableOpacity>
               </View>

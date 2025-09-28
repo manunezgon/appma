@@ -45,6 +45,8 @@ export default function HomeScreen() {
       isPast,
       dayOfWeek: item.dayOfWeek,
       lessonId: item.lessonId,
+      startTime: start,
+      endTime: end, 
     };
   };
 
@@ -122,12 +124,23 @@ export default function HomeScreen() {
     setModalVisible(true);
   };
 
-  const onDeleteClass = async (id) => {
+  const onDeleteClass = async (cls) => {
     try {
-      await fetch(`${API_BASE_URL}/scheduleTemplates/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${user?.token}` },
+      const dateStr = selectedDay.toISOString().split("T")[0];
+      await fetch(`${API_BASE_URL}/scheduleExceptions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user?.token}`},
+        body: JSON.stringify({
+        date: dateStr,
+        startTime: cls.startTime,
+        endTime: cls.endTime,  
+        lessonId: cls.id,
+        cancelled: true,
+      })
       });
+
       fetchClasses();
     } catch (err) {
       console.error(err);
