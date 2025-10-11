@@ -3,15 +3,13 @@ package com.backend.controller;
 import com.backend.dto.ScheduleTemplateRequestDTO;
 import com.backend.dto.ScheduleTemplateResponseDTO;
 import com.backend.model.ScheduleTemplate;
-import com.backend.model.User;
 import com.backend.security.JwtUtil;
 import com.backend.service.ScheduleTemplateService;
-import com.backend.service.UserService; // asumiendo que tienes un UserService para obtener el usuario del token
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -26,7 +24,6 @@ public class ScheduleTemplateController {
     private final ScheduleTemplateService scheduleTemplateService;
     private final JwtUtil jwtUtil;
 
-    // --- Helpers ---
     private ScheduleTemplateResponseDTO toDTO(ScheduleTemplate scheduleTemplate) {
         return new ScheduleTemplateResponseDTO(
                 scheduleTemplate.getId(),
@@ -36,11 +33,10 @@ public class ScheduleTemplateController {
                 scheduleTemplate.getLesson().getId(),
                 scheduleTemplate.getLesson().getLessonName(),
                 scheduleTemplate.getLesson().getProfessorName(),
-                false // default isEnrolled para endpoints globales
+                false // default isEnrolled
         );
     }
 
-    // --- Endpoints ---
     @GetMapping
     public ResponseEntity<List<ScheduleTemplateResponseDTO>> getAllScheduleTemplates() {
         return ResponseEntity.ok(
@@ -48,13 +44,6 @@ public class ScheduleTemplateController {
                         .stream()
                         .map(this::toDTO)
                         .collect(Collectors.toList())
-        );
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<ScheduleTemplateResponseDTO> getScheduleTemplateById(@PathVariable Long id) {
-        return ResponseEntity.ok(
-                toDTO(scheduleTemplateService.getScheduleTemplateById(id))
         );
     }
 
@@ -77,6 +66,7 @@ public class ScheduleTemplateController {
         return ResponseEntity.status(201).body(toDTO(saved));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<ScheduleTemplateResponseDTO> updateScheduleTemplate(
             @PathVariable Long id,
@@ -86,9 +76,11 @@ public class ScheduleTemplateController {
         return ResponseEntity.ok(toDTO(updated));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteScheduleTemplate(@PathVariable Long id) {
         scheduleTemplateService.deleteScheduleTemplate(id);
         return ResponseEntity.noContent().build();
     }
 }
+
