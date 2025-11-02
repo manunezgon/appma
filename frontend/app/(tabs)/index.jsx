@@ -136,7 +136,7 @@ export default function HomeScreen() {
         date: dateStr,
         startTime: cls.startTime,
         endTime: cls.endTime,  
-        lessonId: cls.id,
+        lessonId: cls.lessonId,
         cancelled: true,
       })
       });

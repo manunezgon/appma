@@ -1,14 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, TextInput, Alert, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useUser } from '../../context/usercontext';
 import { API_BASE_URL } from "../config.jsx";
+import CreateScheduleModal from "../../components/CreateScheduleModal.jsx";
 
 export default function Profile() {
   const { user, setUser, logout, token } = useUser();
   const router = useRouter();
 
   const [modalVisible, setModalVisible] = useState(false);
+  const [scheduleModalVisible, setScheduleModalVisible] = useState(false);
+  const [createScheduleModalVisible, setCreateScheduleModalVisible] = useState(false);
+  const [editScheduleModalVisible, setEditScheduleModalVisible] = useState(false);
 
   const [editName, setEditName] = useState(user?.name || '');
   const [editEmail, setEditEmail] = useState(user?.email || '');
@@ -17,6 +21,14 @@ export default function Profile() {
 
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
+
+  useEffect(() => {
+    if (user) {
+      setEditName(user.name || '');
+      setEditEmail(user.email || '');
+      setEditPhone(user.phone || '');
+    }
+  }, [user]);
 
   const handleLogout = async () => {
     await logout();
@@ -36,7 +48,7 @@ export default function Profile() {
       console.error('Error refrescando usuario:', err);
     }
   };
-
+  
   const handleSaveProfile = async () => {
     if (!currentPassword || currentPassword.length < 6) {
       Alert.alert('Debes introducir tu contraseña actual (mínimo 6 caracteres) para guardar cambios');
@@ -133,6 +145,12 @@ export default function Profile() {
         <Text style={styles.buttonText}>Ajustes</Text>
       </TouchableOpacity>
 
+      {user?.role === "ADMIN" && (
+        <TouchableOpacity onPress={() => setScheduleModalVisible(true)} style={styles.button}>
+          <Text style={styles.buttonText}>Gestionar horarios</Text>
+        </TouchableOpacity>
+      )}
+
       <TouchableOpacity onPress={handleLogout} style={[styles.button, styles.logoutButton]}>
         <Text style={styles.buttonText}>Cerrar sesión</Text>
       </TouchableOpacity>
@@ -140,7 +158,7 @@ export default function Profile() {
       {/* Settings modal */}
       <Modal
         visible={modalVisible}
-        animationType="slide"
+        animationType="fade"
         transparent={true}
         onRequestClose={() => setModalVisible(false)}
       >
@@ -175,6 +193,68 @@ export default function Profile() {
               </View>
             </ScrollView>
 
+          </View>
+        </View>
+      </Modal>
+
+      {/* Schedule modal */}
+      <Modal
+        visible={scheduleModalVisible}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setScheduleModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <ScrollView contentContainerStyle={styles.modalScroll}>
+              <View style={styles.modalInner}>
+                <Text style={styles.modalTitle}>Gestión de horarios</Text>
+
+                <TouchableOpacity onPress={() => { setScheduleModalVisible(false); setCreateScheduleModalVisible(true); }} style={styles.button}>
+                  <Text style={styles.buttonText}>Crear horario nuevo</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => { setScheduleModalVisible(false); setEditScheduleModalVisible(true); }} style={styles.button}>
+                  <Text style={styles.buttonText}>Modificar horario existente</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => setScheduleModalVisible(false)} style={[styles.button, styles.cancelButton]}>
+                  <Text style={styles.buttonText}>Cerrar</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* New schedule */}
+      <CreateScheduleModal
+        visible={createScheduleModalVisible}
+        onClose={() => setCreateScheduleModalVisible(false)}
+        token={token}
+      />
+
+      {/* Modify schedule */}
+      <Modal
+        visible={editScheduleModalVisible}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setEditScheduleModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <ScrollView contentContainerStyle={styles.modalScroll}>
+              <View style={styles.modalInner}>
+                <Text style={styles.modalTitle}>Modificar horario existente</Text>
+                {/* Aquí más adelante pondremos los inputs / picker para editar */}
+                <TouchableOpacity
+                  onPress={() => setEditScheduleModalVisible(false)}
+                  style={[styles.button, styles.cancelButton]}
+                >
+                  <Text style={styles.buttonText}>Cerrar</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
           </View>
         </View>
       </Modal>

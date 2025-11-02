@@ -78,10 +78,13 @@ public class UserService {
 
         validateName(dto.getName());
 
-        if (!user.getEmail().equals(dto.getEmail().toLowerCase().trim())) {
+        String newEmailNormalized = normalizeEmail(dto.getEmail());
+        String oldEmailNormalized = normalizeEmail(user.getEmail());
+
+        if (!oldEmailNormalized.equals(newEmailNormalized)) {
             validateEmail(dto.getEmail());
-            checkEmailNotUsed(dto.getEmail());
-            user.setEmail(normalizeEmail(dto.getEmail()));
+            checkEmailNotUsed(dto.getEmail(), id);
+            user.setEmail(newEmailNormalized);
         }
 
         user.setName(dto.getName());
@@ -96,9 +99,9 @@ public class UserService {
             user.setPhone(dto.getPhone());
         }
 
-
         return userRepository.save(user);
     }
+
 
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
@@ -169,10 +172,20 @@ public class UserService {
             throw new IllegalArgumentException("El teléfono solo puede contener números.");
         }
     }
+
     private void checkEmailNotUsed(String email) {
         userRepository.findByEmail(email.toLowerCase().trim())
                 .ifPresent(u -> {
                     throw new EmailAlreadyRegisteredException(email);
+                });
+    }
+
+    private void checkEmailNotUsed(String email, Long currentUserId) {
+        userRepository.findByEmail(email.toLowerCase().trim())
+                .ifPresent(u -> {
+                    if (!u.getId().equals(currentUserId)) {
+                        throw new EmailAlreadyRegisteredException(email);
+                    }
                 });
     }
 }
