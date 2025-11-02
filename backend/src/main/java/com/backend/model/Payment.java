@@ -30,4 +30,14 @@ public class Payment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_type_id", nullable = false)
     private PaymentType paymentType;
+
+    // --- FIELDS FOR STRIPE MODEL ---
+    @Column(name = "stripe_payment_id")
+    private String stripePaymentId; // sessionId o paymentIntentId
+
+    @Column(name = "stripe_status")
+    private String stripeStatus; // succeeded, failed, pending
+
+    @Column(name = "amount_paid")
+    private Double amountPaid;
 }
