@@ -1,11 +1,11 @@
 'use client';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Image, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useUser } from '../context/usercontext';
-import { API_BASE_URL } from "./config"
+import { API_BASE_URL } from "./config";
 
 export default function Register() {
   const [name, setName] = useState('');
@@ -55,8 +55,15 @@ export default function Register() {
       }
 
       await SecureStore.setItemAsync('userToken', tokenData.token);
-      login(tokenData);
+
+      const meResponse = await fetch(`${API_BASE_URL}/users/me`, {
+        headers: { Authorization: `Bearer ${tokenData.token}` },
+      });
+      const meData = await meResponse.json();
+
+      login({token: tokenData.token, ...meData,});
       router.replace('/(tabs)');
+      
     } catch (error) {
       console.error(error);
       Alert.alert('Error', 'No se pudo conectar con el servidor');
