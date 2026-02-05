@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Image, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useUser } from '../context/usercontext';
-import { API_BASE_URL } from "./config"
+import { API_BASE_URL } from "./config";
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -44,7 +44,17 @@ export default function Login() {
       }
 
       await SecureStore.setItemAsync('userToken', data.token);
-      login(data);
+      const meResponse = await fetch(`${API_BASE_URL}/users/me`, {
+        headers: {
+          Authorization: `Bearer ${data.token}`,
+        },
+      });
+
+      const fullUser = await meResponse.json();
+      login({
+        token: data.token, ...fullUser,
+      });
+      
       router.replace('/(tabs)');
 
     } catch (error) {
