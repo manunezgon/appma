@@ -22,7 +22,6 @@ export default function CreateScheduleModal({ visible, onClose, token }) {
   })
     .then(res => res.json())
     .then(data => {
-      console.log("Lecciones recibidas:", data);
       setLessons(data);
       if (data.length > 0) setSelectedLesson(data[0].id);
     })

@@ -20,8 +20,6 @@ const fetchEnrollments = async () => {
     if (!response.ok) throw new Error(response.status);
     const data = await response.json();
 
-    console.log("🔥 DATA FROM API:", data);
-
     const today = new Date();
     today.setHours(0, 0, 0, 0); 
 
