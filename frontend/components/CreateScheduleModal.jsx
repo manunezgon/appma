@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Modal, Alert, ScrollView, Platform } from "react-native";
-import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { Picker } from "@react-native-picker/picker";
+import { useEffect, useState } from "react";
+import { Alert, Modal, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { API_BASE_URL } from "../app/config.jsx";
 
 export default function CreateScheduleModal({ visible, onClose, token }) {
@@ -44,8 +44,8 @@ export default function CreateScheduleModal({ visible, onClose, token }) {
     try {
       const payload = {
         dayOfWeek,
-        startTime: startTime.toISOString().substring(11, 16), 
-        endTime: endTime.toISOString().substring(11, 16),
+        startTime: startTime.getHours().toString().padStart(2,'0') + ':' + startTime.getMinutes().toString().padStart(2,'0'),
+        endTime: endTime.getHours().toString().padStart(2,'0') + ':' + endTime.getMinutes().toString().padStart(2,'0'),
         lessonId: selectedLesson
       };
 
