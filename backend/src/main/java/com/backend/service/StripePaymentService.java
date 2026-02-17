@@ -68,7 +68,9 @@ public class StripePaymentService {
 
         paymentRepository.save(payment);
 
-        return Map.of("checkoutUrl", session.getUrl());
+        return Map.of("checkoutUrl", session.getUrl(),
+                "sessionId", session.getId(),
+                "paymentId", payment.getId());
     }
 
     @Transactional
