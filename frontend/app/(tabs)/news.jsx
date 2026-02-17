@@ -3,12 +3,19 @@ import { useCallback, useState } from "react";
 import { FlatList, RefreshControl, StyleSheet, Text, View, Button, TextInput, TouchableOpacity } from "react-native";
 import { useUser } from '../../context/usercontext';
 import { API_BASE_URL } from "../config";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { Keyboard } from "react-native";
+import { Modal } from 'react-native';
+
 
 export default function News() {
   const [announcements, setAnnouncements] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [newMessage, setNewMessage] = useState("");
   const { user } = useUser();
+  const [confirmVisible, setConfirmVisible] = useState(false);
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
+
 
   const fetchAnnouncements = async () => {
     try {
@@ -42,31 +49,43 @@ export default function News() {
         headers: { Authorization: `Bearer ${user?.token}` },
       });
       setNewMessage("");
+      Keyboard.dismiss();
       fetchAnnouncements();
     } catch (err) {
       console.error("Error creating announcement:", err);
     }
   };
 
-  const deleteAnnouncement = async (id) => {
+  const confirmDelete = (id) => {
+    setSelectedAnnouncement(id);
+    setConfirmVisible(true);
+  };
+
+  const handleDelete = async () => {
+    if (!selectedAnnouncement) return;
+
     try {
-      await fetch(`${API_BASE_URL}/announcements/${id}`, {
+      await fetch(`${API_BASE_URL}/announcements/${selectedAnnouncement}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${user?.token}` },
       });
       fetchAnnouncements();
     } catch (err) {
       console.error("Error deleting announcement:", err);
+    } finally {
+      setConfirmVisible(false);
+      setSelectedAnnouncement(null);
     }
   };
+
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>
       <Text style={styles.message}>{item.message}</Text>
       <Text style={styles.date}>{new Date(item.createdAt).toLocaleString("es-ES")}</Text>
       {user?.role === "ADMIN" && (
-        <TouchableOpacity onPress={() => deleteAnnouncement(item.id)} style={styles.deleteButton}>
-          <Text style={styles.deleteText}>Eliminar</Text>
+        <TouchableOpacity onPress={() => confirmDelete(item.id)} style={styles.deleteButton}>
+          <Ionicons name="trash-outline" size={22} color="#FF3B30" />
         </TouchableOpacity>
       )}
     </View>
@@ -82,7 +101,10 @@ export default function News() {
             value={newMessage}
             onChangeText={setNewMessage}
           />
-          <Button title="Publicar" onPress={createAnnouncement} />
+          <TouchableOpacity onPress={createAnnouncement} disabled={!newMessage.trim()} style={{ opacity: newMessage.trim() ? 1 : 0.4 }}>
+            <Ionicons name="megaphone-outline" size={26} color="#7c23b0ff" />
+          </TouchableOpacity>
+
         </View>
       )}
 
@@ -98,19 +120,112 @@ export default function News() {
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         />
       )}
+
+      <Modal visible={confirmVisible} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>¿Eliminar este anuncio?</Text>
+
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                onPress={() => { setConfirmVisible(false); setSelectedAnnouncement(null); }}
+              >
+                <Ionicons name="close" size={28} color="#7c23b0ff" />
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={handleDelete} style={styles.modalButton}>
+                <Ionicons name="trash-outline" size={28} color="#FF3B30" />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", paddingHorizontal: 16, paddingTop: 70 },
-  adminBox: { marginBottom: 20 },
-  input: { borderWidth: 1, borderColor: "#ccc", padding: 8, borderRadius: 8, marginBottom: 10 },
-  card: { backgroundColor: "#f5f5f5", borderRadius: 12, padding: 12, marginBottom: 10, elevation: 2 },
-  message: { fontSize: 16, fontWeight: "600", marginBottom: 6 },
-  date: { fontSize: 12, color: "#666" },
-  deleteButton: { marginTop: 8, padding: 6, backgroundColor: "#ff4444", borderRadius: 8, alignSelf: "flex-start" },
-  deleteText: { color: "#fff", fontSize: 12 },
-  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  empty: { fontSize: 16, color: "#888" },
+  container: { 
+    flex: 1, 
+    backgroundColor: "#1E1E1E", 
+    paddingHorizontal: 20, 
+    paddingTop: 50 
+  },
+
+  adminBox: { 
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginBottom: 20,
+  backgroundColor: "#CCCCCC",
+  padding: 10,
+  borderRadius: 10,
+  gap: 10,
+},
+
+  input: { 
+  flex: 1,
+  backgroundColor: "#ececec",
+  padding: 10,
+  borderRadius: 10,
+},
+
+  card: { 
+    backgroundColor: "#ececec", 
+    borderRadius: 10, 
+    padding: 10, 
+    marginBottom: 10, 
+  },
+
+  message: { 
+    fontSize: 14, 
+    fontWeight: "600", 
+    marginBottom: 6,
+    color: "#1E1E1E" 
+  },
+
+  date: { 
+    fontSize: 12, 
+    color: "#555" 
+  },
+
+  deleteButton: { 
+    padding: 6, 
+    alignSelf: "flex-end" 
+  },
+
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  modalContent: {
+    backgroundColor: "#CCCCCC",
+    padding: 20,
+    borderRadius: 10,
+    width: "80%",
+  },
+
+  modalText: {
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: "center",
+  },
+
+  modalButtons: {
+    flexDirection: "row", 
+    justifyContent: "space-between", 
+  },
+
+  emptyContainer: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center' 
+  },
+
+  empty: { 
+    fontSize: 16, 
+    color: "#CCCCCC" 
+  },
 });
