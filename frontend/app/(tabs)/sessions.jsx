@@ -109,7 +109,7 @@ const fetchEnrollments = async () => {
         <Text style={styles.time}>{item.time}</Text>
       </View>
       <TouchableOpacity onPress={() => confirmUnenroll(item.enrollmentId)}>
-        <Ionicons name="log-out-outline" size={24} color="#FF3B30" />
+        <Ionicons name="log-out-outline" size={28} color="#FF3B30" />
       </TouchableOpacity>
     </View>
   );

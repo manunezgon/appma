@@ -85,7 +85,7 @@ export default function News() {
       <Text style={styles.date}>{new Date(item.createdAt).toLocaleString("es-ES")}</Text>
       {user?.role === "ADMIN" && (
         <TouchableOpacity onPress={() => confirmDelete(item.id)} style={styles.deleteButton}>
-          <Ionicons name="trash-outline" size={22} color="#FF3B30" />
+          <Ionicons name="trash-outline" size={28} color="#FF3B30" />
         </TouchableOpacity>
       )}
     </View>
@@ -93,6 +93,9 @@ export default function News() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Noticias</Text>
+      </View>
       {user?.role === "ADMIN" && (
         <View style={styles.adminBox}>
           <TextInput
@@ -102,7 +105,7 @@ export default function News() {
             onChangeText={setNewMessage}
           />
           <TouchableOpacity onPress={createAnnouncement} disabled={!newMessage.trim()} style={{ opacity: newMessage.trim() ? 1 : 0.4 }}>
-            <Ionicons name="megaphone-outline" size={26} color="#7c23b0ff" />
+            <Ionicons name="megaphone-outline" size={28} color="#7c23b0ff" />
           </TouchableOpacity>
 
         </View>
@@ -145,6 +148,19 @@ export default function News() {
 }
 
 const styles = StyleSheet.create({
+  header: { 
+    paddingTop: 20,
+    paddingBottom: 10,
+  },
+  title: { 
+    fontSize: 16, 
+    fontWeight: "bold",
+    color:"#CCCCCC",
+    textTransform: "uppercase",
+    justifyContent: "center",
+    textAlign: "center"
+  },
+
   container: { 
     flex: 1, 
     backgroundColor: "#1E1E1E", 
