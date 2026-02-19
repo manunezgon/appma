@@ -1,5 +1,6 @@
 package com.backend.repository;
 
+import com.backend.model.Lesson;
 import com.backend.model.Payment;
 import com.backend.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,5 +14,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     List<Payment> findByMonthPaid(YearMonth month);
 
     boolean existsByUserAndMonthPaid(User user, YearMonth month);
+
+    boolean existsByUserAndLessonAndMonthPaid(User user, Lesson lesson, YearMonth monthPaid);
 
 }

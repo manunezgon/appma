@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -38,11 +39,18 @@ public class EnrollmentController {
     }
 
     @PostMapping
-    public ResponseEntity<EnrollmentResponseDTO> createEnrollment(
+    public ResponseEntity<?> createEnrollment(
             @RequestBody EnrollmentRequestDTO request,
             @RequestHeader("Authorization") String authHeader) {
-        Enrollment enrollment = enrollmentService.enrollUser(request, authHeader);
-        return ResponseEntity.ok(toDTO(enrollment));
+        try {
+            Enrollment enrollment = enrollmentService.enrollUser(request, authHeader);
+            return ResponseEntity.ok(toDTO(enrollment));
+        } catch (IllegalArgumentException ex) {
+            // Devuelve un JSON claro en todos los errores
+            return ResponseEntity.status(400).body(Map.of("error", ex.getMessage()));
+        } catch (Exception ex) {
+            return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
+        }
     }
 
     @DeleteMapping("/{id}")

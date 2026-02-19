@@ -24,7 +24,8 @@ public class LessonController {
         return new LessonResponseDTO(
                 lesson.getId(),
                 lesson.getLessonName(),
-                lesson.getProfessorName()
+                lesson.getProfessorName(),
+                lesson.getAmount_monthly()
         );
     }
 

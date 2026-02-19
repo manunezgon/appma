@@ -6,6 +6,7 @@ import Calendar from "../../components/WeekCalendar";
 import ClassModal from "../../components/ClassModal";
 import { useUser } from "../../context/usercontext";
 import { API_BASE_URL } from "../config";
+import Modal from "react-native-modal";
 
 export default function HomeScreen() {
   const [selectedDay, setSelectedDay] = useState(new Date());
@@ -14,6 +15,9 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalData, setModalData] = useState({});
+  const [errorModalVisible, setErrorModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
   const { user } = useUser();
 
   // --- Helpers ---
@@ -107,8 +111,12 @@ export default function HomeScreen() {
         },
         body: JSON.stringify({ scheduleTemplateId, date: dateStr }),
       });
-      if (!response.ok) throw new Error("Error enrolling");
-
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        setErrorMessage(data.error || "No se pudo apuntar");
+        setErrorModalVisible(true);
+        return;
+      }
       setClasses((prev) =>
         prev.map((cls) =>
           cls.id === scheduleTemplateId ? { ...cls, isEnrolled: true } : cls
@@ -188,10 +196,33 @@ export default function HomeScreen() {
         initialData={modalData}
         lessons={lessonsList}
       />
+      
+      <Modal
+        isVisible={errorModalVisible}
+        onBackdropPress={() => setErrorModalVisible(false)}
+      >
+        <View style={styles.errorModal}>
+          <Text style={styles.errorText}>{errorMessage}</Text>
+          <Button title="Cerrar" onPress={() => setErrorModalVisible(false)} />
+        </View>
+      </Modal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#1E1E1E", paddingTop: 50 },
+    errorModal: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  errorText: {
+    color: "red",
+    fontWeight: "bold",
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: "center",
+  }
 });
