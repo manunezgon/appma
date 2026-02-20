@@ -7,6 +7,7 @@ import ClassModal from "../../components/ClassModal";
 import { useUser } from "../../context/usercontext";
 import { API_BASE_URL } from "../config";
 import Modal from "react-native-modal";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function HomeScreen() {
   const [selectedDay, setSelectedDay] = useState(new Date());
@@ -113,7 +114,7 @@ export default function HomeScreen() {
       });
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        setErrorMessage(data.error || "No se pudo apuntar");
+        setErrorMessage("Mes en curso no pagado");
         setErrorModalVisible(true);
         return;
       }
@@ -202,8 +203,13 @@ export default function HomeScreen() {
         onBackdropPress={() => setErrorModalVisible(false)}
       >
         <View style={styles.errorModal}>
-          <Text style={styles.errorText}>{errorMessage}</Text>
-          <Button title="Cerrar" onPress={() => setErrorModalVisible(false)} />
+           <View style={styles.modalHeader}>
+          <Text style={styles.Title}>{errorMessage}</Text>
+          <Ionicons name="close" size={28} style={styles.closenonpaidIcon} onPress={() => setErrorModalVisible(false)} />
+            </View>
+           <View style={styles.modalContent}>
+            <Text style={styles.Content}> Por favor, paga el mes correspondiente para acceder a esta clase.</Text>
+            </View>
         </View>
       </Modal>
     </View>
@@ -212,17 +218,28 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#1E1E1E", paddingTop: 50 },
-    errorModal: {
-    backgroundColor: "#fff",
-    padding: 20,
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 16,
+    alignItems: "center",},
+  errorModal: {
+    backgroundColor: "#2a2a2a",
     borderRadius: 12,
-    alignItems: "center",
   },
-  errorText: {
-    color: "red",
+  Title: {
+    color: "#fff",
     fontWeight: "bold",
-    fontSize: 16,
-    marginBottom: 20,
+    fontSize: 22,
+  },
+  Content: {
+    color: "#ccc",
+    fontWeight: "bold",
     textAlign: "center",
+  },  closenonpaidIcon: {
+    color: "purple",
+  },
+  modalContent: {
+    color: "purple",
   }
 });

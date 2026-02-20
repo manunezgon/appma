@@ -1,9 +1,7 @@
 package com.backend.service;
 
 import com.backend.exception.UserNotFoundException;
-import com.backend.exception.PaymentTypeNotFoundException;
 import com.backend.model.Payment;
-import com.backend.model.PaymentType;
 import com.backend.model.User;
 import com.backend.repository.PaymentRepository;
 import com.backend.repository.UserRepository;
@@ -22,9 +20,8 @@ public class PaymentService {
     private final UserRepository userRepository;
 
     @Transactional
-    public Payment registerPayment(User user, PaymentType paymentType, YearMonth monthPaid) {
+    public Payment registerPayment(User user,  YearMonth monthPaid) {
         validateUser(user);
-        validatePaymentType(paymentType);
         validateMonth(monthPaid);
 
         if (hasUserPaidForMonth(user, monthPaid)) {
@@ -33,7 +30,6 @@ public class PaymentService {
 
         Payment payment = new Payment();
         payment.setUser(user);
-        payment.setPaymentType(paymentType);
         payment.setMonthPaid(monthPaid);
         payment.setPaymentDate(java.time.LocalDateTime.now());
 
@@ -65,12 +61,6 @@ public class PaymentService {
     private void validateUser(User user) {
         if (user == null || !userRepository.existsById(user.getId())) {
             throw new UserNotFoundException(user != null ? user.getId() : null);
-        }
-    }
-
-    private void validatePaymentType(PaymentType paymentType) {
-        if (paymentType == null) {
-            throw new PaymentTypeNotFoundException("PaymentType cannot be null");
         }
     }
 

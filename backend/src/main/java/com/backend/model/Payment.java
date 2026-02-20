@@ -32,10 +32,6 @@ public class Payment {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_type_id", nullable = false)
-    private PaymentType paymentType;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lesson_id", nullable = false)
     private Lesson lesson;
 
