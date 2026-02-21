@@ -6,6 +6,8 @@ import Calendar from "../../components/WeekCalendar";
 import ClassModal from "../../components/ClassModal";
 import { useUser } from "../../context/usercontext";
 import { API_BASE_URL } from "../config";
+import Modal from "react-native-modal";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function HomeScreen() {
   const [selectedDay, setSelectedDay] = useState(new Date());
@@ -14,6 +16,9 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalData, setModalData] = useState({});
+  const [errorModalVisible, setErrorModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
   const { user } = useUser();
 
   // --- Helpers ---
@@ -107,8 +112,12 @@ export default function HomeScreen() {
         },
         body: JSON.stringify({ scheduleTemplateId, date: dateStr }),
       });
-      if (!response.ok) throw new Error("Error enrolling");
-
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        setErrorMessage("Mes en curso no pagado");
+        setErrorModalVisible(true);
+        return;
+      }
       setClasses((prev) =>
         prev.map((cls) =>
           cls.id === scheduleTemplateId ? { ...cls, isEnrolled: true } : cls
@@ -188,10 +197,49 @@ export default function HomeScreen() {
         initialData={modalData}
         lessons={lessonsList}
       />
+      
+      <Modal
+        isVisible={errorModalVisible}
+        onBackdropPress={() => setErrorModalVisible(false)}
+      >
+        <View style={styles.errorModal}>
+           <View style={styles.modalHeader}>
+          <Text style={styles.Title}>{errorMessage}</Text>
+          <Ionicons name="close" size={28} style={styles.closenonpaidIcon} onPress={() => setErrorModalVisible(false)} />
+            </View>
+           <View style={styles.modalContent}>
+            <Text style={styles.Content}> Por favor, paga el mes correspondiente para acceder a esta clase.</Text>
+            </View>
+        </View>
+      </Modal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#1E1E1E", paddingTop: 50 },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 16,
+    alignItems: "center",},
+  errorModal: {
+    backgroundColor: "#2a2a2a",
+    borderRadius: 12,
+  },
+  Title: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 22,
+  },
+  Content: {
+    color: "#ccc",
+    fontWeight: "bold",
+    textAlign: "center",
+  },  closenonpaidIcon: {
+    color: "purple",
+  },
+  modalContent: {
+    color: "purple",
+  }
 });

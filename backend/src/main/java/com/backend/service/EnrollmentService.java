@@ -2,20 +2,15 @@ package com.backend.service;
 
 import com.backend.dto.EnrollmentRequestDTO;
 import com.backend.exception.ResourceNotFoundException;
-import com.backend.model.Enrollment;
-import com.backend.model.ScheduleException;
-import com.backend.model.ScheduleTemplate;
-import com.backend.model.User;
-import com.backend.repository.EnrollmentRepository;
-import com.backend.repository.ScheduleExceptionRepository;
-import com.backend.repository.ScheduleTemplateRepository;
-import com.backend.repository.UserRepository;
+import com.backend.model.*;
+import com.backend.repository.*;
 import com.backend.security.JwtUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 
 @Service
@@ -23,6 +18,7 @@ import java.util.List;
 public class EnrollmentService {
 
     private final EnrollmentRepository enrollmentRepository;
+    private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
     private final ScheduleTemplateRepository scheduleTemplateRepository;
     private final ScheduleExceptionRepository scheduleExceptionRepository;
@@ -53,6 +49,19 @@ public class EnrollmentService {
                 .orElseThrow(() -> new ResourceNotFoundException("ScheduleTemplate not found with id " + dto.scheduleTemplateId()));
 
         LocalDate date = LocalDate.parse(dto.date());
+
+        //Here we check if the user has paid the month
+        YearMonth yearMonth = YearMonth.from(date);
+        Lesson lesson = template.getLesson();
+
+        boolean hasPaid = paymentRepository
+                .existsByUserAndLessonAndMonthPaid(user, lesson, yearMonth);
+
+        if (!hasPaid) {
+            throw new IllegalArgumentException(
+                    "User has not paid for this lesson for month " + yearMonth
+            );
+        }
 
         if (!template.getDayOfWeek().equals(date.getDayOfWeek())) {
             throw new IllegalArgumentException("ScheduleTemplate does not occur on this day");

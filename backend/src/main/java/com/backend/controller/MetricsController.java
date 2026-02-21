@@ -38,14 +38,22 @@ public class MetricsController {
 
     //Ranking metrics//
     @GetMapping("/month")
-    public ResponseEntity<List<UserRankingDTO>> getMonthlyRanking() {
-        List<UserRankingDTO> monthlyRanking = toRankingDTO(metricsService.getMonthlyRanking());
+    public ResponseEntity<List<UserRankingDTO>> getMonthlyRanking(
+            @RequestParam(required = false) Long lessonId) {
+
+        List<UserRankingDTO> monthlyRanking =
+                toRankingDTO(metricsService.getMonthlyRanking(lessonId));
+
         return ResponseEntity.ok(monthlyRanking);
     }
 
     @GetMapping("/year")
-    public ResponseEntity<List<UserRankingDTO>> getYearlyRanking() {
-        List<UserRankingDTO> yearlyRanking = toRankingDTO(metricsService.getYearlyRanking());
+    public ResponseEntity<List<UserRankingDTO>> getYearlyRanking(
+            @RequestParam(required = false) Long lessonId) {
+
+        List<UserRankingDTO> yearlyRanking =
+                toRankingDTO(metricsService.getYearlyRanking(lessonId));
+
         return ResponseEntity.ok(yearlyRanking);
     }
 }

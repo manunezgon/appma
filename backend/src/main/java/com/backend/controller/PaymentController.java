@@ -7,7 +7,6 @@ import com.backend.dto.UserResponseDTO;
 import com.backend.model.Payment;
 import com.backend.model.User;
 import com.backend.service.PaymentService;
-import com.backend.service.PaymentTypeService;
 import com.backend.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,14 +24,12 @@ public class PaymentController {
 
     private final PaymentService paymentService;
     private final UserService userService;
-    private final PaymentTypeService paymentTypeService;
 
     // --- Helpers ---
     private PaymentResponseDTO toDTO(Payment payment) {
         return new PaymentResponseDTO(
                 payment.getId(),
                 payment.getUser().getId(),
-                payment.getPaymentType().getId(),
                 payment.getMonthPaid()
         );
     }
@@ -47,9 +44,8 @@ public class PaymentController {
             @Valid @RequestBody PaymentRegisterDTO dto) {
 
         User user = userService.getUserById(dto.userId());
-        var paymentType = paymentTypeService.getPaymentTypeById(dto.paymentTypeId());
 
-        Payment payment = paymentService.registerPayment(user, paymentType, dto.monthPaid());
+        Payment payment = paymentService.registerPayment(user, dto.monthPaid());
         return ResponseEntity.ok(toDTO(payment));
     }
 

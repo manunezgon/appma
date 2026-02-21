@@ -30,11 +30,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errors);
     }
 
-    @ExceptionHandler(PaymentTypeNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handlePaymentTypeNotFound(PaymentTypeNotFoundException ex) {
-        return ResponseEntity.status(404).body(Map.of("error", ex.getMessage()));
-    }
-
     @ExceptionHandler(EmailNotRegisteredException.class)
     public ResponseEntity<Map<String, String>> handleEmailNotRegistered(EmailNotRegisteredException ex) {
         return ResponseEntity.status(404).body(Map.of("error", ex.getMessage()));

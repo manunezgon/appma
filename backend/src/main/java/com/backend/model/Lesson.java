@@ -20,4 +20,7 @@ public class Lesson {
 
     @Column(nullable = false)
     private String professorName;
+
+    @Column(nullable = false)
+    private Double amount_monthly;
 }
