@@ -63,11 +63,19 @@ public class MetricsService {
     }
 
     //RANKING-METRICS//
-    public List<Object[]> getMonthlyRanking() {
+// MONTH
+    public List<Object[]> getMonthlyRanking(Long lessonId) {
+        if (lessonId != null) {
+            return enrollmentRepository.findRankingByCurrentMonthAndLesson(lessonId);
+        }
         return enrollmentRepository.findRankingByCurrentMonth();
     }
 
-    public List<Object[]> getYearlyRanking() {
+    // YEAR
+    public List<Object[]> getYearlyRanking(Long lessonId) {
+        if (lessonId != null) {
+            return enrollmentRepository.findRankingByCurrentYearAndLesson(lessonId);
+        }
         return enrollmentRepository.findRankingByCurrentYear();
     }
 }

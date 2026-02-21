@@ -5,6 +5,7 @@ import com.backend.model.ScheduleTemplate;
 import com.backend.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -74,11 +75,38 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
         SELECT u.name, COUNT(*) as totalClasses
         FROM enrollments e
         INNER JOIN users u ON e.user_id = u.id
+        INNER JOIN schedule_template s ON e.schedule_template_id = s.id
+        WHERE MONTH(e.date) = MONTH(CURRENT_DATE)
+          AND YEAR(e.date) = YEAR(CURRENT_DATE)
+          AND s.lesson_id = :lessonId
+        GROUP BY u.id, u.name
+        ORDER BY totalClasses DESC
+    """,
+    nativeQuery = true)
+    List<Object[]> findRankingByCurrentMonthAndLesson(@Param("lessonId") Long lessonId);
+
+    @Query(value = """
+        SELECT u.name, COUNT(*) as totalClasses
+        FROM enrollments e
+        INNER JOIN users u ON e.user_id = u.id
         WHERE YEAR(e.date) = YEAR(CURRENT_DATE)
         GROUP BY u.id, u.name
         ORDER BY totalClasses DESC
         """,
     nativeQuery = true)
     List<Object[]> findRankingByCurrentYear();
+
+    @Query(value = """
+        SELECT u.name, COUNT(*) as totalClasses
+        FROM enrollments e
+        INNER JOIN users u ON e.user_id = u.id
+        INNER JOIN schedule_template s ON e.schedule_template_id = s.id
+        WHERE YEAR(e.date) = YEAR(CURRENT_DATE)
+          AND s.lesson_id = :lessonId
+        GROUP BY u.id, u.name
+        ORDER BY totalClasses DESC
+        """,
+            nativeQuery = true)
+    List<Object[]> findRankingByCurrentYearAndLesson(@Param("lessonId") Long lessonId);
 
 }
