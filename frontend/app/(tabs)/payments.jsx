@@ -1,74 +1,189 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  Alert,
   FlatList,
-  Modal,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
+import { useUser } from "../../context/usercontext";
+import { API_BASE_URL } from "../config";
+
+import { PaymentModal } from "../../components/PaymentModal";
+import { StudentCard } from "../../components/StudentCard";
+import { StudentPaymentsModal } from "../../components/StudentPaymentsModal";
+
+const generateMonths = () => {
+  const months = [];
+  const now = new Date();
+
+  for (let i = 0; i <= 12; i++) {
+    const date = new Date(now.getFullYear(), now.getMonth() + i, 1);
+    const value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    const label = date.toLocaleString("es-ES", {
+      month: "long",
+      year: "numeric",
+    });
+    months.push({
+      label: label.charAt(0).toUpperCase() + label.slice(1),
+      value,
+    });
+  }
+
+  return months;
+};
 
 export default function Payments() {
+  const { user } = useUser();
+
   const [search, setSearch] = useState("");
+  const [students, setStudents] = useState([]);
+  const [loadingStudents, setLoadingStudents] = useState(true);
+
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [payments, setPayments] = useState([]);
+  const [loadingPayments, setLoadingPayments] = useState(false);
+
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedLessonId, setSelectedLessonId] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [registeringPayment, setRegisteringPayment] = useState(false);
 
-  // MOCK DE ALUMNOS
-  const students = [
-    { id: 1, name: "Juan Pérez" },
-    { id: 2, name: "María García" },
-    { id: 3, name: "Carlos López" },
-    { id: 4, name: "Ana Torres" },
-    { id: 5, name: "David Ruiz" },
-  ];
+  const [lessons, setLessons] = useState([]);
+  const months = generateMonths();
 
+  // ===========================
+  // Fetch functions
+  // ===========================
+  const fetchLessons = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/lessons`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const data = await response.json();
+      setLessons(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchStudents = async () => {
+    try {
+      setLoadingStudents(true);
+      const response = await fetch(`${API_BASE_URL}/users`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+
+      if (!response.ok) throw new Error("Error cargando usuarios");
+      const data = await response.json();
+
+      const studentsOnly = data
+        .filter((u) => u.role === "MEMBER")
+        .map((u) => ({
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          phone: u.phone,
+        }));
+
+      setStudents(studentsOnly);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingStudents(false);
+    }
+  };
+
+  const fetchPaymentsByUser = async (userId) => {
+    try {
+      setLoadingPayments(true);
+      const response = await fetch(`${API_BASE_URL}/payments/user/${userId}`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      if (!response.ok) throw new Error("Error cargando pagos");
+
+      const data = await response.json();
+      setPayments(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingPayments(false);
+    }
+  };
+
+  const deletePayment = async (paymentId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/payments/${paymentId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      if (!response.ok) throw new Error("Error eliminando pago");
+
+      fetchPaymentsByUser(selectedStudent.id);
+    } catch (err) {
+      console.error(err);
+      Alert.alert("Error eliminando pago");
+    }
+  };
+
+  const registerPayment = async () => {
+    if (!selectedMonth) return Alert.alert("Selecciona un mes");
+
+    try {
+      setRegisteringPayment(true);
+      const response = await fetch(`${API_BASE_URL}/payments/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+        body: JSON.stringify({
+          userId: selectedStudent.id,
+          lessonId: selectedLessonId,
+          monthPaid: selectedMonth,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Error registrando pago");
+
+      Alert.alert("Pago registrado correctamente");
+      setShowPaymentModal(false);
+      setSelectedMonth("");
+      setSelectedLessonId(null);
+      fetchPaymentsByUser(selectedStudent.id);
+    } catch (err) {
+      console.error(err);
+      Alert.alert("Error registrando pago");
+    } finally {
+      setRegisteringPayment(false);
+    }
+  };
+
+  // ===========================
+  // Effects
+  // ===========================
+  useEffect(() => {
+    if (user?.token) fetchStudents();
+  }, [user]);
+  useEffect(() => {
+    if (user?.token) fetchLessons();
+  }, [user]);
+
+  // ===========================
+  // Filtered students
+  // ===========================
   const filteredStudents = students.filter((s) =>
     s.name.toLowerCase().includes(search.toLowerCase()),
   );
 
-  // MOCK MODALIDADES POR ALUMNO
-  const studentModalitiesMock = {
-    1: [
-      { id: 1, name: "Karate", paid: false, lastPaidMonth: "2026-01" },
-      { id: 2, name: "BJJ", paid: true, lastPaidMonth: "2026-02" },
-    ],
-    2: [
-      { id: 1, name: "Karate", paid: true, lastPaidMonth: "2026-02" },
-      { id: 3, name: "MMA", paid: false, lastPaidMonth: null },
-    ],
-    3: [{ id: 2, name: "BJJ", paid: true, lastPaidMonth: "2026-02" }],
-    4: [{ id: 1, name: "Karate", paid: false, lastPaidMonth: "2026-01" }],
-  };
-
-  const renderStudent = ({ item }) => (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={() => setSelectedStudent(item)}
-    >
-      <Text style={styles.name}>{item.name}</Text>
-      <Ionicons name="chevron-forward-outline" size={28} color="#888" />
-    </TouchableOpacity>
-  );
-
-  const renderModality = ({ item }) => (
-    <View style={styles.modalityCard}>
-      <Text style={styles.modalityName}>{item.name}</Text>
-      <Text style={styles.modalityStatus}>
-        Último pago: {item.lastPaidMonth ?? "Nunca"}
-      </Text>
-    </View>
-  );
-
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Alumnos</Text>
-      </View>
+      {/* Header */}
+      <Text style={styles.title}>Alumnos</Text>
+
       {/* Buscador */}
       <View style={styles.searchBox}>
-        <Ionicons name="search" size={28} color="#888" />
         <TextInput
           placeholder="Buscar alumno..."
           placeholderTextColor="#888"
@@ -78,79 +193,53 @@ export default function Payments() {
         />
       </View>
 
-      <FlatList
-        data={filteredStudents}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderStudent}
-        ListEmptyComponent={
-          <Text style={styles.empty}>No se encontraron alumnos</Text>
-        }
+      {/* Lista de alumnos */}
+      {loadingStudents ? (
+        <Text style={styles.loadingText}>Cargando alumnos...</Text>
+      ) : (
+        <FlatList
+          data={filteredStudents}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <StudentCard
+              student={item}
+              onPress={(student) => {
+                setSelectedStudent(student);
+                fetchPaymentsByUser(student.id);
+              }}
+            />
+          )}
+          ListEmptyComponent={<Text style={styles.empty}>No hay alumnos</Text>}
+        />
+      )}
+
+      {/* Modal pagos del alumno */}
+      <StudentPaymentsModal
+        student={selectedStudent}
+        payments={payments}
+        onDelete={deletePayment}
+        onRegister={() => setShowPaymentModal(true)}
+        onClose={() => {
+          setSelectedStudent(null);
+          setPayments([]);
+        }}
+        loadingPayments={loadingPayments}
       />
 
-      {/* Modal principal: historial de modalidades */}
-      <Modal
-        visible={selectedStudent !== null}
-        animationType="fade"
-        transparent={true}
-        onRequestClose={() => setSelectedStudent(null)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{selectedStudent?.name}</Text>
-            <Text style={styles.modalSubtitle}>
-              Modalidades en las que se ha apuntado
-            </Text>
-
-            <FlatList
-              data={studentModalitiesMock[selectedStudent?.id] || []}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={renderModality}
-              style={{ width: "100%", marginTop: 10 }}
-            />
-
-            {/* Botón registrar pago debajo de toda la lista */}
-            <TouchableOpacity
-              style={styles.registerButton}
-              onPress={() => setShowPaymentModal(true)}
-            >
-              <Text style={styles.registerButtonText}>Registrar pago</Text>
-            </TouchableOpacity>
-
-            {/* Cerrar modal principal */}
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setSelectedStudent(null)}
-            >
-              <Ionicons name="close" size={28} color="#7c23b0" />
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-
-      {/* Modal secundario: formulario para pago nuevo */}
-      <Modal
+      {/* Modal registrar pago */}
+      <PaymentModal
         visible={showPaymentModal}
-        animationType="fade"
-        transparent={true}
-        onRequestClose={() => setShowPaymentModal(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Registrar pago</Text>
-            <Text style={styles.modalSubtitle}>
-              Aquí irá el formulario para registrar un nuevo pago
-            </Text>
-
-            {/* Cerrar modal */}
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setShowPaymentModal(false)}
-            >
-              <Ionicons name="close" size={28} color="#7c23b0" />
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+        student={selectedStudent}
+        lessons={lessons}
+        months={months}
+        selectedLessonId={selectedLessonId}
+        setSelectedLessonId={setSelectedLessonId}
+        selectedMonth={selectedMonth}
+        setSelectedMonth={setSelectedMonth}
+        onConfirm={registerPayment}
+        registering={registeringPayment}
+        onClose={() => setShowPaymentModal(false)}
+      />
     </View>
   );
 }
@@ -162,21 +251,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 50,
   },
-
-  header: {
-    paddingTop: 20,
-    paddingBottom: 10,
-  },
-
   title: {
     fontSize: 16,
     fontWeight: "bold",
     color: "#CCCCCC",
     textTransform: "uppercase",
-    justifyContent: "center",
     textAlign: "center",
+    marginBottom: 20,
   },
-
   searchBox: {
     flexDirection: "row",
     alignItems: "center",
@@ -185,100 +267,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 20,
   },
-
   searchInput: {
     flex: 1,
     padding: 10,
     color: "#fff",
   },
-
-  card: {
-    backgroundColor: "#2A2A2A",
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+  loadingText: {
+    color: "#ccc",
+    marginTop: 10,
   },
-
-  name: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-
   empty: {
     textAlign: "center",
     color: "#888",
     marginTop: 20,
-  },
-
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  modalContent: {
-    backgroundColor: "#2A2A2A",
-    padding: 20,
-    borderRadius: 10,
-    width: "90%",
-    alignItems: "center",
-    position: "relative",
-    maxHeight: "80%",
-  },
-
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#fff",
-    marginBottom: 10,
-  },
-
-  modalSubtitle: {
-    color: "#ccc",
-    textAlign: "center",
-    marginBottom: 10,
-  },
-
-  closeButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-  },
-
-  modalityCard: {
-    backgroundColor: "#1E1E1E",
-    padding: 12,
-    borderRadius: 10,
-    marginBottom: 10,
-    width: "100%",
-  },
-
-  modalityName: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-
-  modalityStatus: {
-    color: "#888",
-    fontSize: 12,
-    marginTop: 3,
-  },
-   registerButton: {
-    marginTop: 15,
-    backgroundColor: "#00923aff",
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-  },
-    registerButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
   },
 });

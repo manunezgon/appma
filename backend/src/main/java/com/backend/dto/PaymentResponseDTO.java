@@ -7,5 +7,8 @@ import java.time.YearMonth;
 public record PaymentResponseDTO(
         Long id,
         Long userId,
-        @JsonFormat(pattern = "yyyy-MM") YearMonth monthPaid
+        YearMonth monthPaid,
+        Long lessonId,
+        String lessonName,
+        String professorName
 ) {}
