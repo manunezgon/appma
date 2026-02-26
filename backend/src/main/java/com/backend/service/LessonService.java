@@ -29,16 +29,17 @@ public class LessonService {
     }
 
     @Transactional
-    public Lesson registerLesson(String lessonName, String professorName) {
+    public Lesson registerLesson(String lessonName, String professorName, Double amountMonthly) {
         List<Lesson> listLessons = validateLessonName(lessonName, professorName);
 
         if (!listLessons.isEmpty()) {
-            throw new IllegalStateException("You've already register that lesson");
+            throw new IllegalStateException("You've already registered that lesson");
         }
 
         Lesson lesson = new Lesson();
         lesson.setLessonName(lessonName);
         lesson.setProfessorName(professorName);
+        lesson.setAmount_monthly(amountMonthly);
 
         return lessonRepository.save(lesson);
     }

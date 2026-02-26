@@ -34,7 +34,7 @@ public class LessonController {
     public ResponseEntity<LessonResponseDTO> registerLesson(
             @Valid @RequestBody LessonRequestDTO dto) {
 
-        Lesson lesson = lessonService.registerLesson(dto.lessonName(), dto.professorName());
+        Lesson lesson = lessonService.registerLesson(dto.lessonName(), dto.professorName(), dto.amountMonthly());
         return ResponseEntity.ok(toDTO(lesson));
     }
 
