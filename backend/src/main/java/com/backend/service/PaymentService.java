@@ -1,6 +1,7 @@
 package com.backend.service;
 
 import com.backend.exception.UserNotFoundException;
+import com.backend.model.Lesson;
 import com.backend.model.Payment;
 import com.backend.model.User;
 import com.backend.repository.PaymentRepository;
@@ -9,6 +10,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
 
@@ -20,18 +22,17 @@ public class PaymentService {
     private final UserRepository userRepository;
 
     @Transactional
-    public Payment registerPayment(User user,  YearMonth monthPaid) {
-        validateUser(user);
-        validateMonth(monthPaid);
+    public Payment registerPayment(User user, Lesson lesson, YearMonth month) {
 
-        if (hasUserPaidForMonth(user, monthPaid)) {
-            throw new IllegalStateException("User has already paid for this month");
+        if(paymentRepository.existsByUserAndLessonAndMonthPaid(user, lesson, month)) {
+            throw new RuntimeException("Ya existe un pago para esta modalidad y mes");
         }
 
         Payment payment = new Payment();
         payment.setUser(user);
-        payment.setMonthPaid(monthPaid);
-        payment.setPaymentDate(java.time.LocalDateTime.now());
+        payment.setLesson(lesson);
+        payment.setMonthPaid(month);
+        payment.setPaymentDate(LocalDateTime.now());
 
         return paymentRepository.save(payment);
     }
@@ -57,6 +58,13 @@ public class PaymentService {
         return userRepository.findUsersWhoHaveNotPaid(month);
     }
 
+    public void deletePayment(Long paymentId) {
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new RuntimeException("Pago no encontrado"));
+
+        paymentRepository.delete(payment);
+    }
+
     // --- Validations ---
     private void validateUser(User user) {
         if (user == null || !userRepository.existsById(user.getId())) {
@@ -67,6 +75,12 @@ public class PaymentService {
     private void validateMonth(YearMonth month) {
         if (month == null) {
             throw new IllegalArgumentException("Month cannot be null");
+        }
+    }
+
+    private void validateLesson(Lesson lesson) {
+        if (lesson == null) {
+            throw new IllegalArgumentException("Lesson cannot be null");
         }
     }
 }

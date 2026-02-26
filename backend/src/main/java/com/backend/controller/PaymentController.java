@@ -1,5 +1,7 @@
 package com.backend.controller;
 
+import com.backend.model.Lesson;
+import com.backend.service.LessonService;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.backend.dto.PaymentRegisterDTO;
 import com.backend.dto.PaymentResponseDTO;
@@ -24,13 +26,17 @@ public class PaymentController {
 
     private final PaymentService paymentService;
     private final UserService userService;
+    private final LessonService lessonService;
 
     // --- Helpers ---
     private PaymentResponseDTO toDTO(Payment payment) {
         return new PaymentResponseDTO(
                 payment.getId(),
                 payment.getUser().getId(),
-                payment.getMonthPaid()
+                payment.getMonthPaid(),
+                payment.getLesson().getId(),
+                payment.getLesson().getLessonName(),
+                payment.getLesson().getProfessorName()
         );
     }
 
@@ -44,8 +50,14 @@ public class PaymentController {
             @Valid @RequestBody PaymentRegisterDTO dto) {
 
         User user = userService.getUserById(dto.userId());
+        Lesson lesson = lessonService.getLessonById(dto.lessonId());
 
-        Payment payment = paymentService.registerPayment(user, dto.monthPaid());
+        Payment payment = paymentService.registerPayment(
+                user,
+                lesson,
+                dto.monthPaid()
+        );
+
         return ResponseEntity.ok(toDTO(payment));
     }
 
@@ -77,5 +89,11 @@ public class PaymentController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(notPaidUsers);
+    }
+
+    @DeleteMapping("/{paymentId}")
+    public ResponseEntity<Void> deletePayment(@PathVariable Long paymentId) {
+        paymentService.deletePayment(paymentId);
+        return ResponseEntity.noContent().build();
     }
 }
