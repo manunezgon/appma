@@ -52,7 +52,8 @@ export default function ClassList({
               <View style={styles.centerContainer}>
                 <Text style={styles.classTime}>{item.time}</Text>
               </View>
-
+              
+              {userRole != "ADMIN" && (
               <View style={styles.rightContainer}>
                 <TouchableOpacity
                   style={[
@@ -81,6 +82,7 @@ export default function ClassList({
                   />
                 </TouchableOpacity>
               </View>
+              )}
 
               {userRole === "ADMIN" && (
                 <View style={styles.adminButtons}>
