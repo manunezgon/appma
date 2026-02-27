@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import {
-    Alert,
-    Modal,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 import DayPicker from "./DayPicker";
@@ -21,7 +21,7 @@ export default function ScheduleWizardModal({
   API_BASE_URL,
 }) {
   const [step, setStep] = useState(1);
-  const [mode, setMode] = useState(null); // create | edit
+  const [mode, setMode] = useState(null); // create | editSchedule | editLesson
   const [lessonMode, setLessonMode] = useState(null); // new | existing
 
   const [lessons, setLessons] = useState([]);
@@ -89,8 +89,10 @@ export default function ScheduleWizardModal({
   };
 
   useEffect(() => {
-    if (visible && lessonMode === "existing") fetchLessons();
-  }, [visible, lessonMode]);
+    if (visible && (lessonMode === "existing" || mode === "editLesson")) {
+      fetchLessons();
+    }
+  }, [visible, lessonMode, mode]);
 
   // --- Fetch schedules ---
   const fetchSchedules = async () => {
@@ -112,7 +114,7 @@ export default function ScheduleWizardModal({
   };
 
   useEffect(() => {
-    if (visible && mode === "edit") fetchSchedules();
+    if (visible && mode === "editSchedule") fetchSchedules();
   }, [visible, mode]);
 
   // --- Guardar horario ---
@@ -147,11 +149,11 @@ export default function ScheduleWizardModal({
       }
 
       const url =
-        mode === "edit"
+        mode === "editSchedule"
           ? `${API_BASE_URL}/scheduleTemplates/${selectedLesson}`
           : `${API_BASE_URL}/scheduleTemplates`;
 
-      const method = mode === "edit" ? "PUT" : "POST";
+      const method = mode === "editSchedule" ? "PUT" : "POST";
 
       const res = await fetch(url, {
         method,
@@ -169,7 +171,7 @@ export default function ScheduleWizardModal({
 
       if (res.ok) {
         Alert.alert(
-          mode === "edit"
+          mode === "editSchedule"
             ? "Horario actualizado correctamente"
             : "Horario creado correctamente",
         );
@@ -181,6 +183,117 @@ export default function ScheduleWizardModal({
     }
   };
 
+  // --- Borrar horario ---
+
+  const handleDeleteSchedule = async () => {
+    Alert.alert(
+      "Eliminar horario",
+      "¿Estás seguro de que quieres eliminar este horario?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const res = await fetch(
+                `${API_BASE_URL}/scheduleTemplates/${selectedLesson}`,
+                {
+                  method: "DELETE",
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                },
+              );
+
+              if (res.ok) {
+                Alert.alert("Horario eliminado correctamente");
+                handleClose();
+              } else {
+                Alert.alert("Error eliminando el horario");
+              }
+            } catch (err) {
+              console.error(err);
+              Alert.alert("Error del servidor");
+            }
+          },
+        },
+      ],
+    );
+  };
+
+  // --- Actualizar lessons ---
+  const handleUpdateLesson = async () => {
+    if (!newLessonName || !newProfessorName || !newAmountMonthly) {
+      Alert.alert("Completa todos los campos");
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/lessons/${selectedLesson}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          lessonName: newLessonName,
+          professorName: newProfessorName,
+          amountMonthly: parseFloat(newAmountMonthly),
+        }),
+      });
+
+      if (res.ok) {
+        Alert.alert("Lesson actualizada correctamente");
+        handleClose();
+      } else {
+        Alert.alert("Error actualizando lesson");
+      }
+    } catch (err) {
+      console.error(err);
+      Alert.alert("Error del servidor");
+    }
+  };
+
+  // --- Borrar lesson ---
+  const handleDeleteLesson = async () => {
+    Alert.alert(
+      "Eliminar lesson",
+      "¿Estás seguro de que quieres eliminar esta lesson? Se borrarán también todos los horarios asociados.",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const res = await fetch(
+                `${API_BASE_URL}/lessons/${selectedLesson}`,
+                {
+                  method: "DELETE",
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                },
+              );
+
+              if (res.ok) {
+                Alert.alert("Lesson eliminada correctamente");
+                handleClose();
+              } else {
+                Alert.alert("Error eliminando la lesson");
+              }
+            } catch (err) {
+              console.error(err);
+              Alert.alert("Error del servidor");
+            }
+          },
+        },
+      ],
+    );
+  };
+
+  // --- Botón atras ---
   const goBack = () => setStep((prev) => Math.max(prev - 1, 1));
 
   // --- Helpers para obtener la lesson seleccionada ---
@@ -193,7 +306,9 @@ export default function ScheduleWizardModal({
         }
       : mode === "create"
         ? lessons.find((l) => l.id === selectedLesson)
-        : schedules.find((s) => s.id === selectedLesson);
+        : mode === "editSchedule"
+          ? schedules.find((s) => s.id === selectedLesson)
+          : lessons.find((l) => l.id === selectedLesson);
 
   return (
     <Modal visible={visible} animationType="fade" transparent>
@@ -221,12 +336,24 @@ export default function ScheduleWizardModal({
                 <TouchableOpacity
                   style={styles.button}
                   onPress={() => {
-                    setMode("edit");
+                    setMode("editSchedule");
                     setStep(2);
                   }}
                 >
                   <Text style={styles.buttonText}>
                     Modificar horario existente
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => {
+                    setMode("editLesson");
+                    setLessonMode("existing");
+                    setStep(2);
+                  }}
+                >
+                  <Text style={styles.buttonText}>
+                    Modificar lesson existente
                   </Text>
                 </TouchableOpacity>
               </>
@@ -259,7 +386,7 @@ export default function ScheduleWizardModal({
               </>
             )}
 
-            {step === 2 && mode === "edit" && (
+            {step === 2 && mode === "editSchedule" && (
               <>
                 <Text style={styles.subtitle}>
                   Selecciona un horario para modificar
@@ -296,74 +423,165 @@ export default function ScheduleWizardModal({
               </>
             )}
 
+            {step === 2 && mode === "editLesson" && (
+              <>
+                <Text style={styles.subtitle}>
+                  Selecciona una lesson para modificar
+                </Text>
+
+                {loadingLessons ? (
+                  <Text>Cargando lessons...</Text>
+                ) : (
+                  <SelectableList
+                    items={lessons}
+                    selectedId={selectedLesson}
+                    onSelect={(id) => {
+                      const lesson = lessons.find((l) => l.id === id);
+
+                      setSelectedLesson(id);
+                      setNewLessonName(lesson.lessonName);
+                      setNewProfessorName(lesson.professorName);
+                      setNewAmountMonthly(String(lesson.amountMonthly));
+
+                      setStep(3);
+                    }}
+                    renderItem={(l) => (
+                      <Text style={{ color: "#fff" }}>
+                        {l.lessonName} - {l.professorName} (${l.amountMonthly})
+                      </Text>
+                    )}
+                  />
+                )}
+              </>
+            )}
+
             {/* ---------------- STEP 3 ---------------- */}
             {step === 3 && (
               <>
-                {lessonMode === "new" && mode === "create" && (
+                {mode === "editLesson" && (
                   <>
-                    <Text style={styles.subtitle}>
-                      Nombre de la nueva lesson
-                    </Text>
+                    <Text style={styles.subtitle}>Editar lesson</Text>
+
+                    <Text>Nombre</Text>
                     <TextInputField
                       value={newLessonName}
                       onChangeText={setNewLessonName}
-                      placeholder="Ej: Yoga avanzado"
                     />
-                    <Text style={styles.subtitle}>Profesor</Text>
+
+                    <Text>Profesor</Text>
                     <TextInputField
                       value={newProfessorName}
                       onChangeText={setNewProfessorName}
-                      placeholder="Nombre del profesor"
                     />
-                    <Text style={styles.subtitle}>Precio mensual</Text>
+
+                    <Text>Precio mensual</Text>
                     <TextInputField
                       value={newAmountMonthly}
                       onChangeText={setNewAmountMonthly}
-                      placeholder="Ej: 35"
                       keyboardType="numeric"
                     />
-                  </>
-                )}
 
-                {lessonMode === "existing" && mode === "create" && (
-                  <>
-                    <Text style={styles.subtitle}>Selecciona una lesson</Text>
-                    {loadingLessons ? (
-                      <Text>Cargando lessons...</Text>
-                    ) : (
-                      <SelectableList
-                        items={lessons}
-                        selectedId={selectedLesson}
-                        onSelect={setSelectedLesson}
-                        renderItem={(l) => (
-                          <Text style={{ color: "#fff" }}>
-                            {l.lessonName} - {l.professorName} ($
-                            {l.amountMonthly})
-                          </Text>
-                        )}
-                      />
+                    <TouchableOpacity
+                      style={[styles.button, { marginTop: 10 }]}
+                      onPress={handleUpdateLesson}
+                    >
+                      <Text style={styles.buttonText}>Guardar cambios</Text>
+                    </TouchableOpacity>
+                    {mode === "editLesson" && selectedLesson && (
+                      <TouchableOpacity
+                        style={[styles.deleteButton, { marginTop: 10 }]}
+                        onPress={handleDeleteLesson}
+                      >
+                        <Text style={styles.deleteButtonText}>
+                          Borrar lesson
+                        </Text>
+                      </TouchableOpacity>
                     )}
                   </>
                 )}
 
-                {lessonMode === "existing" && mode === "edit" && (
+                {mode !== "editLesson" && (
                   <>
-                    <Text style={styles.subtitle}>Editar horario</Text>
-                    <LessonSummary
-                      lesson={selectedLessonObj}
-                      day={selectedDay}
-                      startTime={startTime}
-                      endTime={endTime}
-                    />
+                    {lessonMode === "new" && mode === "create" && (
+                      <>
+                        <Text style={styles.subtitle}>
+                          Nombre de la nueva lesson
+                        </Text>
+                        <TextInputField
+                          value={newLessonName}
+                          onChangeText={setNewLessonName}
+                          placeholder="Ej: Yoga avanzado"
+                        />
+                        <Text style={styles.subtitle}>Profesor</Text>
+                        <TextInputField
+                          value={newProfessorName}
+                          onChangeText={setNewProfessorName}
+                          placeholder="Nombre del profesor"
+                        />
+                        <Text style={styles.subtitle}>Precio mensual</Text>
+                        <TextInputField
+                          value={newAmountMonthly}
+                          onChangeText={setNewAmountMonthly}
+                          placeholder="Ej: 35"
+                          keyboardType="numeric"
+                        />
+                      </>
+                    )}
+
+                    {lessonMode === "existing" && mode === "create" && (
+                      <>
+                        <Text style={styles.subtitle}>
+                          Selecciona una lesson
+                        </Text>
+                        {loadingLessons ? (
+                          <Text>Cargando lessons...</Text>
+                        ) : (
+                          <SelectableList
+                            items={lessons}
+                            selectedId={selectedLesson}
+                            onSelect={setSelectedLesson}
+                            renderItem={(l) => (
+                              <Text style={{ color: "#fff" }}>
+                                {l.lessonName} - {l.professorName} ($
+                                {l.amountMonthly})
+                              </Text>
+                            )}
+                          />
+                        )}
+                      </>
+                    )}
+
+                    {lessonMode === "existing" && mode === "editSchedule" && (
+                      <>
+                        <Text style={styles.subtitle}>Editar horario</Text>
+                        <LessonSummary
+                          lesson={selectedLessonObj}
+                          day={selectedDay}
+                          startTime={startTime}
+                          endTime={endTime}
+                        />
+                      </>
+                    )}
+
+                    <TouchableOpacity
+                      style={[styles.button, { marginTop: 10 }]}
+                      onPress={() => setStep(lessonMode === "new" ? 4 : 4)}
+                    >
+                      <Text style={styles.buttonText}>Siguiente</Text>
+                    </TouchableOpacity>
+
+                    {mode === "editSchedule" && (
+                      <TouchableOpacity
+                        style={[styles.deleteButton, { marginTop: 10 }]}
+                        onPress={handleDeleteSchedule}
+                      >
+                        <Text style={styles.deleteButtonText}>
+                          Borrar horario
+                        </Text>
+                      </TouchableOpacity>
+                    )}
                   </>
                 )}
-
-                <TouchableOpacity
-                  style={[styles.button, { marginTop: 10 }]}
-                  onPress={() => setStep(lessonMode === "new" ? 4 : 4)}
-                >
-                  <Text style={styles.buttonText}>Siguiente</Text>
-                </TouchableOpacity>
               </>
             )}
 
@@ -402,7 +620,9 @@ export default function ScheduleWizardModal({
             {step === 5 && (
               <>
                 <Text style={styles.subtitle}>
-                  {mode === "edit" ? "Confirmar cambios" : "Confirmar horario"}
+                  {mode === "editSchedule"
+                    ? "Confirmar cambios"
+                    : "Confirmar horario"}
                 </Text>
                 <LessonSummary
                   lesson={selectedLessonObj}
@@ -415,7 +635,9 @@ export default function ScheduleWizardModal({
                   onPress={handleSaveSchedule}
                 >
                   <Text style={styles.buttonText}>
-                    {mode === "edit" ? "Guardar cambios" : "Guardar horario"}
+                    {mode === "editSchedule"
+                      ? "Guardar cambios"
+                      : "Guardar horario"}
                   </Text>
                 </TouchableOpacity>
               </>
@@ -442,7 +664,6 @@ export default function ScheduleWizardModal({
   );
 }
 
-// Agrega tus estilos como antes
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
@@ -469,4 +690,15 @@ const styles = StyleSheet.create({
   },
   backButton: { flex: 1, marginRight: 5, backgroundColor: "#757575" },
   cancelButton: { flex: 1, marginLeft: 5, backgroundColor: "#E53935" },
+  deleteButton: {
+    backgroundColor: "#ff4d4d",
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+
+  deleteButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
 });
