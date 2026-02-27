@@ -7,7 +7,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { useUser } from "../../context/usercontext";
+import { useUser } from "../../context/UserContext";
 import { API_BASE_URL } from "../config";
 
 import { PaymentModal } from "../../components/PaymentModal";

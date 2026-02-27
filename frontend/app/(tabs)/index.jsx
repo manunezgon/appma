@@ -4,7 +4,7 @@ import { StyleSheet, View, Button, TouchableOpacity, Text } from "react-native";
 import ClassList from "../../components/ClassList";
 import Calendar from "../../components/WeekCalendar";
 import ClassModal from "../../components/ClassModal";
-import { useUser } from "../../context/usercontext";
+import { useUser } from "../../context/UserContext";
 import { API_BASE_URL } from "../config";
 import Modal from "react-native-modal";
 import { Ionicons } from "@expo/vector-icons";

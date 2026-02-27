@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { API_BASE_URL } from "../config";
-import { useUser } from "../../context/usercontext";
+import { useUser } from "../../context/UserContext";
 
 export default function Ranking() {
   const { user } = useUser();

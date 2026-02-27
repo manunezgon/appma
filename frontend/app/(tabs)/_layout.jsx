@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import { useUser } from "../../context/usercontext";
+import { useUser } from "../../context/UserContext";
 
 export default function TabLayout() {
   const { user, loading } = useUser();

@@ -2,7 +2,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useState } from "react";
 import { Button, Modal, RefreshControl, SectionList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { useUser } from "../../context/usercontext";
+import { useUser } from "../../context/UserContext";
 import { API_BASE_URL } from "../config";
 
 export default function Sessions() {

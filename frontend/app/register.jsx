@@ -4,7 +4,7 @@ import * as SecureStore from 'expo-secure-store';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Image, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { useUser } from '../context/usercontext';
+import { useUser } from '../context/UserContext';
 import { API_BASE_URL } from "./config";
 
 export default function Register() {
