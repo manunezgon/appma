@@ -10,7 +10,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import ScheduleWizardModal from "../../components/ScheduleWizardModal";
 import { useUser } from "../../context/UserContext";
 import { API_BASE_URL } from "../config.jsx";
 
@@ -19,8 +18,6 @@ export default function Profile() {
   const router = useRouter();
 
   const [modalVisible, setModalVisible] = useState(false);
-
-  const [scheduleWizardVisible, setScheduleWizardVisible] = useState(false);
 
   const [editName, setEditName] = useState(user?.name || "");
   const [editEmail, setEditEmail] = useState(user?.email || "");
@@ -164,15 +161,6 @@ export default function Profile() {
         <Text style={styles.buttonText}>Ajustes</Text>
       </TouchableOpacity>
 
-      {user?.role === "ADMIN" && (
-        <TouchableOpacity
-          onPress={() => setScheduleWizardVisible(true)}
-          style={styles.button}
-        >
-          <Text style={styles.buttonText}>Gestionar horarios</Text>
-        </TouchableOpacity>
-      )}
-
       <TouchableOpacity
         onPress={handleLogout}
         style={[styles.button, styles.logoutButton]}
@@ -263,13 +251,6 @@ export default function Profile() {
           </View>
         </View>
       </Modal>
-
-      <ScheduleWizardModal
-        visible={scheduleWizardVisible}
-        onClose={() => setScheduleWizardVisible(false)}
-        token={token}
-        API_BASE_URL={API_BASE_URL}
-      />
     </ScrollView>
   );
 }

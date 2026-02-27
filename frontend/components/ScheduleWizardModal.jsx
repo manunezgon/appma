@@ -1,7 +1,6 @@
 import { useState } from "react";
 import {
   Alert,
-  Modal,
   ScrollView,
   StyleSheet,
   Text,
@@ -16,7 +15,7 @@ import LessonSummary from "./LessonSummary";
 import SelectableList from "./SelectableList";
 import TextInputField from "./TextInputField";
 
-export default function ScheduleWizardModal({ visible, onClose }) {
+export default function ScheduleWizardModal({ onClose }) {
   const { lessons, loadingLessons, createLesson, updateLesson, deleteLesson } =
     useLessons();
   const {
@@ -209,404 +208,392 @@ export default function ScheduleWizardModal({ visible, onClose }) {
         : lessons.find((l) => l.id === selectedLessonId);
 
   return (
-    <Modal visible={visible} animationType="fade" transparent>
-      <View style={styles.overlay}>
-        <View style={styles.container}>
-          <ScrollView contentContainerStyle={styles.inner}>
-            <Text style={styles.title}>Gestión de horarios</Text>
-            <Text style={styles.stepIndicator}>
-              Paso {step} de {totalSteps}
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.inner}>
+        <Text style={styles.title}>Gestión de horarios</Text>
+        <Text style={styles.stepIndicator}>
+          Paso {step} de {totalSteps}
+        </Text>
+
+        {/* ---------------- STEP 1 ---------------- */}
+        {step === 1 && (
+          <>
+            <Text style={styles.subtitle}>¿Qué quieres hacer?</Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                setMode("create");
+                setLessonMode(null);
+                setSelectedLessonId(null);
+                setSelectedScheduleId(null);
+                setStep(2);
+              }}
+            >
+              <Text style={styles.buttonText}>Crear horario nuevo</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                setMode("editSchedule");
+                setLessonMode("existing");
+                setSelectedLessonId(null);
+                setSelectedScheduleId(null);
+                setStep(2);
+              }}
+            >
+              <Text style={styles.buttonText}>Modificar horario existente</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                setMode("editLesson");
+                setLessonMode("existing");
+                setSelectedLessonId(null);
+                setSelectedScheduleId(null);
+                setStep(2);
+              }}
+            >
+              <Text style={styles.buttonText}>Modificar lesson existente</Text>
+            </TouchableOpacity>
+          </>
+        )}
+
+        {/* ---------------- STEP 2 ---------------- */}
+        {step === 2 && mode === "create" && (
+          <>
+            <Text style={styles.subtitle}>¿Qué tipo de lesson quieres?</Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                setLessonMode("new");
+                setStep(3);
+              }}
+            >
+              <Text style={styles.buttonText}>Crear lesson nueva</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                setLessonMode("existing");
+                setStep(3);
+              }}
+            >
+              <Text style={styles.buttonText}>Usar lesson existente</Text>
+            </TouchableOpacity>
+          </>
+        )}
+
+        {step === 2 && mode === "editSchedule" && (
+          <>
+            <Text style={styles.subtitle}>
+              Selecciona un horario para modificar
             </Text>
 
-            {/* ---------------- STEP 1 ---------------- */}
-            {step === 1 && (
-              <>
-                <Text style={styles.subtitle}>¿Qué quieres hacer?</Text>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    setMode("create");
-                    setLessonMode(null);
-                    setSelectedLessonId(null);
-                    setSelectedScheduleId(null);
-                    setStep(2);
-                  }}
-                >
-                  <Text style={styles.buttonText}>Crear horario nuevo</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    setMode("editSchedule");
-                    setLessonMode("existing");
-                    setSelectedLessonId(null);
-                    setSelectedScheduleId(null);
-                    setStep(2);
-                  }}
-                >
-                  <Text style={styles.buttonText}>
-                    Modificar horario existente
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    setMode("editLesson");
-                    setLessonMode("existing");
-                    setSelectedLessonId(null);
-                    setSelectedScheduleId(null);
-                    setStep(2);
-                  }}
-                >
-                  <Text style={styles.buttonText}>
-                    Modificar lesson existente
-                  </Text>
-                </TouchableOpacity>
-              </>
-            )}
+            {loadingSchedules ? (
+              <Text>Cargando horarios...</Text>
+            ) : schedules.length === 0 ? (
+              <Text>No hay horarios disponibles</Text>
+            ) : (
+              <SelectableList
+                items={schedules}
+                selectedId={selectedScheduleId}
+                onSelect={(id) => {
+                  const sched = schedules.find((s) => s.id === id);
 
-            {/* ---------------- STEP 2 ---------------- */}
-            {step === 2 && mode === "create" && (
-              <>
-                <Text style={styles.subtitle}>
-                  ¿Qué tipo de lesson quieres?
-                </Text>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    setLessonMode("new");
-                    setStep(3);
-                  }}
-                >
-                  <Text style={styles.buttonText}>Crear lesson nueva</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    setLessonMode("existing");
-                    setStep(3);
-                  }}
-                >
-                  <Text style={styles.buttonText}>Usar lesson existente</Text>
-                </TouchableOpacity>
-              </>
-            )}
+                  setSelectedScheduleId(id);
+                  setSelectedLessonId(sched.lessonId);
+                  setLessonMode("existing");
 
-            {step === 2 && mode === "editSchedule" && (
-              <>
-                <Text style={styles.subtitle}>
-                  Selecciona un horario para modificar
-                </Text>
+                  setSelectedDay(sched.dayOfWeek);
+                  setStartTime(sched.startTime);
+                  setEndTime(sched.endTime);
 
-                {loadingSchedules ? (
-                  <Text>Cargando horarios...</Text>
-                ) : schedules.length === 0 ? (
-                  <Text>No hay horarios disponibles</Text>
-                ) : (
-                  <SelectableList
-                    items={schedules}
-                    selectedId={selectedScheduleId}
-                    onSelect={(id) => {
-                      const sched = schedules.find((s) => s.id === id);
-
-                      setSelectedScheduleId(id);
-                      setSelectedLessonId(sched.lessonId);
-                      setLessonMode("existing");
-
-                      setSelectedDay(sched.dayOfWeek);
-                      setStartTime(sched.startTime);
-                      setEndTime(sched.endTime);
-
-                      setStep(3);
-                    }}
-                    renderItem={(sched) => (
-                      <>
-                        <Text style={{ color: "#fff" }}>
-                          {sched.lessonName} - {sched.professorName}
-                          {"\n"}
-                          {sched.dayOfWeek} {sched.startTime}-{sched.endTime}
-                        </Text>
-                      </>
-                    )}
-                  />
-                )}
-              </>
-            )}
-
-            {step === 2 && mode === "editLesson" && (
-              <>
-                <Text style={styles.subtitle}>
-                  Selecciona una lesson para modificar
-                </Text>
-
-                {loadingLessons ? (
-                  <Text>Cargando lessons...</Text>
-                ) : (
-                  <SelectableList
-                    items={lessons}
-                    selectedId={selectedLessonId}
-                    onSelect={(id) => {
-                      const lesson = lessons.find((l) => l.id === id);
-
-                      setSelectedLessonId(id);
-                      setNewLessonName(lesson.lessonName);
-                      setNewProfessorName(lesson.professorName);
-                      setNewAmountMonthly(String(lesson.amountMonthly));
-
-                      setStep(3);
-                    }}
-                    renderItem={(l) => (
-                      <Text style={{ color: "#fff" }}>
-                        {l.lessonName} - {l.professorName} (${l.amountMonthly})
-                      </Text>
-                    )}
-                  />
-                )}
-              </>
-            )}
-
-            {/* ---------------- STEP 3 ---------------- */}
-            {step === 3 && (
-              <>
-                {mode === "editLesson" && (
+                  setStep(3);
+                }}
+                renderItem={(sched) => (
                   <>
-                    <Text style={styles.subtitle}>Editar lesson</Text>
+                    <Text style={{ color: "#fff" }}>
+                      {sched.lessonName} - {sched.professorName}
+                      {"\n"}
+                      {sched.dayOfWeek} {sched.startTime}-{sched.endTime}
+                    </Text>
+                  </>
+                )}
+              />
+            )}
+          </>
+        )}
 
-                    <Text>Nombre</Text>
+        {step === 2 && mode === "editLesson" && (
+          <>
+            <Text style={styles.subtitle}>
+              Selecciona una lesson para modificar
+            </Text>
+
+            {loadingLessons ? (
+              <Text>Cargando lessons...</Text>
+            ) : (
+              <SelectableList
+                items={lessons}
+                selectedId={selectedLessonId}
+                onSelect={(id) => {
+                  const lesson = lessons.find((l) => l.id === id);
+
+                  setSelectedLessonId(id);
+                  setNewLessonName(lesson.lessonName);
+                  setNewProfessorName(lesson.professorName);
+                  setNewAmountMonthly(String(lesson.amountMonthly));
+
+                  setStep(3);
+                }}
+                renderItem={(l) => (
+                  <Text style={{ color: "#fff" }}>
+                    {l.lessonName} - {l.professorName} (${l.amountMonthly})
+                  </Text>
+                )}
+              />
+            )}
+          </>
+        )}
+
+        {/* ---------------- STEP 3 ---------------- */}
+        {step === 3 && (
+          <>
+            {mode === "editLesson" && (
+              <>
+                <Text style={styles.subtitle}>Editar lesson</Text>
+
+                <Text>Nombre</Text>
+                <TextInputField
+                  value={newLessonName}
+                  onChangeText={setNewLessonName}
+                />
+
+                <Text>Profesor</Text>
+                <TextInputField
+                  value={newProfessorName}
+                  onChangeText={setNewProfessorName}
+                />
+
+                <Text>Precio mensual</Text>
+                <TextInputField
+                  value={newAmountMonthly}
+                  onChangeText={setNewAmountMonthly}
+                  keyboardType="numeric"
+                />
+
+                <TouchableOpacity
+                  style={[styles.button, { marginTop: 10 }]}
+                  onPress={handleUpdateLesson}
+                >
+                  <Text style={styles.buttonText}>Guardar cambios</Text>
+                </TouchableOpacity>
+                {mode === "editLesson" && selectedLessonId && (
+                  <TouchableOpacity
+                    style={[styles.deleteButton, { marginTop: 10 }]}
+                    onPress={handleDeleteLesson}
+                  >
+                    <Text style={styles.deleteButtonText}>Borrar lesson</Text>
+                  </TouchableOpacity>
+                )}
+              </>
+            )}
+
+            {mode !== "editLesson" && (
+              <>
+                {lessonMode === "new" && mode === "create" && (
+                  <>
+                    <Text style={styles.subtitle}>
+                      Nombre de la nueva lesson
+                    </Text>
                     <TextInputField
                       value={newLessonName}
                       onChangeText={setNewLessonName}
+                      placeholder="Ej: Yoga avanzado"
                     />
-
-                    <Text>Profesor</Text>
+                    <Text style={styles.subtitle}>Profesor</Text>
                     <TextInputField
                       value={newProfessorName}
                       onChangeText={setNewProfessorName}
+                      placeholder="Nombre del profesor"
                     />
-
-                    <Text>Precio mensual</Text>
+                    <Text style={styles.subtitle}>Precio mensual</Text>
                     <TextInputField
                       value={newAmountMonthly}
                       onChangeText={setNewAmountMonthly}
+                      placeholder="Ej: 35"
                       keyboardType="numeric"
                     />
-
-                    <TouchableOpacity
-                      style={[styles.button, { marginTop: 10 }]}
-                      onPress={handleUpdateLesson}
-                    >
-                      <Text style={styles.buttonText}>Guardar cambios</Text>
-                    </TouchableOpacity>
-                    {mode === "editLesson" && selectedLessonId && (
-                      <TouchableOpacity
-                        style={[styles.deleteButton, { marginTop: 10 }]}
-                        onPress={handleDeleteLesson}
-                      >
-                        <Text style={styles.deleteButtonText}>
-                          Borrar lesson
-                        </Text>
-                      </TouchableOpacity>
-                    )}
                   </>
                 )}
 
-                {mode !== "editLesson" && (
+                {lessonMode === "existing" && mode === "create" && (
                   <>
-                    {lessonMode === "new" && mode === "create" && (
-                      <>
-                        <Text style={styles.subtitle}>
-                          Nombre de la nueva lesson
-                        </Text>
-                        <TextInputField
-                          value={newLessonName}
-                          onChangeText={setNewLessonName}
-                          placeholder="Ej: Yoga avanzado"
-                        />
-                        <Text style={styles.subtitle}>Profesor</Text>
-                        <TextInputField
-                          value={newProfessorName}
-                          onChangeText={setNewProfessorName}
-                          placeholder="Nombre del profesor"
-                        />
-                        <Text style={styles.subtitle}>Precio mensual</Text>
-                        <TextInputField
-                          value={newAmountMonthly}
-                          onChangeText={setNewAmountMonthly}
-                          placeholder="Ej: 35"
-                          keyboardType="numeric"
-                        />
-                      </>
-                    )}
-
-                    {lessonMode === "existing" && mode === "create" && (
-                      <>
-                        <Text style={styles.subtitle}>
-                          Selecciona una lesson
-                        </Text>
-                        {loadingLessons ? (
-                          <Text>Cargando lessons...</Text>
-                        ) : (
-                          <SelectableList
-                            items={lessons}
-                            selectedId={selectedLessonId}
-                            onSelect={setSelectedLessonId}
-                            renderItem={(l) => (
-                              <Text style={{ color: "#fff" }}>
-                                {l.lessonName} - {l.professorName} ($
-                                {l.amountMonthly})
-                              </Text>
-                            )}
-                          />
+                    <Text style={styles.subtitle}>Selecciona una lesson</Text>
+                    {loadingLessons ? (
+                      <Text>Cargando lessons...</Text>
+                    ) : (
+                      <SelectableList
+                        items={lessons}
+                        selectedId={selectedLessonId}
+                        onSelect={setSelectedLessonId}
+                        renderItem={(l) => (
+                          <Text style={{ color: "#fff" }}>
+                            {l.lessonName} - {l.professorName} ($
+                            {l.amountMonthly})
+                          </Text>
                         )}
-                      </>
-                    )}
-
-                    {lessonMode === "existing" && mode === "editSchedule" && (
-                      <>
-                        <Text style={styles.subtitle}>Editar horario</Text>
-                        <LessonSummary
-                          lesson={selectedLessonObj}
-                          day={selectedDay}
-                          startTime={startTime}
-                          endTime={endTime}
-                        />
-                      </>
-                    )}
-
-                    <TouchableOpacity
-                      style={[styles.button, { marginTop: 10 }]}
-                      // Paso 3 - botón "Siguiente"
-                      onPress={() => {
-                        if (lessonMode === "new") {
-                          if (
-                            !newLessonName ||
-                            !newProfessorName ||
-                            !newAmountMonthly
-                          ) {
-                            Alert.alert(
-                              "Completa todos los datos de la lesson",
-                            );
-                            return;
-                          }
-                        }
-
-                        if (lessonMode === "existing" && !selectedLessonId) {
-                          Alert.alert("Selecciona una lesson");
-                          return;
-                        }
-
-                        setStep(4); // pasar al día/hora
-                      }}
-                    >
-                      <Text style={styles.buttonText}>Siguiente</Text>
-                    </TouchableOpacity>
-
-                    {mode === "editSchedule" && (
-                      <TouchableOpacity
-                        style={[styles.deleteButton, { marginTop: 10 }]}
-                        onPress={handleDeleteSchedule}
-                      >
-                        <Text style={styles.deleteButtonText}>
-                          Borrar horario
-                        </Text>
-                      </TouchableOpacity>
+                      />
                     )}
                   </>
                 )}
-              </>
-            )}
 
-            {/* ---------------- STEP 4 ---------------- */}
-            {step === 4 && (
-              <>
-                <Text style={styles.subtitle}>Selecciona el día y hora</Text>
-                <DayPicker
-                  days={daysOfWeek}
-                  selectedDay={selectedDay}
-                  onSelect={setSelectedDay}
-                />
-                <Text style={{ marginTop: 10 }}>Hora inicio</Text>
-                <TextInputField
-                  value={startTime}
-                  onChangeText={setStartTime}
-                  placeholder="Ej: 18:00"
-                />
-                <Text>Hora fin</Text>
-                <TextInputField
-                  value={endTime}
-                  onChangeText={setEndTime}
-                  placeholder="Ej: 19:00"
-                />
+                {lessonMode === "existing" && mode === "editSchedule" && (
+                  <>
+                    <Text style={styles.subtitle}>Editar horario</Text>
+                    <LessonSummary
+                      lesson={selectedLessonObj}
+                      day={selectedDay}
+                      startTime={startTime}
+                      endTime={endTime}
+                    />
+                  </>
+                )}
 
                 <TouchableOpacity
                   style={[styles.button, { marginTop: 10 }]}
-                  onPress={() => setStep(5)}
+                  // Paso 3 - botón "Siguiente"
+                  onPress={() => {
+                    if (lessonMode === "new") {
+                      if (
+                        !newLessonName ||
+                        !newProfessorName ||
+                        !newAmountMonthly
+                      ) {
+                        Alert.alert("Completa todos los datos de la lesson");
+                        return;
+                      }
+                    }
+
+                    if (lessonMode === "existing" && !selectedLessonId) {
+                      Alert.alert("Selecciona una lesson");
+                      return;
+                    }
+
+                    setStep(4); // pasar al día/hora
+                  }}
                 >
                   <Text style={styles.buttonText}>Siguiente</Text>
                 </TouchableOpacity>
+
+                {mode === "editSchedule" && (
+                  <TouchableOpacity
+                    style={[styles.deleteButton, { marginTop: 10 }]}
+                    onPress={handleDeleteSchedule}
+                  >
+                    <Text style={styles.deleteButtonText}>Borrar horario</Text>
+                  </TouchableOpacity>
+                )}
               </>
             )}
+          </>
+        )}
 
-            {/* ---------------- STEP 5 ---------------- */}
-            {step === 5 && (
-              <>
-                <Text style={styles.subtitle}>
-                  {mode === "editSchedule"
-                    ? "Confirmar cambios"
-                    : "Confirmar horario"}
-                </Text>
-                <LessonSummary
-                  lesson={selectedLessonObj}
-                  day={selectedDay}
-                  startTime={startTime}
-                  endTime={endTime}
-                />
-                <TouchableOpacity
-                  style={[styles.button, { marginTop: 10 }]}
-                  onPress={handleSaveSchedule}
-                >
-                  <Text style={styles.buttonText}>
-                    {mode === "editSchedule"
-                      ? "Guardar cambios"
-                      : "Guardar horario"}
-                  </Text>
-                </TouchableOpacity>
-              </>
-            )}
+        {/* ---------------- STEP 4 ---------------- */}
+        {step === 4 && (
+          <>
+            <Text style={styles.subtitle}>Selecciona el día y hora</Text>
+            <DayPicker
+              days={daysOfWeek}
+              selectedDay={selectedDay}
+              onSelect={setSelectedDay}
+            />
+            <Text style={{ marginTop: 10 }}>Hora inicio</Text>
+            <TextInputField
+              value={startTime}
+              onChangeText={setStartTime}
+              placeholder="Ej: 18:00"
+            />
+            <Text>Hora fin</Text>
+            <TextInputField
+              value={endTime}
+              onChangeText={setEndTime}
+              placeholder="Ej: 19:00"
+            />
 
-            {/* ---------------- Botones atrás / cancelar ---------------- */}
-            <View style={styles.bottomButtons}>
-              {step > 1 && (
-                <TouchableOpacity style={styles.backButton} onPress={goBack}>
-                  <Text style={styles.buttonText}>Atrás</Text>
-                </TouchableOpacity>
-              )}
-              <TouchableOpacity
-                style={[styles.button, styles.cancelButton]}
-                onPress={handleClose}
-              >
-                <Text style={styles.buttonText}>Cancelar</Text>
-              </TouchableOpacity>
-            </View>
-          </ScrollView>
+            <TouchableOpacity
+              style={[styles.button, { marginTop: 10 }]}
+              onPress={() => setStep(5)}
+            >
+              <Text style={styles.buttonText}>Siguiente</Text>
+            </TouchableOpacity>
+          </>
+        )}
+
+        {/* ---------------- STEP 5 ---------------- */}
+        {step === 5 && (
+          <>
+            <Text style={styles.subtitle}>
+              {mode === "editSchedule"
+                ? "Confirmar cambios"
+                : "Confirmar horario"}
+            </Text>
+            <LessonSummary
+              lesson={selectedLessonObj}
+              day={selectedDay}
+              startTime={startTime}
+              endTime={endTime}
+            />
+            <TouchableOpacity
+              style={[styles.button, { marginTop: 10 }]}
+              onPress={handleSaveSchedule}
+            >
+              <Text style={styles.buttonText}>
+                {mode === "editSchedule"
+                  ? "Guardar cambios"
+                  : "Guardar horario"}
+              </Text>
+            </TouchableOpacity>
+          </>
+        )}
+
+        {/* ---------------- Botones atrás / cancelar ---------------- */}
+        <View style={styles.bottomButtons}>
+          {step > 1 && (
+            <TouchableOpacity style={styles.backButton} onPress={goBack}>
+              <Text style={styles.buttonText}>Atrás</Text>
+            </TouchableOpacity>
+          )}
+          {step > 1 && (
+            <TouchableOpacity
+              style={[styles.button, styles.cancelButton]}
+              onPress={handleClose}
+            >
+              <Text style={styles.buttonText}>Cancelar</Text>
+            </TouchableOpacity>
+          )}
         </View>
-      </View>
-    </Modal>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  overlay: {
+  container: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    padding: 20,
+    backgroundColor: "#1E1E1E",
+    paddingTop: 20,
+    paddingHorizontal: 20,
   },
-  container: { backgroundColor: "#fff", borderRadius: 10, maxHeight: "90%" },
-  inner: { padding: 20 },
-  title: { fontSize: 20, fontWeight: "bold", marginBottom: 10 },
-  stepIndicator: { marginBottom: 15 },
-  subtitle: { fontSize: 16, fontWeight: "bold", marginVertical: 8 },
+  inner: { paddingBottom: 50 },
+  title: { fontSize: 20, fontWeight: "bold", marginBottom: 10, color: "#fff" },
+  stepIndicator: { marginBottom: 15, color: "#fff" },
+  subtitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginVertical: 8,
+    color: "#fff",
+  },
   button: {
     padding: 10,
     marginVertical: 5,
@@ -621,15 +608,4 @@ const styles = StyleSheet.create({
   },
   backButton: { flex: 1, marginRight: 5, backgroundColor: "#757575" },
   cancelButton: { flex: 1, marginLeft: 5, backgroundColor: "#E53935" },
-  deleteButton: {
-    backgroundColor: "#ff4d4d",
-    padding: 12,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-
-  deleteButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
 });
