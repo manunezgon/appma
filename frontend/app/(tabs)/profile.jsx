@@ -11,7 +11,7 @@ import {
   View,
 } from "react-native";
 import ScheduleWizardModal from "../../components/ScheduleWizardModal";
-import { useUser } from "../../context/usercontext";
+import { useUser } from "../../context/UserContext";
 import { API_BASE_URL } from "../config.jsx";
 
 export default function Profile() {
