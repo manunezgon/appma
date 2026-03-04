@@ -1,4 +1,4 @@
-import { Text } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 export default function LessonSummary({
   lesson,
@@ -7,20 +7,25 @@ export default function LessonSummary({
   endTime,
   showAmount = true,
 }) {
+  if (!lesson) return null;
+
   return (
-    <>
-      <Text style={{ fontWeight: "bold" }}>Lesson: {lesson?.lessonName}</Text>
-      <Text style={{ fontWeight: "bold" }}>
-        Profesor: {lesson?.professorName}
-      </Text>
-      {showAmount && lesson?.amountMonthly && (
-        <Text style={{ fontWeight: "bold" }}>
-          Precio mensual: ${lesson.amountMonthly}
+    <View style={styles.container}>
+      <Text style={styles.boldText}>Lesson: {lesson.lessonName}</Text>
+      <Text style={styles.boldText}>Teacher: {lesson.professorName}</Text>
+      {showAmount && lesson.amountMonthly != null && (
+        <Text style={styles.boldText}>
+          Monthly Price: ${lesson.amountMonthly.toFixed(2)}
         </Text>
       )}
-      <Text>Día: {day}</Text>
-      <Text>Hora inicio: {startTime}</Text>
-      <Text>Hora fin: {endTime}</Text>
-    </>
+      <Text>Day: {day}</Text>
+      <Text>Start Time: {startTime}</Text>
+      <Text>End Time: {endTime}</Text>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { marginVertical: 5 },
+  boldText: { fontWeight: "bold" },
+});

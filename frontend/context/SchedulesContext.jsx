@@ -1,94 +1,81 @@
-// SchedulesContext.js
 import { createContext, useContext, useEffect, useState } from "react";
-import { API_BASE_URL } from "../app/config"; // <- importamos directo
+import { API_BASE_URL } from "../app/config";
 import { useUser } from "./UserContext";
 
 const SchedulesContext = createContext();
 
+const authFetch = async (url, options = {}, token) => {
+  const res = await fetch(url, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      ...options.headers,
+    },
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || "Request failed");
+  }
+  return res.json();
+};
+
 export const SchedulesProvider = ({ children }) => {
-  const { token } = useUser(); // usamos el token del user context
+  const { token } = useUser();
   const [schedules, setSchedules] = useState([]);
   const [loadingSchedules, setLoadingSchedules] = useState(false);
 
   const fetchSchedules = async () => {
+    if (!token) return;
     setLoadingSchedules(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/scheduleTemplates`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setSchedules(data);
-      }
+      const data = await authFetch(`${API_BASE_URL}/scheduleTemplates`, {}, token);
+      setSchedules(data);
+    } catch (err) {
+      console.error("Error fetching schedules:", err);
+      setSchedules([]);
     } finally {
       setLoadingSchedules(false);
     }
   };
 
   useEffect(() => {
-    if (token) {
-      fetchSchedules();
-    }
+    if (token) fetchSchedules();
+    else setSchedules([]);
   }, [token]);
 
   const createSchedule = async (scheduleData) => {
-    const res = await fetch(`${API_BASE_URL}/scheduleTemplates`, {
+    await authFetch(`${API_BASE_URL}/scheduleTemplates`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
       body: JSON.stringify(scheduleData),
-    });
-
-    if (res.ok) {
-      await fetchSchedules();
-    } else {
-      throw new Error("Error creando horario");
-    }
+    }, token);
+    await fetchSchedules();
   };
 
   const updateSchedule = async (id, scheduleData) => {
-    const res = await fetch(`${API_BASE_URL}/scheduleTemplates/${id}`, {
+    await authFetch(`${API_BASE_URL}/scheduleTemplates/${id}`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
       body: JSON.stringify(scheduleData),
-    });
-
-    if (res.ok) {
-      await fetchSchedules();
-    } else {
-      throw new Error("Error actualizando horario");
-    }
+    }, token);
+    await fetchSchedules();
   };
 
   const deleteSchedule = async (id) => {
-    const res = await fetch(`${API_BASE_URL}/scheduleTemplates/${id}`, {
+    await authFetch(`${API_BASE_URL}/scheduleTemplates/${id}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (res.ok) {
-      await fetchSchedules();
-    } else {
-      throw new Error("Error eliminando horario");
-    }
+    }, token);
+    await fetchSchedules();
   };
 
   return (
-    <SchedulesContext.Provider
-      value={{
-        schedules,
-        loadingSchedules,
-        fetchSchedules,
-        createSchedule,
-        updateSchedule,
-        deleteSchedule,
-      }}
-    >
+    <SchedulesContext.Provider value={{
+      schedules,
+      loadingSchedules,
+      fetchSchedules,
+      createSchedule,
+      updateSchedule,
+      deleteSchedule,
+    }}>
       {children}
     </SchedulesContext.Provider>
   );

@@ -1,97 +1,81 @@
-// LessonsContext.js
 import { createContext, useContext, useEffect, useState } from "react";
-import { API_BASE_URL } from "../app/config"; // <- importamos directo
+import { API_BASE_URL } from "../app/config";
 import { useUser } from "./UserContext";
 
 const LessonsContext = createContext();
 
+// Helper for authenticated fetch
+const authFetch = async (url, options = {}, token) => {
+  const res = await fetch(url, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      ...options.headers,
+    },
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || "Request failed");
+  }
+  return res.json();
+};
+
 export const LessonsProvider = ({ children }) => {
-  const { token } = useUser(); // usamos el token del contexto de usuario
+  const { token } = useUser();
   const [lessons, setLessons] = useState([]);
   const [loadingLessons, setLoadingLessons] = useState(false);
 
   const fetchLessons = async () => {
-    if (!token) return; // 🔹 previene llamadas sin token
+    if (!token) return;
     setLoadingLessons(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/lessons`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setLessons(data);
-      }
+      const data = await authFetch(`${API_BASE_URL}/lessons`, {}, token);
+      setLessons(data);
+    } catch (err) {
+      console.error("Error fetching lessons:", err);
+      setLessons([]);
     } finally {
       setLoadingLessons(false);
     }
   };
 
   useEffect(() => {
-    if (token) {
-      fetchLessons();
-    }
+    if (token) fetchLessons();
+    else setLessons([]);
   }, [token]);
 
   const createLesson = async (lessonData) => {
-    const res = await fetch(`${API_BASE_URL}/lessons/register`, {
+    const createdLesson = await authFetch(`${API_BASE_URL}/lessons/register`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
       body: JSON.stringify(lessonData),
-    });
-
-    if (res.ok) {
-      const createdLesson = await res.json();
-      await fetchLessons();
-      return createdLesson;
-    }
-
-    throw new Error("Error creando lesson");
+    }, token);
+    await fetchLessons();
+    return createdLesson;
   };
 
   const updateLesson = async (id, lessonData) => {
-    const res = await fetch(`${API_BASE_URL}/lessons/${id}`, {
+    await authFetch(`${API_BASE_URL}/lessons/${id}`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
       body: JSON.stringify(lessonData),
-    });
-
-    if (res.ok) {
-      await fetchLessons();
-    } else {
-      throw new Error("Error actualizando lesson");
-    }
+    }, token);
+    await fetchLessons();
   };
 
   const deleteLesson = async (id) => {
-    const res = await fetch(`${API_BASE_URL}/lessons/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (res.ok) {
-      await fetchLessons();
-    } else {
-      throw new Error("Error eliminando lesson");
-    }
+    await authFetch(`${API_BASE_URL}/lessons/${id}`, { method: "DELETE" }, token);
+    await fetchLessons();
   };
 
   return (
-    <LessonsContext.Provider
-      value={{
-        lessons,
-        loadingLessons,
-        fetchLessons,
-        createLesson,
-        updateLesson,
-        deleteLesson,
-      }}
-    >
+    <LessonsContext.Provider value={{
+      lessons,
+      loadingLessons,
+      fetchLessons,
+      createLesson,
+      updateLesson,
+      deleteLesson,
+    }}>
       {children}
     </LessonsContext.Provider>
   );
