@@ -1,4 +1,4 @@
-import { Text, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import SelectableList from "../SelectableList";
 import style from "./Styles.jsx";
 
@@ -51,43 +51,56 @@ export default function Step2Select({
     );
   }
 
-  // --- Edit Schedule Mode: select schedule to edit ---
+  // --- Edit Schedule Mode ---
   if (mode === "editSchedule") {
+    if (loadingSchedules) return <Text>Loading schedules...</Text>;
+    if (!schedules.length) return <Text>No schedules available</Text>;
+
+    // --- Group schedules by day and sort by startTime ---
+    const schedulesByDay = schedules.reduce((acc, s) => {
+      acc[s.dayOfWeek] = acc[s.dayOfWeek] || [];
+      acc[s.dayOfWeek].push(s);
+      return acc;
+    }, {});
+
+    Object.keys(schedulesByDay).forEach((day) => {
+      schedulesByDay[day].sort((a, b) =>
+        a.startTime.localeCompare(b.startTime),
+      );
+    });
+
     return (
       <>
-        <Text style={style.subtitle}>Select a schedule to edit</Text>
+        {Object.entries(schedulesByDay).map(([day, daySchedules]) => (
+          <View key={day}>
+            <Text style={{ fontWeight: "bold", marginTop: 10 }}>{day}</Text>
+            <SelectableList
+              items={daySchedules}
+              selectedId={selectedScheduleId}
+              onSelect={(id) => {
+                const sched = schedules.find((s) => s.id === id);
+                if (!sched) return;
 
-        {loadingSchedules ? (
-          <Text>Loading schedules...</Text>
-        ) : schedules.length === 0 ? (
-          <Text>No schedules available</Text>
-        ) : (
-          <SelectableList
-            items={schedules}
-            selectedId={selectedScheduleId}
-            onSelect={(id) => {
-              const sched = schedules.find((s) => s.id === id);
-              if (!sched) return; // safety check
+                setSelectedScheduleId(id);
+                setSelectedLessonId(sched.lessonId);
+                setLessonMode("existing");
 
-              setSelectedScheduleId(id);
-              setSelectedLessonId(sched.lessonId);
-              setLessonMode("existing");
+                setSelectedDay(sched.dayOfWeek);
+                setStartTime(sched.startTime);
+                setEndTime(sched.endTime);
 
-              setSelectedDay(sched.dayOfWeek);
-              setStartTime(sched.startTime);
-              setEndTime(sched.endTime);
-
-              setStep(3);
-            }}
-            renderItem={(sched) => (
-              <Text style={{ color: "#fff" }}>
-                {sched.lessonName} - {sched.professorName}
-                {"\n"}
-                {sched.dayOfWeek} {sched.startTime}-{sched.endTime}
-              </Text>
-            )}
-          />
-        )}
+                setStep(3);
+              }}
+              renderItem={(sched) => (
+                <Text style={{ color: "#fff" }}>
+                  {sched.lessonName} - {sched.professorName}
+                  {"\n"}
+                  {sched.startTime}-{sched.endTime}
+                </Text>
+              )}
+            />
+          </View>
+        ))}
       </>
     );
   }

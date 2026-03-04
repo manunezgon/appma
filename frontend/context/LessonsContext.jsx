@@ -14,11 +14,19 @@ const authFetch = async (url, options = {}, token) => {
       ...options.headers,
     },
   });
+
   if (!res.ok) {
     const text = await res.text();
     throw new Error(text || "Request failed");
   }
-  return res.json();
+
+  const text = await res.text();
+  try {
+    return text ? JSON.parse(text) : null;
+  } catch (err) {
+    console.warn("Failed to parse JSON:", err);
+    return null;
+  }
 };
 
 export const LessonsProvider = ({ children }) => {
@@ -46,36 +54,50 @@ export const LessonsProvider = ({ children }) => {
   }, [token]);
 
   const createLesson = async (lessonData) => {
-    const createdLesson = await authFetch(`${API_BASE_URL}/lessons/register`, {
-      method: "POST",
-      body: JSON.stringify(lessonData),
-    }, token);
+    const createdLesson = await authFetch(
+      `${API_BASE_URL}/lessons/register`,
+      {
+        method: "POST",
+        body: JSON.stringify(lessonData),
+      },
+      token,
+    );
     await fetchLessons();
     return createdLesson;
   };
 
   const updateLesson = async (id, lessonData) => {
-    await authFetch(`${API_BASE_URL}/lessons/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(lessonData),
-    }, token);
+    await authFetch(
+      `${API_BASE_URL}/lessons/${id}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(lessonData),
+      },
+      token,
+    );
     await fetchLessons();
   };
 
   const deleteLesson = async (id) => {
-    await authFetch(`${API_BASE_URL}/lessons/${id}`, { method: "DELETE" }, token);
+    await authFetch(
+      `${API_BASE_URL}/lessons/${id}`,
+      { method: "DELETE" },
+      token,
+    );
     await fetchLessons();
   };
 
   return (
-    <LessonsContext.Provider value={{
-      lessons,
-      loadingLessons,
-      fetchLessons,
-      createLesson,
-      updateLesson,
-      deleteLesson,
-    }}>
+    <LessonsContext.Provider
+      value={{
+        lessons,
+        loadingLessons,
+        fetchLessons,
+        createLesson,
+        updateLesson,
+        deleteLesson,
+      }}
+    >
       {children}
     </LessonsContext.Provider>
   );

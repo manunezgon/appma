@@ -13,11 +13,20 @@ const authFetch = async (url, options = {}, token) => {
       ...options.headers,
     },
   });
+
   if (!res.ok) {
     const text = await res.text();
     throw new Error(text || "Request failed");
   }
-  return res.json();
+
+  // Check if response has content
+  const text = await res.text();
+  try {
+    return text ? JSON.parse(text) : null;
+  } catch (err) {
+    console.warn("Failed to parse JSON:", err);
+    return null;
+  }
 };
 
 export const SchedulesProvider = ({ children }) => {
@@ -29,7 +38,11 @@ export const SchedulesProvider = ({ children }) => {
     if (!token) return;
     setLoadingSchedules(true);
     try {
-      const data = await authFetch(`${API_BASE_URL}/scheduleTemplates`, {}, token);
+      const data = await authFetch(
+        `${API_BASE_URL}/scheduleTemplates`,
+        {},
+        token,
+      );
       setSchedules(data);
     } catch (err) {
       console.error("Error fetching schedules:", err);
@@ -45,37 +58,51 @@ export const SchedulesProvider = ({ children }) => {
   }, [token]);
 
   const createSchedule = async (scheduleData) => {
-    await authFetch(`${API_BASE_URL}/scheduleTemplates`, {
-      method: "POST",
-      body: JSON.stringify(scheduleData),
-    }, token);
+    await authFetch(
+      `${API_BASE_URL}/scheduleTemplates`,
+      {
+        method: "POST",
+        body: JSON.stringify(scheduleData),
+      },
+      token,
+    );
     await fetchSchedules();
   };
 
   const updateSchedule = async (id, scheduleData) => {
-    await authFetch(`${API_BASE_URL}/scheduleTemplates/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(scheduleData),
-    }, token);
+    await authFetch(
+      `${API_BASE_URL}/scheduleTemplates/${id}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(scheduleData),
+      },
+      token,
+    );
     await fetchSchedules();
   };
 
   const deleteSchedule = async (id) => {
-    await authFetch(`${API_BASE_URL}/scheduleTemplates/${id}`, {
-      method: "DELETE",
-    }, token);
+    await authFetch(
+      `${API_BASE_URL}/scheduleTemplates/${id}`,
+      {
+        method: "DELETE",
+      },
+      token,
+    );
     await fetchSchedules();
   };
 
   return (
-    <SchedulesContext.Provider value={{
-      schedules,
-      loadingSchedules,
-      fetchSchedules,
-      createSchedule,
-      updateSchedule,
-      deleteSchedule,
-    }}>
+    <SchedulesContext.Provider
+      value={{
+        schedules,
+        loadingSchedules,
+        fetchSchedules,
+        createSchedule,
+        updateSchedule,
+        deleteSchedule,
+      }}
+    >
       {children}
     </SchedulesContext.Provider>
   );
