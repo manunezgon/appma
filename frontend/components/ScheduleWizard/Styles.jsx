@@ -3,7 +3,6 @@ import { StyleSheet } from "react-native";
 const style = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1E1E1E",
     paddingTop: 20,
     paddingHorizontal: 20,
   },
@@ -11,31 +10,50 @@ const style = StyleSheet.create({
     paddingBottom: 50,
   },
   title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 10,
-    color: "#fff",
-  },
-  stepIndicator: {
-    marginBottom: 15,
-    color: "#fff",
-  },
-  subtitle: {
     fontSize: 16,
     fontWeight: "bold",
-    marginVertical: 8,
-    color: "#fff",
+    color: "#CCCCCC",
+    textTransform: "uppercase",
+    justifyContent: "center",
+    textAlign: "center",
+  },
+  subtitle: {
+    fontSize: 15,
+    color: "#CCCCCC",
+    justifyContent: "center",
+    textAlign: "center",
+    padding: 20,
+    textTransform: "uppercase",
+  },
+  subtitle2: {
+    fontSize: 15,
+    color: "#CCCCCC",
+    justifyContent: "center",
+    textAlign: "center",
+    padding: 5,
   },
   button: {
+    flex: 1,
     padding: 10,
-    marginVertical: 5,
+    margin: 5,
     borderRadius: 8,
-    backgroundColor: "#1976D2",
+    backgroundColor: "#555555",
   },
   buttonText: {
-    color: "#fff",
+    fontSize: 15,
     fontWeight: "bold",
+    color: "#CCCCCC",
+    justifyContent: "center",
     textAlign: "center",
+  },
+  bottomButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 50,
+    marginTop: 20,
+  },
+  midButtons: {
+    marginTop: 20,
   },
   deleteButton: {
     padding: 10,
@@ -43,33 +61,25 @@ const style = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: "#E53935",
   },
-  deleteButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    textAlign: "center",
-  },
   backButton: {
     flex: 1,
-    marginRight: 5,
     backgroundColor: "#757575",
     padding: 10,
     borderRadius: 8,
   },
   cancelButton: {
     flex: 1,
-    marginLeft: 5,
     backgroundColor: "#E53935",
     padding: 10,
     borderRadius: 8,
   },
-  bottomButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 20,
+  saveButton: {
+    flex: 1,
+    backgroundColor: "#69188E",
   },
   inputField: {
-    backgroundColor: "#2E2E2E",
-    color: "#fff",
+    backgroundColor: "#ccc",
+    color: "#1E1E1E",
     padding: 10,
     borderRadius: 8,
     marginVertical: 5,
@@ -83,6 +93,22 @@ const style = StyleSheet.create({
   selectableItemText: {
     color: "#fff",
   },
+  selectedItem: { backgroundColor: "#69188E" },
+  classContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  classNameContainer: { flexShrink: 1 },
+  className: { fontSize: 16, fontWeight: "bold", color: "#fff" },
+  professorName: { fontSize: 14, color: "#aaa", marginTop: 2 },
+  startTimeEndTime: { fontSize: 14, color: "#fff" },
+  amount: { fontSize: 14, color: "#fff" },
+  summary: {
+    backgroundColor: "#3E3E3E",
+    padding: 15,
+  },
+  summaryText: { fontSize: 14, color: "#fff", marginBottom: 5 },
 });
 
 export default style;

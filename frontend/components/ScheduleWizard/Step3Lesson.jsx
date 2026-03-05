@@ -1,8 +1,8 @@
-import { Text, TouchableOpacity, Alert } from "react-native";
-import TextInputField from "../TextInputField";
-import LessonSummary from "../LessonSummary";
-import SelectableList from "../SelectableList";
+import { Alert, Text, TouchableOpacity, View } from "react-native";
+import LessonSummary from "./LessonSummary.jsx";
+import SelectableList from "./SelectableList.jsx";
 import style from "./Styles.jsx";
+import TextInputField from "./TextInputField.jsx";
 
 export default function Step3Lesson({
   mode,
@@ -49,34 +49,41 @@ export default function Step3Lesson({
       <>
         <Text style={style.subtitle}>Edit Lesson</Text>
 
-        <Text>Name</Text>
-        <TextInputField value={newLessonName} onChangeText={setNewLessonName} />
+        <Text style={style.subtitle2}>Name</Text>
+        <TextInputField
+          value={newLessonName}
+          onChangeText={setNewLessonName}
+          style={style.inputField}
+        />
 
-        <Text>Instructor</Text>
-        <TextInputField value={newProfessorName} onChangeText={setNewProfessorName} />
+        <Text style={style.subtitle2}>Instructor</Text>
+        <TextInputField
+          value={newProfessorName}
+          onChangeText={setNewProfessorName}
+          style={style.inputField}
+        />
 
-        <Text>Monthly Price</Text>
+        <Text style={style.subtitle2}>Monthly Price</Text>
         <TextInputField
           value={newAmountMonthly}
           onChangeText={setNewAmountMonthly}
           keyboardType="numeric"
+          style={style.inputField}
         />
-
-        <TouchableOpacity
-          style={[style.button, { marginTop: 10 }]}
-          onPress={handleUpdateLesson}
-        >
-          <Text style={style.buttonText}>Save Changes</Text>
-        </TouchableOpacity>
-
-        {selectedLessonId && (
+        <View style={style.midButtons}>
           <TouchableOpacity
-            style={[style.deleteButton, { marginTop: 10 }]}
-            onPress={handleDeleteLesson}
+            style={[style.button, style.saveButton]}
+            onPress={handleUpdateLesson}
           >
-            <Text style={style.deleteButtonText}>Delete Lesson</Text>
+            <Text style={style.buttonText}>Save Changes</Text>
           </TouchableOpacity>
-        )}
+
+          {selectedLessonId && (
+            <TouchableOpacity style={style.button} onPress={handleDeleteLesson}>
+              <Text style={style.buttonText}>Delete Lesson</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </>
     );
   }
@@ -86,26 +93,30 @@ export default function Step3Lesson({
       {/* --- New Lesson Form --- */}
       {lessonMode === "new" && (
         <>
-          <Text style={style.subtitle}>New Lesson Name</Text>
+          <Text style={style.subtitle}>Create New Lesson</Text>
+          <Text style={style.subtitle2}>New Lesson Name</Text>
           <TextInputField
             value={newLessonName}
             onChangeText={setNewLessonName}
             placeholder="e.g. Advanced Yoga"
+            style={style.inputField}
           />
 
-          <Text style={style.subtitle}>Instructor</Text>
+          <Text style={style.subtitle2}>Instructor</Text>
           <TextInputField
             value={newProfessorName}
             onChangeText={setNewProfessorName}
             placeholder="Instructor name"
+            style={style.inputField}
           />
 
-          <Text style={style.subtitle}>Monthly Price</Text>
+          <Text style={style.subtitle2}>Monthly Price</Text>
           <TextInputField
             value={newAmountMonthly}
             onChangeText={setNewAmountMonthly}
             placeholder="e.g. 35"
             keyboardType="numeric"
+            style={style.inputField}
           />
         </>
       )}
@@ -120,11 +131,28 @@ export default function Step3Lesson({
             <SelectableList
               items={lessons}
               selectedId={selectedLessonId}
-              onSelect={setSelectedLessonId}
+              onSelect={(id) => {
+                const lesson = lessons.find((l) => l.id === id);
+                if (!lesson) return; // safety check
+
+                setSelectedLessonId(id);
+                setNewLessonName(lesson.lessonName);
+                setNewProfessorName(lesson.professorName);
+                setNewAmountMonthly(String(lesson.amountMonthly));
+
+                setStep(3);
+              }}
               renderItem={(l) => (
-                <Text style={{ color: "#fff" }}>
-                  {l.lessonName} - {l.professorName} (${l.amountMonthly})
-                </Text>
+                <View style={style.classContainer}>
+                  {/* Left side */}
+                  <View style={style.classNameContainer}>
+                    <Text style={style.className}>{l.lessonName}</Text>
+                    <Text style={style.professorName}>{l.professorName}</Text>
+                  </View>
+
+                  {/* Right side */}
+                  <Text style={style.amount}>{l.amountMonthly}€</Text>
+                </View>
               )}
             />
           )}
@@ -155,10 +183,10 @@ export default function Step3Lesson({
       {/* --- Delete Schedule Button --- */}
       {mode === "editSchedule" && (
         <TouchableOpacity
-          style={[style.deleteButton, { marginTop: 10 }]}
+          style={[style.button, style.deleteButton]}
           onPress={handleDeleteSchedule}
         >
-          <Text style={style.deleteButtonText}>Delete Schedule</Text>
+          <Text style={style.buttonText}>Delete Schedule</Text>
         </TouchableOpacity>
       )}
     </>

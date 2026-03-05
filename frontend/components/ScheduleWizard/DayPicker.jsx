@@ -1,4 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import style from "./Styles.jsx";
 
 export default function DayPicker({ days, selectedDay, onSelect }) {
   return (
@@ -8,30 +9,13 @@ export default function DayPicker({ days, selectedDay, onSelect }) {
         return (
           <TouchableOpacity
             key={day.value}
-            style={[styles.button, isSelected && styles.selectedButton]}
+            style={[style.button, isSelected && style.selectedItem]}
             onPress={() => onSelect(day.value)}
           >
-            <Text style={styles.buttonText}>{day.label}</Text>
+            <Text style={style.buttonText}>{day.label}</Text>
           </TouchableOpacity>
         );
       })}
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  button: {
-    padding: 10,
-    marginVertical: 4,
-    borderRadius: 8,
-    backgroundColor: "#1976D2",
-  },
-  selectedButton: {
-    backgroundColor: "#4CAF50",
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-});

@@ -1,4 +1,5 @@
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
+import style from "./Styles.jsx";
 
 export default function SelectableList({
   items = [],
@@ -13,7 +14,10 @@ export default function SelectableList({
       {items.map((item) => (
         <TouchableOpacity
           key={item.id}
-          style={[styles.item, selectedId === item.id && styles.selectedItem]}
+          style={[
+            style.selectableItem,
+            selectedId === item.id && style.selectedItem,
+          ]}
           onPress={() => onSelect(item.id)}
           accessibilityRole="button"
         >
@@ -23,15 +27,3 @@ export default function SelectableList({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  item: {
-    padding: 10,
-    marginVertical: 4,
-    borderRadius: 8,
-    backgroundColor: "#1976D2",
-  },
-  selectedItem: {
-    backgroundColor: "#4CAF50",
-  },
-});

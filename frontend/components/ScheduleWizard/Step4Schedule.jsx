@@ -1,7 +1,7 @@
 import { Text, TouchableOpacity } from "react-native";
-import DayPicker from "../DayPicker";
-import TextInputField from "../TextInputField";
+import DayPicker from "./DayPicker.jsx";
 import style from "./Styles.jsx";
+import TextInputField from "./TextInputField.jsx";
 
 const daysOfWeek = [
   { label: "Monday", value: "MONDAY" },
@@ -35,19 +35,21 @@ export default function Step4Schedule({
       />
 
       {/* --- Start Time Input --- */}
-      <Text style={{ marginTop: 10 }}>Start Time</Text>
+      <Text style={style.subtitle2}>Start Time</Text>
       <TextInputField
         value={startTime}
         onChangeText={setStartTime}
         placeholder="e.g. 18:00"
+        style={style.inputField}
       />
 
       {/* --- End Time Input --- */}
-      <Text>End Time</Text>
+      <Text style={style.subtitle2}>End Time</Text>
       <TextInputField
         value={endTime}
         onChangeText={setEndTime}
         placeholder="e.g. 19:00"
+        style={style.inputField}
       />
 
       {/* --- Next Button --- */}

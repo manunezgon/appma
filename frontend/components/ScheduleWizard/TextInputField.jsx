@@ -1,4 +1,4 @@
-import { StyleSheet, TextInput } from "react-native";
+import { TextInput } from "react-native";
 
 export default function TextInputField({
   value,
@@ -9,7 +9,6 @@ export default function TextInputField({
 }) {
   return (
     <TextInput
-      style={styles.input}
       value={value}
       onChangeText={onChangeText}
       placeholder={placeholder}
@@ -19,12 +18,3 @@ export default function TextInputField({
   );
 }
 
-const styles = StyleSheet.create({
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 10,
-    marginVertical: 5,
-  },
-});

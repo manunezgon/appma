@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   View,
   ActivityIndicator,
@@ -193,6 +193,6 @@ const styles = StyleSheet.create({
   position: { width: 30, color: "#ccc", fontWeight: "bold" },
   userName: { flex: 1, color: "#ccc", fontWeight: "600" },
   classes: { width: 40, textAlign: "right", color: "#ccc", fontWeight: "bold" },
-  topPosition: { color: "purple" },
+  topPosition: { color: "#69188E" },
   topText: { color: "#fff" },
 });

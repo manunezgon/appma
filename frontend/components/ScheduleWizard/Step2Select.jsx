@@ -1,5 +1,5 @@
 import { Text, TouchableOpacity, View } from "react-native";
-import SelectableList from "../SelectableList";
+import SelectableList from "./SelectableList.jsx";
 import style from "./Styles.jsx";
 
 export default function Step2Select({
@@ -22,6 +22,15 @@ export default function Step2Select({
   setNewProfessorName,
   setNewAmountMonthly,
 }) {
+  const weekOrder = [
+    "MONDAY",
+    "TUESDAY",
+    "WEDNESDAY",
+    "THURSDAY",
+    "FRIDAY",
+    "SATURDAY",
+    "SUNDAY",
+  ];
   // --- Create Mode: choose between new or existing lesson ---
   if (mode === "create") {
     return (
@@ -71,36 +80,48 @@ export default function Step2Select({
 
     return (
       <>
-        {Object.entries(schedulesByDay).map(([day, daySchedules]) => (
-          <View key={day}>
-            <Text style={{ fontWeight: "bold", marginTop: 10 }}>{day}</Text>
-            <SelectableList
-              items={daySchedules}
-              selectedId={selectedScheduleId}
-              onSelect={(id) => {
-                const sched = schedules.find((s) => s.id === id);
-                if (!sched) return;
+        {Object.entries(schedulesByDay)
+          .sort(
+            ([dayA], [dayB]) =>
+              weekOrder.indexOf(dayA) - weekOrder.indexOf(dayB),
+          )
+          .map(([day, daySchedules]) => (
+            <View key={day}>
+              <Text style={style.subtitle}>{day}</Text>
+              <SelectableList
+                items={daySchedules}
+                selectedId={selectedScheduleId}
+                onSelect={(id) => {
+                  const sched = schedules.find((s) => s.id === id);
+                  if (!sched) return;
 
-                setSelectedScheduleId(id);
-                setSelectedLessonId(sched.lessonId);
-                setLessonMode("existing");
+                  setSelectedScheduleId(id);
+                  setSelectedLessonId(sched.lessonId);
+                  setLessonMode("existing");
 
-                setSelectedDay(sched.dayOfWeek);
-                setStartTime(sched.startTime);
-                setEndTime(sched.endTime);
+                  setSelectedDay(sched.dayOfWeek);
+                  setStartTime(sched.startTime);
+                  setEndTime(sched.endTime);
 
-                setStep(3);
-              }}
-              renderItem={(sched) => (
-                <Text style={{ color: "#fff" }}>
-                  {sched.lessonName} - {sched.professorName}
-                  {"\n"}
-                  {sched.startTime}-{sched.endTime}
-                </Text>
-              )}
-            />
-          </View>
-        ))}
+                  setStep(3);
+                }}
+                renderItem={(sched) => (
+                  <View style={style.classContainer}>
+                    <View style={style.classNameContainer}>
+                      <Text style={style.className}>{sched.lessonName}</Text>
+                      <Text style={style.professorName}>
+                        {sched.professorName}
+                      </Text>
+                    </View>
+
+                    <Text style={style.startTimeEndTime}>
+                      {sched.startTime} - {sched.endTime}
+                    </Text>
+                  </View>
+                )}
+              />
+            </View>
+          ))}
       </>
     );
   }
@@ -129,9 +150,16 @@ export default function Step2Select({
               setStep(3);
             }}
             renderItem={(l) => (
-              <Text style={{ color: "#fff" }}>
-                {l.lessonName} - {l.professorName} (${l.amountMonthly})
-              </Text>
+              <View style={style.classContainer}>
+                {/* Left side */}
+                <View style={style.classNameContainer}>
+                  <Text style={style.className}>{l.lessonName}</Text>
+                  <Text style={style.professorName}>{l.professorName}</Text>
+                </View>
+
+                {/* Right side */}
+                <Text style={style.amount}>{l.amountMonthly}€</Text>
+              </View>
             )}
           />
         )}
