@@ -25,30 +25,20 @@ public class PaymentService {
     @Transactional
     public Payment registerPayment(User user, Lesson lesson, YearMonth month, PaymentType type) {
 
-        if (type == PaymentType.GLOBAL) {
-
-            boolean exists = paymentRepository
-                    .existsByUserAndTypeAndMonthPaid(user, PaymentType.GLOBAL, month);
-
-            if (exists) {
-                throw new RuntimeException("Ya existe un pago global para este mes");
-            }
-
-            lesson = null;
+        // Verificar si ya existe cualquier pago para este usuario en el mes
+        boolean exists = paymentRepository.existsByUserAndMonthPaid(user, month);
+        if (exists) {
+            throw new RuntimeException("Ya existe un pago para este usuario en este mes");
         }
 
-        if (type == PaymentType.LESSON) {
+        // Si es pago de lección, lesson no puede ser null
+        if (type == PaymentType.LESSON && lesson == null) {
+            throw new IllegalArgumentException("Lesson is required for LESSON payment");
+        }
 
-            if (lesson == null) {
-                throw new IllegalArgumentException("Lesson is required for LESSON payment");
-            }
-
-            boolean exists = paymentRepository
-                    .existsByUserAndLessonAndMonthPaid(user, lesson, month);
-
-            if (exists) {
-                throw new RuntimeException("Ya existe un pago para esta lesson este mes");
-            }
+        // Si es GLOBAL, lesson debe ser null
+        if (type == PaymentType.GLOBAL) {
+            lesson = null;
         }
 
         Payment payment = new Payment();
@@ -66,12 +56,10 @@ public class PaymentService {
         return paymentRepository.findByUser(user);
     }
 
-    // Sobrecarga para chequeo sin lesson
     public boolean hasUserPaidForMonth(User user, YearMonth month) {
         return hasUserPaidForMonth(user, month, null); // llama a la versión nueva
     }
 
-    // Versión con lesson
     public boolean hasUserPaidForMonth(User user, YearMonth month, Lesson lesson) {
         validateUser(user);
         validateMonth(month);
@@ -112,12 +100,6 @@ public class PaymentService {
     private void validateMonth(YearMonth month) {
         if (month == null) {
             throw new IllegalArgumentException("Month cannot be null");
-        }
-    }
-
-    private void validateLesson(Lesson lesson) {
-        if (lesson == null) {
-            throw new IllegalArgumentException("Lesson cannot be null");
         }
     }
 }

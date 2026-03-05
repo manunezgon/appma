@@ -241,13 +241,12 @@ export default function Payments() {
         student={selectedStudent}
         lessons={lessons}
         months={months}
+        paidMonths={payments.map((p) => p.monthPaid)}
         selectedLessonId={selectedLessonId}
         setSelectedLessonId={setSelectedLessonId}
         selectedMonth={selectedMonth}
         setSelectedMonth={setSelectedMonth}
-        onConfirm={({ lessonId, monthPaid, isGlobal }) =>
-          registerPayment({ lessonId, monthPaid, isGlobal })
-        }
+        onConfirm={registerPayment}
         registering={registeringPayment}
         onClose={() => setShowPaymentModal(false)}
       />

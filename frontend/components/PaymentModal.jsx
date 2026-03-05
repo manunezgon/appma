@@ -15,6 +15,7 @@ export const PaymentModal = ({
   student,
   lessons,
   months,
+  paidMonths, // 👈 nuevo
   selectedLessonId,
   setSelectedLessonId,
   selectedMonth,
@@ -92,13 +93,18 @@ export const PaymentModal = ({
               style={styles.picker}
             >
               <Picker.Item label="Selecciona un mes..." value="" />
-              {months.map((month) => (
-                <Picker.Item
-                  key={month.value}
-                  label={month.label}
-                  value={month.value}
-                />
-              ))}
+              {months.map((month) => {
+                const isPaid = paidMonths?.includes(month.value);
+
+                return (
+                  <Picker.Item
+                    key={month.value}
+                    label={isPaid ? `${month.label} (Pagado)` : month.label}
+                    value={month.value}
+                    enabled={!isPaid}
+                  />
+                );
+              })}
             </Picker>
           </View>
 

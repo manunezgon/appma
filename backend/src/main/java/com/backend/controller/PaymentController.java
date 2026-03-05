@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.YearMonth;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -48,30 +49,35 @@ public class PaymentController {
 
     // --- Endpoints ---
     @PostMapping("/register")
-    public ResponseEntity<PaymentResponseDTO> registerPayment(
-            @Valid @RequestBody PaymentRegisterDTO dto) {
+    public ResponseEntity<?> registerPayment(@Valid @RequestBody PaymentRegisterDTO dto) {
+        try {
+            User user = userService.getUserById(dto.userId());
 
-        User user = userService.getUserById(dto.userId());
+            Lesson lesson = null;
+            if (dto.type() == PaymentType.LESSON) {
+                if (dto.lessonId() == null) {
+                    throw new IllegalArgumentException("lessonId is required for LESSON payments");
+                }
+                lesson = lessonService.getLessonById(dto.lessonId());
+            }
 
-        Lesson lesson = null;
+            Payment payment = paymentService.registerPayment(
+                    user,
+                    lesson,
+                    dto.monthPaid(),
+                    dto.type()
+            );
 
-        if (dto.type() == PaymentType.LESSON && dto.lessonId() == null) {
-            throw new IllegalArgumentException("lessonId is required for LESSON payments");
+            return ResponseEntity.ok(toDTO(payment));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(409).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", "An unexpected error occurred"));
         }
-
-        if (dto.type() == PaymentType.LESSON) {
-            lesson = lessonService.getLessonById(dto.lessonId());
-        }
-
-        Payment payment = paymentService.registerPayment(
-                user,
-                lesson,
-                dto.monthPaid(),
-                dto.type()
-        );
-
-        return ResponseEntity.ok(toDTO(payment));
     }
+
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<PaymentResponseDTO>> getPaymentsByUser(@PathVariable Long userId) {
         User user = userService.getUserById(userId);
