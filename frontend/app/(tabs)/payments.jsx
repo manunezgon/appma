@@ -1,18 +1,13 @@
 import { useEffect, useState } from "react";
-import {
-  Alert,
-  FlatList,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { FlatList, StyleSheet, Text, TextInput, View } from "react-native";
+import { useLessons } from "../../context/LessonsContext";
+import { usePayments } from "../../context/PaymentsContext";
 import { useUser } from "../../context/UserContext";
 import { API_BASE_URL } from "../config";
 
-import { PaymentModal } from "../../components/PaymentModal";
+import { PaymentModal } from "../../components/Payments/PaymentModal";
+import { StudentPaymentsModal } from "../../components/Payments/StudentPaymentsModal";
 import { StudentCard } from "../../components/StudentCard";
-import { StudentPaymentsModal } from "../../components/StudentPaymentsModal";
 
 const generateMonths = () => {
   const months = [];
@@ -36,38 +31,31 @@ const generateMonths = () => {
 
 export default function Payments() {
   const { user } = useUser();
+  const { lessons } = useLessons();
+  const {
+    payments,
+    loadingPayments,
+    registeringPayment,
+    fetchPaymentsByUser,
+    deletePayment,
+    registerPayment,
+  } = usePayments();
 
   const [search, setSearch] = useState("");
   const [students, setStudents] = useState([]);
   const [loadingStudents, setLoadingStudents] = useState(true);
 
   const [selectedStudent, setSelectedStudent] = useState(null);
-  const [payments, setPayments] = useState([]);
-  const [loadingPayments, setLoadingPayments] = useState(false);
 
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedLessonId, setSelectedLessonId] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState("");
-  const [registeringPayment, setRegisteringPayment] = useState(false);
 
-  const [lessons, setLessons] = useState([]);
-  const months = generateMonths();
+  const [months] = useState(generateMonths());
 
   // ===========================
   // Fetch functions
   // ===========================
-  const fetchLessons = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/lessons`, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
-      const data = await response.json();
-      setLessons(data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   const fetchStudents = async () => {
     try {
       setLoadingStudents(true);
@@ -95,88 +83,11 @@ export default function Payments() {
     }
   };
 
-  const fetchPaymentsByUser = async (userId) => {
-    try {
-      setLoadingPayments(true);
-      const response = await fetch(`${API_BASE_URL}/payments/user/${userId}`, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
-      if (!response.ok) throw new Error("Error cargando pagos");
-
-      const data = await response.json();
-      setPayments(data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoadingPayments(false);
-    }
-  };
-
-  const deletePayment = async (paymentId) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/payments/${paymentId}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
-      if (!response.ok) throw new Error("Error eliminando pago");
-
-      fetchPaymentsByUser(selectedStudent.id);
-    } catch (err) {
-      console.error(err);
-      Alert.alert("Error eliminando pago");
-    }
-  };
-
-  const registerPayment = async ({ lessonId, monthPaid, isGlobal }) => {
-    if (!monthPaid) return Alert.alert("Selecciona un mes");
-
-    try {
-      setRegisteringPayment(true);
-
-      const payload = {
-        userId: selectedStudent.id,
-        monthPaid,
-        type: isGlobal ? "GLOBAL" : "LESSON",
-        // Solo enviamos lessonId si no es global
-        ...(isGlobal ? {} : { lessonId }),
-      };
-
-      const response = await fetch(`${API_BASE_URL}/payments/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error("Error registering payment:", errorData);
-        throw new Error("Error registrando pago");
-      }
-
-      Alert.alert("Pago registrado correctamente");
-      setShowPaymentModal(false);
-      setSelectedMonth("");
-      setSelectedLessonId(null);
-      fetchPaymentsByUser(selectedStudent.id);
-    } catch (err) {
-      console.error(err);
-      Alert.alert("Error registrando pago");
-    } finally {
-      setRegisteringPayment(false);
-    }
-  };
-
   // ===========================
   // Effects
   // ===========================
   useEffect(() => {
     if (user?.token) fetchStudents();
-  }, [user]);
-  useEffect(() => {
-    if (user?.token) fetchLessons();
   }, [user]);
 
   // ===========================
@@ -226,16 +137,14 @@ export default function Payments() {
       <StudentPaymentsModal
         student={selectedStudent}
         payments={payments}
-        onDelete={deletePayment}
+        onDelete={(paymentId) => deletePayment(paymentId, selectedStudent.id)}
         onRegister={() => setShowPaymentModal(true)}
         onClose={() => {
           setSelectedStudent(null);
-          setPayments([]);
         }}
         loadingPayments={loadingPayments}
       />
 
-      {/* Modal registrar pago */}
       <PaymentModal
         visible={showPaymentModal}
         student={selectedStudent}
@@ -246,7 +155,16 @@ export default function Payments() {
         setSelectedLessonId={setSelectedLessonId}
         selectedMonth={selectedMonth}
         setSelectedMonth={setSelectedMonth}
-        onConfirm={registerPayment}
+        onConfirm={async (data) => {
+          await registerPayment({
+            userId: selectedStudent.id,
+            ...data,
+          });
+
+          setShowPaymentModal(false);
+          setSelectedMonth("");
+          setSelectedLessonId(null);
+        }}
         registering={registeringPayment}
         onClose={() => setShowPaymentModal(false)}
       />
