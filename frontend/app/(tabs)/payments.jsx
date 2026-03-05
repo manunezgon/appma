@@ -127,25 +127,34 @@ export default function Payments() {
     }
   };
 
-  const registerPayment = async () => {
-    if (!selectedMonth) return Alert.alert("Selecciona un mes");
+  const registerPayment = async ({ lessonId, monthPaid, isGlobal }) => {
+    if (!monthPaid) return Alert.alert("Selecciona un mes");
 
     try {
       setRegisteringPayment(true);
+
+      const payload = {
+        userId: selectedStudent.id,
+        monthPaid,
+        type: isGlobal ? "GLOBAL" : "LESSON",
+        // Solo enviamos lessonId si no es global
+        ...(isGlobal ? {} : { lessonId }),
+      };
+
       const response = await fetch(`${API_BASE_URL}/payments/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${user.token}`,
         },
-        body: JSON.stringify({
-          userId: selectedStudent.id,
-          lessonId: selectedLessonId,
-          monthPaid: selectedMonth,
-        }),
+        body: JSON.stringify(payload),
       });
 
-      if (!response.ok) throw new Error("Error registrando pago");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Error registering payment:", errorData);
+        throw new Error("Error registrando pago");
+      }
 
       Alert.alert("Pago registrado correctamente");
       setShowPaymentModal(false);
@@ -236,7 +245,9 @@ export default function Payments() {
         setSelectedLessonId={setSelectedLessonId}
         selectedMonth={selectedMonth}
         setSelectedMonth={setSelectedMonth}
-        onConfirm={registerPayment}
+        onConfirm={({ lessonId, monthPaid, isGlobal }) =>
+          registerPayment({ lessonId, monthPaid, isGlobal })
+        }
         registering={registeringPayment}
         onClose={() => setShowPaymentModal(false)}
       />

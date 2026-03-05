@@ -9,11 +9,7 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 
 @Entity
-@Table(name = "payments",
-    uniqueConstraints = @UniqueConstraint(
-            columnNames = {"user_id", "lesson_id", "monthPaid"}
-    )
-)
+@Table(name = "payments")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,12 +23,16 @@ public class Payment {
     @Column(nullable = false)
     private YearMonth monthPaid;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PaymentType type;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lesson_id", nullable = false)
+    @JoinColumn(name = "lesson_id", nullable = true)
     private Lesson lesson;
 
 }

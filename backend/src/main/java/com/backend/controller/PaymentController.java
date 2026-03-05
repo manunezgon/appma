@@ -1,6 +1,7 @@
 package com.backend.controller;
 
 import com.backend.model.Lesson;
+import com.backend.model.PaymentType;
 import com.backend.service.LessonService;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.backend.dto.PaymentRegisterDTO;
@@ -34,9 +35,10 @@ public class PaymentController {
                 payment.getId(),
                 payment.getUser().getId(),
                 payment.getMonthPaid(),
-                payment.getLesson().getId(),
-                payment.getLesson().getLessonName(),
-                payment.getLesson().getProfessorName()
+                payment.getLesson() != null ? payment.getLesson().getId() : null,
+                payment.getLesson() != null ? payment.getLesson().getLessonName() : "GLOBAL PASS",
+                payment.getLesson() != null ? payment.getLesson().getProfessorName() : null,
+                payment.getType()
         );
     }
 
@@ -50,17 +52,26 @@ public class PaymentController {
             @Valid @RequestBody PaymentRegisterDTO dto) {
 
         User user = userService.getUserById(dto.userId());
-        Lesson lesson = lessonService.getLessonById(dto.lessonId());
+
+        Lesson lesson = null;
+
+        if (dto.type() == PaymentType.LESSON && dto.lessonId() == null) {
+            throw new IllegalArgumentException("lessonId is required for LESSON payments");
+        }
+
+        if (dto.type() == PaymentType.LESSON) {
+            lesson = lessonService.getLessonById(dto.lessonId());
+        }
 
         Payment payment = paymentService.registerPayment(
                 user,
                 lesson,
-                dto.monthPaid()
+                dto.monthPaid(),
+                dto.type()
         );
 
         return ResponseEntity.ok(toDTO(payment));
     }
-
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<PaymentResponseDTO>> getPaymentsByUser(@PathVariable Long userId) {
         User user = userService.getUserById(userId);

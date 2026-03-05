@@ -3,6 +3,7 @@ package com.backend.service;
 import com.backend.exception.UserNotFoundException;
 import com.backend.model.Lesson;
 import com.backend.model.Payment;
+import com.backend.model.PaymentType;
 import com.backend.model.User;
 import com.backend.repository.PaymentRepository;
 import com.backend.repository.UserRepository;
@@ -22,15 +23,38 @@ public class PaymentService {
     private final UserRepository userRepository;
 
     @Transactional
-    public Payment registerPayment(User user, Lesson lesson, YearMonth month) {
+    public Payment registerPayment(User user, Lesson lesson, YearMonth month, PaymentType type) {
 
-        if(paymentRepository.existsByUserAndLessonAndMonthPaid(user, lesson, month)) {
-            throw new RuntimeException("Ya existe un pago para esta modalidad y mes");
+        if (type == PaymentType.GLOBAL) {
+
+            boolean exists = paymentRepository
+                    .existsByUserAndTypeAndMonthPaid(user, PaymentType.GLOBAL, month);
+
+            if (exists) {
+                throw new RuntimeException("Ya existe un pago global para este mes");
+            }
+
+            lesson = null;
+        }
+
+        if (type == PaymentType.LESSON) {
+
+            if (lesson == null) {
+                throw new IllegalArgumentException("Lesson is required for LESSON payment");
+            }
+
+            boolean exists = paymentRepository
+                    .existsByUserAndLessonAndMonthPaid(user, lesson, month);
+
+            if (exists) {
+                throw new RuntimeException("Ya existe un pago para esta lesson este mes");
+            }
         }
 
         Payment payment = new Payment();
         payment.setUser(user);
         payment.setLesson(lesson);
+        payment.setType(type);
         payment.setMonthPaid(month);
         payment.setPaymentDate(LocalDateTime.now());
 
@@ -42,10 +66,23 @@ public class PaymentService {
         return paymentRepository.findByUser(user);
     }
 
+    // Sobrecarga para chequeo sin lesson
     public boolean hasUserPaidForMonth(User user, YearMonth month) {
+        return hasUserPaidForMonth(user, month, null); // llama a la versión nueva
+    }
+
+    // Versión con lesson
+    public boolean hasUserPaidForMonth(User user, YearMonth month, Lesson lesson) {
         validateUser(user);
         validateMonth(month);
-        return paymentRepository.existsByUserAndMonthPaid(user, month);
+
+        boolean hasGlobal = paymentRepository.existsByUserAndTypeAndMonthPaid(user, PaymentType.GLOBAL, month);
+
+        if (lesson == null) return hasGlobal;
+
+        boolean hasLesson = paymentRepository.existsByUserAndLessonAndMonthPaid(user, lesson, month);
+
+        return hasGlobal || hasLesson;
     }
 
     public List<Payment> getPaymentsForMonth(YearMonth month) {
