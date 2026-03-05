@@ -2,7 +2,7 @@
 
 import * as SecureStore from 'expo-secure-store';
 import { createContext, useContext, useEffect, useState } from 'react';
-import { API_BASE_URL } from "../app/config"
+import { API_BASE_URL } from "../app/config";
 
 const UserContext = createContext();
 
@@ -15,19 +15,19 @@ export const UserProvider = ({ children }) => {
       try {
         const token = await SecureStore.getItemAsync('userToken');
         if (token) {
-          const response = await fetch(`${API_BASE_URL}/users/me`, {
+          const res = await fetch(`${API_BASE_URL}/users/me`, {
             headers: { Authorization: `Bearer ${token}` },
           });
-          if (response.ok) {
-            const userData = await response.json();
+          if (res.ok) {
+            const userData = await res.json();
             setUser({ ...userData, token });
           } else {
             await SecureStore.deleteItemAsync('userToken');
             setUser(null);
           }
         }
-      } catch (error) {
-        console.error('Error cargando usuario desde storage:', error);
+      } catch (err) {
+        console.error('Error loading user:', err);
         setUser(null);
       } finally {
         setLoading(false);
@@ -54,4 +54,8 @@ export const UserProvider = ({ children }) => {
   );
 };
 
-export const useUser = () => useContext(UserContext);
+export const useUser = () => {
+  const context = useContext(UserContext);
+  if (!context) throw new Error("useUser must be used within a UserProvider");
+  return context;
+};

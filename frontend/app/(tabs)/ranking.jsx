@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   View,
   ActivityIndicator,
@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { API_BASE_URL } from "../config";
-import { useUser } from "../../context/usercontext";
+import { useUser } from "../../context/UserContext";
 
 export default function Ranking() {
   const { user } = useUser();
@@ -193,6 +193,6 @@ const styles = StyleSheet.create({
   position: { width: 30, color: "#ccc", fontWeight: "bold" },
   userName: { flex: 1, color: "#ccc", fontWeight: "600" },
   classes: { width: 40, textAlign: "right", color: "#ccc", fontWeight: "bold" },
-  topPosition: { color: "purple" },
+  topPosition: { color: "#69188E" },
   topText: { color: "#fff" },
 });
