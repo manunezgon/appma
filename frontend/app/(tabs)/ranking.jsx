@@ -1,15 +1,15 @@
+import { Picker } from "@react-native-picker/picker";
 import { useEffect, useState } from "react";
 import {
-  View,
   ActivityIndicator,
-  StyleSheet,
   ScrollView,
+  StyleSheet,
   Text,
   TouchableOpacity,
+  View,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
-import { API_BASE_URL } from "../config";
 import { useUser } from "../../context/UserContext";
+import { API_BASE_URL } from "../config";
 
 export default function Ranking() {
   const { user } = useUser();
@@ -17,10 +17,23 @@ export default function Ranking() {
   const [ranking, setRanking] = useState([]);
   const [lessons, setLessons] = useState([]);
   const [selectedLesson, setSelectedLesson] = useState(null);
-  const [selectedType, setSelectedType] = useState(null);
+  const [selectedType, setSelectedType] = useState("month");
   const [loading, setLoading] = useState(false);
 
-  // Fetch lessons
+  const myIndex = ranking.findIndex((r) => r.userId === user?.id);
+  const myPosition = myIndex !== -1 ? myIndex + 1 : null;
+  const myClasses = myIndex !== -1 ? ranking[myIndex].totalClasses : 0;
+
+  const topThree = ranking.slice(0, 3);
+  const rest = ranking.slice(3);
+
+  const now = new Date();
+
+  const monthName = now.toLocaleString("en-US", { month: "long" });
+  const formattedMonth = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+
+  const year = now.getFullYear();
+
   useEffect(() => {
     const fetchLessons = async () => {
       try {
@@ -37,7 +50,6 @@ export default function Ranking() {
     fetchLessons();
   }, []);
 
-  // Fetch ranking
   useEffect(() => {
     if (!selectedType) return;
 
@@ -45,6 +57,7 @@ export default function Ranking() {
       setLoading(true);
       try {
         let url = `${API_BASE_URL}/metrics/${selectedType}`;
+
         if (selectedLesson) {
           url += `?lessonId=${selectedLesson}`;
         }
@@ -65,84 +78,153 @@ export default function Ranking() {
     fetchRanking();
   }, [selectedType, selectedLesson]);
 
-  const renderRanking = () =>
-    ranking.map((r, index) => (
-      <View key={index} style={styles.row}>
-        <Text style={[styles.position, index < 3 && styles.topPosition]}>
-          {index + 1}
-        </Text>
-        <Text style={[styles.userName, index < 3 && styles.topText]}>
-          {r.userName}
-        </Text>
-        <Text style={[styles.classes, index < 3 && styles.topText]}>
-          {r.totalClasses}
-        </Text>
-      </View>
-    ));
-
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      {!selectedType && (
-        <View style={styles.buttonContainer}>
+      <>
+        <Text style={styles.sectionTitle}>
+          Ranking · {selectedType === "month" ? formattedMonth : year}
+        </Text>
+        <View style={styles.segmentedControl}>
           <TouchableOpacity
-            style={styles.mainButton}
+            style={[
+              styles.segmentButton,
+              selectedType === "month" && styles.segmentActive,
+            ]}
             onPress={() => setSelectedType("month")}
           >
-            <Text style={styles.buttonText}>Monthly Ranking</Text>
+            <Text
+              style={[
+                styles.segmentText,
+                selectedType === "month" && styles.segmentTextActive,
+              ]}
+            >
+              Month
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.mainButton}
+            style={[
+              styles.segmentButton,
+              selectedType === "year" && styles.segmentActive,
+            ]}
             onPress={() => setSelectedType("year")}
           >
-            <Text style={styles.buttonText}>Yearly Ranking</Text>
+            <Text
+              style={[
+                styles.segmentText,
+                selectedType === "year" && styles.segmentTextActive,
+              ]}
+            >
+              Year
+            </Text>
           </TouchableOpacity>
         </View>
-      )}
-
-      {selectedType && (
-        <>
-          <TouchableOpacity
-            onPress={() => {
-              setSelectedType(null);
-              setSelectedLesson(null);
-            }}
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={selectedLesson}
+            dropdownIconColor="white"
+            onValueChange={(itemValue) => setSelectedLesson(itemValue)}
+            style={{ color: "white" }}
           >
-            <Text style={styles.backText}>← Volver</Text>
-          </TouchableOpacity>
+            <Picker.Item label="Todas las clases" value={null} />
+            {lessons.map((lesson) => (
+              <Picker.Item
+                key={lesson.id}
+                label={lesson.lessonName}
+                value={lesson.id}
+              />
+            ))}
+          </Picker>
+        </View>
 
-          <Text style={styles.sectionTitle}>
-            {selectedType === "month"
-              ? "Monthly Ranking"
-              : "Yearly Ranking"}
-          </Text>
+        {loading ? (
+          <ActivityIndicator size="large" color="purple" />
+        ) : (
+          <>
+            {/* TU PROGRESO */}
 
-          {/* DROPDOWN */}
-          <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={selectedLesson}
-              dropdownIconColor="white"
-              onValueChange={(itemValue) => setSelectedLesson(itemValue)}
-              style={{ color: "white" }}
-            >
-              <Picker.Item label="Todas las clases" value={null} />
-              {lessons.map((lesson) => (
-                <Picker.Item
-                  key={lesson.id}
-                  label={lesson.lessonName}
-                  value={lesson.id}
-                />
-              ))}
-            </Picker>
-          </View>
+            {myPosition && (
+              <View style={styles.myProgressCard}>
+                <Text style={styles.myProgressTitle}>Tu progreso</Text>
 
-          {loading ? (
-            <ActivityIndicator size="large" color="purple" />
-          ) : (
-            <View style={styles.card}>{renderRanking()}</View>
-          )}
-        </>
-      )}
+                <View style={styles.myProgressRow}>
+                  <Text style={styles.myProgressValue}>#{myPosition}</Text>
+                  <Text style={styles.myProgressLabel}>posición</Text>
+                </View>
+
+                <View style={styles.myProgressRow}>
+                  <Text style={styles.myProgressValue}>{myClasses}</Text>
+                  <Text style={styles.myProgressLabel}>clases</Text>
+                </View>
+              </View>
+            )}
+
+            {/* PODIUM */}
+
+            {topThree[0] && (
+              <View style={styles.podiumFirst}>
+                <Text style={styles.podiumPlace}>🥇</Text>
+                <Text style={styles.podiumName}>{topThree[0].userName}</Text>
+                <Text style={styles.podiumClasses}>
+                  {topThree[0].totalClasses}
+                </Text>
+              </View>
+            )}
+            <View style={styles.podiumContainer}>
+              {topThree[1] && (
+                <View style={styles.podiumSecond}>
+                  <Text style={styles.podiumPlace}>🥈</Text>
+                  <Text style={styles.podiumName}>{topThree[1].userName}</Text>
+                  <Text style={styles.podiumClasses}>
+                    {topThree[1].totalClasses}
+                  </Text>
+                </View>
+              )}
+
+              {topThree[2] && (
+                <View style={styles.podiumThird}>
+                  <Text style={styles.podiumPlace}>🥉</Text>
+                  <Text style={styles.podiumName}>{topThree[2].userName}</Text>
+                  <Text style={styles.podiumClasses}>
+                    {topThree[2].totalClasses}
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            {/* LISTA RESTO */}
+
+            <View style={styles.card}>
+              {rest.map((r, index) => {
+                const realIndex = index + 3;
+                const previous = ranking[realIndex - 1];
+
+                const diff = previous
+                  ? previous.totalClasses - r.totalClasses
+                  : 0;
+
+                return (
+                  <View key={realIndex} style={styles.row}>
+                    <Text style={styles.position}>{realIndex + 1}</Text>
+
+                    <Text style={styles.userName}>{r.userName}</Text>
+
+                    <View style={{ alignItems: "flex-end" }}>
+                      <Text style={styles.classes}>{r.totalClasses}</Text>
+
+                      {diff > 0 && (
+                        <Text style={styles.diffText}>
+                          +{diff} para alcanzar
+                        </Text>
+                      )}
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
+          </>
+        )}
+      </>
     </ScrollView>
   );
 }
@@ -152,6 +234,7 @@ const styles = StyleSheet.create({
   content: { padding: 16, paddingTop: 50 },
 
   buttonContainer: { marginTop: 40, gap: 20 },
+
   mainButton: {
     backgroundColor: "#2a2a2a",
     paddingVertical: 18,
@@ -160,6 +243,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "purple",
   },
+
   buttonText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
 
   backText: { color: "purple", marginBottom: 15, fontWeight: "bold" },
@@ -190,9 +274,109 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: "#3a3a3a",
   },
+
   position: { width: 30, color: "#ccc", fontWeight: "bold" },
+
   userName: { flex: 1, color: "#ccc", fontWeight: "600" },
-  classes: { width: 40, textAlign: "right", color: "#ccc", fontWeight: "bold" },
-  topPosition: { color: "#69188E" },
-  topText: { color: "#fff" },
+
+  classes: { color: "#ccc", fontWeight: "bold" },
+
+  diffText: { color: "#888", fontSize: 11 },
+
+  myProgressCard: {
+    backgroundColor: "#2a2a2a",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+  },
+
+  myProgressTitle: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 18,
+    marginBottom: 10,
+  },
+
+  myProgressRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+
+  myProgressValue: {
+    color: "purple",
+    fontSize: 22,
+    fontWeight: "bold",
+  },
+
+  myProgressLabel: { color: "#ccc" },
+
+  podiumContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "flex-end",
+    marginBottom: 20,
+    gap: 80,
+  },
+
+  podiumFirst: {
+    alignItems: "center",
+    marginHorizontal: 10,
+    justifyContent: "flex-end",
+  },
+
+  podiumSecond: {
+    alignItems: "center",
+    marginHorizontal: 10,
+    justifyContent: "flex-end",
+  },
+
+  podiumThird: {
+    alignItems: "center",
+    marginHorizontal: 10,
+    justifyContent: "flex-end",
+  },
+
+  podiumPlace: {
+    fontSize: 28,
+    marginBottom: 4,
+  },
+
+  podiumName: {
+    color: "white",
+    fontWeight: "bold",
+    marginBottom: 2,
+  },
+
+  podiumClasses: {
+    color: "purple",
+    fontWeight: "bold",
+  },
+
+  segmentedControl: {
+    flexDirection: "row",
+    backgroundColor: "#2a2a2a",
+    borderRadius: 10,
+    marginBottom: 15,
+  },
+
+  segmentButton: {
+    flex: 1,
+    paddingVertical: 8,
+    alignItems: "center",
+    borderRadius: 10,
+  },
+
+  segmentActive: {
+    backgroundColor: "purple",
+  },
+
+  segmentText: {
+    color: "#ccc",
+    fontWeight: "600",
+  },
+
+  segmentTextActive: {
+    color: "white",
+  },
 });

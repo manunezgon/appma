@@ -18,12 +18,12 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
     //METRICS-BY-USER//
     @Query(value = """
-    SELECT COUNT(*) FROM enrollments e WHERE user_id = :userId AND MONTH(date) = MONTH(CURRENT_DATE) AND YEAR(date) = YEAR(CURRENT_DATE)""",
+    SELECT COUNT(*) FROM enrollments e WHERE user_id = :userId AND MONTH(date) = MONTH(CURRENT_DATE) AND YEAR(date) = YEAR(CURRENT_DATE) AND e.date <= CURRENT_DATE""",
     nativeQuery = true)
     int countByUserCurrentMonth(Long userId);
 
     @Query(value = """
-    SELECT COUNT(*) FROM enrollments e WHERE user_id = :userId AND YEAR(date) = YEAR(CURRENT_DATE)""",
+    SELECT COUNT(*) FROM enrollments e WHERE user_id = :userId AND YEAR(date) = YEAR(CURRENT_DATE) AND e.date <= CURRENT_DATE""",
     nativeQuery = true)
     int countByUserCurrentYear(Long userId);
 
@@ -65,6 +65,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
         INNER JOIN users u ON e.user_id = u.id
         WHERE MONTH(e.date) = MONTH(CURRENT_DATE)
         AND YEAR(e.date) = YEAR(CURRENT_DATE)
+        AND e.date <= CURRENT_DATE
         GROUP BY u.id, u.name
         ORDER BY totalClasses DESC
         """,
@@ -78,6 +79,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
         INNER JOIN schedule_template s ON e.schedule_template_id = s.id
         WHERE MONTH(e.date) = MONTH(CURRENT_DATE)
           AND YEAR(e.date) = YEAR(CURRENT_DATE)
+          AND e.date <= CURRENT_DATE
           AND s.lesson_id = :lessonId
         GROUP BY u.id, u.name
         ORDER BY totalClasses DESC
@@ -90,6 +92,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
         FROM enrollments e
         INNER JOIN users u ON e.user_id = u.id
         WHERE YEAR(e.date) = YEAR(CURRENT_DATE)
+            AND e.date <= CURRENT_DATE
         GROUP BY u.id, u.name
         ORDER BY totalClasses DESC
         """,
@@ -102,6 +105,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
         INNER JOIN users u ON e.user_id = u.id
         INNER JOIN schedule_template s ON e.schedule_template_id = s.id
         WHERE YEAR(e.date) = YEAR(CURRENT_DATE)
+            AND e.date <= CURRENT_DATE
           AND s.lesson_id = :lessonId
         GROUP BY u.id, u.name
         ORDER BY totalClasses DESC
