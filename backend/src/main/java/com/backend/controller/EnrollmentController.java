@@ -1,11 +1,13 @@
 package com.backend.controller;
 
+import com.backend.dto.AttendanceDTO;
 import com.backend.dto.EnrollmentRequestDTO;
 import com.backend.dto.EnrollmentResponseDTO;
 import com.backend.model.Enrollment;
 import com.backend.service.EnrollmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +21,7 @@ public class EnrollmentController {
 
     private final EnrollmentService enrollmentService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<EnrollmentResponseDTO>> getAllEnrollments() {
         List<EnrollmentResponseDTO> dtos = enrollmentService.getAllEnrollments()
@@ -70,7 +73,45 @@ public class EnrollmentController {
                 e.getScheduleTemplate().getLesson().getLessonName(),
                 e.getScheduleTemplate().getLesson().getProfessorName(),
                 e.getScheduleTemplate().getStartTime() + " - " + e.getScheduleTemplate().getEndTime(),
-                e.getDate()
+                e.getDate(),
+                e.isAttended()
         );
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/class")
+    public ResponseEntity<?> getClassEnrollments(
+            @RequestParam Long scheduleTemplateId,
+            @RequestParam String date) {
+
+        try {
+            List<EnrollmentResponseDTO> dtos = enrollmentService
+                    .getClassEnrollments(scheduleTemplateId, date)
+                    .stream()
+                    .map(this::toDTO)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(dtos);
+
+        } catch (Exception ex) {
+            return ResponseEntity.status(400).body(Map.of("error", ex.getMessage()));
+        }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/attendance")
+    public ResponseEntity<?> markAttendance(
+            @RequestBody AttendanceDTO dto) {
+
+        try {
+            enrollmentService.markAttendance(dto);
+            return ResponseEntity.ok().build();
+
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(400).body(Map.of("error", ex.getMessage()));
+
+        } catch (Exception ex) {
+            return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
+        }
     }
 }
