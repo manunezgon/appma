@@ -95,7 +95,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     // =========================
 
     @Query(value = """
-        SELECT u.name, COUNT(*) as totalClasses
+        SELECT u.id, u.name, COUNT(*) as totalClasses
         FROM enrollments e
         INNER JOIN users u ON e.user_id = u.id
         WHERE e.attended = true
@@ -109,7 +109,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
 
     @Query(value = """
-        SELECT u.name, COUNT(*) as totalClasses
+        SELECT u.id, u.name, COUNT(*) as totalClasses
         FROM enrollments e
         INNER JOIN users u ON e.user_id = u.id
         INNER JOIN schedule_template s ON e.schedule_template_id = s.id
@@ -125,7 +125,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
 
     @Query(value = """
-        SELECT u.name, COUNT(*) as totalClasses
+        SELECT u.id, u.name, COUNT(*) as totalClasses
         FROM enrollments e
         INNER JOIN users u ON e.user_id = u.id
         WHERE e.attended = true
@@ -138,7 +138,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
 
     @Query(value = """
-        SELECT u.name, COUNT(*) as totalClasses
+        SELECT u.id, u.name, COUNT(*) as totalClasses
         FROM enrollments e
         INNER JOIN users u ON e.user_id = u.id
         INNER JOIN schedule_template s ON e.schedule_template_id = s.id

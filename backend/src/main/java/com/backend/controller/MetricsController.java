@@ -32,7 +32,11 @@ public class MetricsController {
 
     private List<UserRankingDTO> toRankingDTO(List<Object[]> list){
         return list.stream()
-                .map(r -> new UserRankingDTO((String) r[0], ((Number) r[1]).longValue()))
+                .map(r -> new UserRankingDTO(
+                        ((Number) r[0]).longValue(), // userId
+                        (String) r[1],               // userName
+                        ((Number) r[2]).longValue()  // totalClasses
+                ))
                 .toList();
     }
 
