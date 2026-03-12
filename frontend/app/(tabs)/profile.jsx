@@ -2,15 +2,17 @@ import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   Alert,
-  Modal,
+  Image,
   ScrollView,
-  StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
+  Keyboard 
 } from "react-native";
+import EditProfileModal from "../../components/Profile/EditProfileModal.jsx";
+import styles from "../../components/Profile/Styles.jsx";
 import { useUser } from "../../context/UserContext";
+import profilePic from "../assets/images/white_logo_circle.png";
 import { API_BASE_URL } from "../config.jsx";
 
 export default function Profile() {
@@ -132,216 +134,64 @@ export default function Profile() {
   if (!user)
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>Cargando perfil...</Text>
+        <Text style={styles.title}>Loading profile...</Text>
       </View>
     );
-
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Mi Perfil</Text>
-
-      <View style={styles.infoBox}>
-        <Text style={styles.label}>Nombre:</Text>
-        <Text style={styles.value}>{user.name}</Text>
-
-        <Text style={styles.label}>Email:</Text>
-        <Text style={styles.value}>{user.email}</Text>
-
-        <Text style={styles.label}>Rol:</Text>
-        <Text style={styles.value}>{user.role}</Text>
-
-        <Text style={styles.label}>Teléfono:</Text>
-        <Text style={styles.value}>{user.phone}</Text>
-      </View>
-
-      <TouchableOpacity
-        onPress={() => setModalVisible(true)}
-        style={styles.button}
-      >
-        <Text style={styles.buttonText}>Ajustes</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={handleLogout}
-        style={[styles.button, styles.logoutButton]}
-      >
-        <Text style={styles.buttonText}>Cerrar sesión</Text>
-      </TouchableOpacity>
-
-      {/* Settings modal */}
-      <Modal
-        visible={modalVisible}
-        animationType="fade"
-        transparent={true}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <ScrollView contentContainerStyle={styles.modalScroll}>
-              <Text style={styles.modalTitle}>Editar Perfil</Text>
-
-              <View style={styles.modalInner}>
-                {/* Profile settings */}
-                <TextInput
-                  style={styles.input}
-                  placeholder="Nombre"
-                  value={editName}
-                  onChangeText={setEditName}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Email"
-                  value={editEmail}
-                  onChangeText={setEditEmail}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Teléfono (opcional, mínimo 9 caracteres)"
-                  value={editPhone}
-                  onChangeText={setEditPhone}
-                  keyboardType="phone-pad"
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Contraseña actual"
-                  secureTextEntry
-                  value={currentPassword}
-                  onChangeText={setCurrentPassword}
-                />
-                <TouchableOpacity
-                  onPress={handleSaveProfile}
-                  style={styles.button}
-                >
-                  <Text style={styles.buttonText}>Guardar cambios</Text>
-                </TouchableOpacity>
-
-                <View style={styles.separator} />
-
-                {/* Password settings */}
-                <Text style={styles.modalTitle}>Cambiar Contraseña</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Contraseña actual"
-                  secureTextEntry
-                  value={oldPassword}
-                  onChangeText={setOldPassword}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Nueva contraseña"
-                  secureTextEntry
-                  value={newPassword}
-                  onChangeText={setNewPassword}
-                />
-                <TouchableOpacity
-                  onPress={handleChangePassword}
-                  style={styles.button}
-                >
-                  <Text style={styles.buttonText}>Actualizar contraseña</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => setModalVisible(false)}
-                  style={[styles.button, styles.cancelButton]}
-                >
-                  <Text style={styles.buttonText}>Cerrar ajustes</Text>
-                </TouchableOpacity>
-              </View>
-            </ScrollView>
+    <>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.header}>
+          <Image source={profilePic} style={styles.profileImage} />
+          <View style={styles.headerText}>
+            <Text style={styles.name}>{user.name}</Text>
           </View>
         </View>
-      </Modal>
-    </ScrollView>
+
+        <View style={styles.infoBox}>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Email:</Text>
+            <Text style={styles.value}>{user.email}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Phone:</Text>
+            <Text style={styles.value}>{user.phone || "-"}</Text>
+          </View>
+        </View>
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            onPress={() => setModalVisible(true)}
+            style={styles.button}
+          >
+            <Text style={styles.buttonText}>Edit profile</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={handleLogout}
+            style={[styles.button, styles.logoutButton]}
+          >
+            <Text style={styles.buttonText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+      <EditProfileModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        editName={editName}
+        setEditName={setEditName}
+        editEmail={editEmail}
+        setEditEmail={setEditEmail}
+        editPhone={editPhone}
+        setEditPhone={setEditPhone}
+        currentPassword={currentPassword}
+        setCurrentPassword={setCurrentPassword}
+        handleSaveProfile={handleSaveProfile}
+        oldPassword={oldPassword}
+        setOldPassword={setOldPassword}
+        newPassword={newPassword}
+        setNewPassword={setNewPassword}
+        handleChangePassword={handleChangePassword}
+      />
+    </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: "#fff",
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 20,
-    fontWeight: "bold",
-  },
-  infoBox: {
-    width: "90%",
-    padding: 20,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    marginBottom: 20,
-    backgroundColor: "#f9f9f9",
-  },
-  label: {
-    fontSize: 14,
-    color: "#555",
-    marginTop: 10,
-  },
-  value: {
-    fontSize: 16,
-    color: "#000",
-  },
-  button: {
-    backgroundColor: "#69188E",
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    width: "70%",
-    marginTop: 10,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    textAlign: "center",
-  },
-  logoutButton: {
-    backgroundColor: "#aaa",
-    marginTop: 20,
-  },
-  cancelButton: {
-    backgroundColor: "#aaa",
-    marginTop: 10,
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  modalContent: {
-    width: "90%",
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 10,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  separator: {
-    marginVertical: 15,
-  },
-  modalScroll: {
-    flexGrow: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalInner: {
-    width: "100%",
-    alignItems: "center",
-  },
-  input: {
-    width: "90%",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 10,
-    marginVertical: 5,
-  },
-});
