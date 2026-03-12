@@ -1,6 +1,7 @@
 package com.backend.controller;
 
 import com.backend.model.Lesson;
+import com.backend.model.PaymentType;
 import com.backend.service.LessonService;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.backend.dto.PaymentRegisterDTO;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.YearMonth;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -34,9 +36,10 @@ public class PaymentController {
                 payment.getId(),
                 payment.getUser().getId(),
                 payment.getMonthPaid(),
-                payment.getLesson().getId(),
-                payment.getLesson().getLessonName(),
-                payment.getLesson().getProfessorName()
+                payment.getLesson() != null ? payment.getLesson().getId() : null,
+                payment.getLesson() != null ? payment.getLesson().getLessonName() : "GLOBAL PASS",
+                payment.getLesson() != null ? payment.getLesson().getProfessorName() : null,
+                payment.getType()
         );
     }
 
@@ -46,19 +49,33 @@ public class PaymentController {
 
     // --- Endpoints ---
     @PostMapping("/register")
-    public ResponseEntity<PaymentResponseDTO> registerPayment(
-            @Valid @RequestBody PaymentRegisterDTO dto) {
+    public ResponseEntity<?> registerPayment(@Valid @RequestBody PaymentRegisterDTO dto) {
+        try {
+            User user = userService.getUserById(dto.userId());
 
-        User user = userService.getUserById(dto.userId());
-        Lesson lesson = lessonService.getLessonById(dto.lessonId());
+            Lesson lesson = null;
+            if (dto.type() == PaymentType.LESSON) {
+                if (dto.lessonId() == null) {
+                    throw new IllegalArgumentException("lessonId is required for LESSON payments");
+                }
+                lesson = lessonService.getLessonById(dto.lessonId());
+            }
 
-        Payment payment = paymentService.registerPayment(
-                user,
-                lesson,
-                dto.monthPaid()
-        );
+            Payment payment = paymentService.registerPayment(
+                    user,
+                    lesson,
+                    dto.monthPaid(),
+                    dto.type()
+            );
 
-        return ResponseEntity.ok(toDTO(payment));
+            return ResponseEntity.ok(toDTO(payment));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(409).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", "An unexpected error occurred"));
+        }
     }
 
     @GetMapping("/user/{userId}")

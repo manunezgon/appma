@@ -7,6 +7,7 @@ import { ActivityIndicator, Text, TextInput, View } from "react-native";
 import { LessonsProvider } from "../context/LessonsContext";
 import { SchedulesProvider } from "../context/SchedulesContext";
 import { UserProvider, useUser } from "../context/UserContext";
+import { PaymentsProvider } from "../context/PaymentsContext";
 
 function RootGuard({ children }) {
   const { user } = useUser();
@@ -50,17 +51,19 @@ export default function RootLayout() {
 
   return (
     <UserProvider>
-      <LessonsProvider>
-        <SchedulesProvider>
-          <RootGuard>
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="login" options={{ headerShown: false }} />
-              <Stack.Screen name="register" options={{ headerShown: false }} />
-            </Stack>
-          </RootGuard>
-        </SchedulesProvider>
-      </LessonsProvider>
+      <PaymentsProvider>
+        <LessonsProvider>
+          <SchedulesProvider>
+            <RootGuard>
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="login" options={{ headerShown: false }} />
+                <Stack.Screen name="register" options={{ headerShown: false }} />
+              </Stack>
+            </RootGuard>
+         </SchedulesProvider>
+       </LessonsProvider>
+      </PaymentsProvider>
     </UserProvider>
   );
 }
