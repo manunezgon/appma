@@ -57,20 +57,22 @@ public class PaymentService {
     }
 
     public boolean hasUserPaidForMonth(User user, YearMonth month) {
-        return hasUserPaidForMonth(user, month, null); // llama a la versión nueva
+        return hasUserPaidForMonth(user, month, null); 
     }
 
     public boolean hasUserPaidForMonth(User user, YearMonth month, Lesson lesson) {
         validateUser(user);
         validateMonth(month);
 
-        boolean hasGlobal = paymentRepository.existsByUserAndTypeAndMonthPaid(user, PaymentType.GLOBAL, month);
+        if (paymentRepository.existsByUserAndTypeAndMonthPaid(user, PaymentType.GLOBAL, month)) {
+            return true;
+        };
 
-        if (lesson == null) return hasGlobal;
+        if (lesson == null) {
+            return false;
+        };
 
-        boolean hasLesson = paymentRepository.existsByUserAndLessonAndMonthPaid(user, lesson, month);
-
-        return hasGlobal || hasLesson;
+        return paymentRepository.existsByUserAndLessonAndMonthPaid(user, lesson, month);
     }
 
     public List<Payment> getPaymentsForMonth(YearMonth month) {
