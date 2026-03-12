@@ -5,16 +5,16 @@ export default function ProgressCard({ position, classes }) {
   if (position == null) return null;
   return (
     <View style={styles.myProgressCard}>
-      <Text style={styles.myProgressTitle}>Tu progreso</Text>
+      <Text style={styles.myProgressTitle}>Your Progress</Text>
 
       <View style={styles.myProgressRow}>
+        <Text style={styles.myProgressLabel}>TOP</Text>
         <Text style={styles.myProgressValue}>#{position}</Text>
-        <Text style={styles.myProgressLabel}>posición</Text>
       </View>
 
       <View style={styles.myProgressRow}>
-        <Text style={styles.myProgressValue}>{classes}</Text>
-        <Text style={styles.myProgressLabel}>clases</Text>
+        <Text style={styles.myProgressLabel}>{classes}</Text>
+        <Text style={styles.myProgressLabel}>attended classes</Text>
       </View>
     </View>
   );

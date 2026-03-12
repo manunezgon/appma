@@ -68,8 +68,8 @@ export default function Ranking() {
   }, [selectedType, selectedLesson, user?.token]);
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.sectionTitle}>
+    <ScrollView style={styles.container } contentContainerStyle={styles.content}>
+      <Text style={styles.title}>
         Ranking · {selectedType === "month" ? formattedMonth : year}
       </Text>
 
@@ -82,7 +82,7 @@ export default function Ranking() {
       />
 
       {loading ? (
-        <ActivityIndicator size="large" color="purple" />
+        <ActivityIndicator size="large" color="#69188E" />
       ) : (
         <>
           <ProgressCard position={myPosition} classes={myClasses} />

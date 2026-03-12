@@ -1,81 +1,83 @@
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#1E1E1E" },
+  container: {
+    flex: 1,
+    paddingTop: 20,
+    paddingHorizontal: 20,
+    backgroundColor: "#1E1E1E",
+  },
   content: { padding: 16, paddingTop: 50 },
 
-  buttonContainer: { marginTop: 40, gap: 20 },
-
-  mainButton: {
-    backgroundColor: "#2a2a2a",
-    paddingVertical: 18,
-    borderRadius: 12,
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "purple",
-  },
-
-  buttonText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
-
-  backText: { color: "purple", marginBottom: 15, fontWeight: "bold" },
-
-  sectionTitle: {
-    fontSize: 22,
+  title: {
+    fontSize: 16,
     fontWeight: "bold",
-    color: "#fff",
-    marginBottom: 10,
+    color: "#CCCCCC",
+    textTransform: "uppercase",
+    justifyContent: "center",
+    textAlign: "center",
+    paddingBottom: 30,
   },
 
-  pickerContainer: {
-    backgroundColor: "#2a2a2a",
-    borderRadius: 12,
+  segmentedControl: {
+    flexDirection: "row",
+    backgroundColor: "#555555",
+    borderRadius: 8,
     marginBottom: 15,
   },
 
-  card: {
-    backgroundColor: "#2a2a2a",
-    borderRadius: 12,
+  segmentButton: {
+    flex: 1,
     paddingVertical: 10,
-    paddingHorizontal: 12,
+    alignItems: "center",
+    borderRadius: 8,
   },
 
-  row: {
-    flexDirection: "row",
-    paddingVertical: 10,
-    borderBottomWidth: 0.5,
-    borderBottomColor: "#3a3a3a",
+  segmentActive: {
+    backgroundColor: "#69188E",
   },
 
-  position: { width: 30, color: "#ccc", fontWeight: "bold" },
+  segmentText: {
+    color: "#CCCCCC",
+  },
 
-  userName: { flex: 1, color: "#ccc", fontWeight: "600" },
+  segmentTextActive: {
+    color: "#CCCCCC",
+    fontWeight: "600",
+  },
 
-  classes: { color: "#ccc", fontWeight: "bold" },
+  pickerContainer: {
+    backgroundColor: "#555555",
+    borderRadius: 10,
+    marginBottom: 15,
+  },
 
-  diffText: { color: "#888", fontSize: 11 },
-
-  myProgressCard: {
+myProgressCard: {
     backgroundColor: "#2a2a2a",
-    borderRadius: 12,
+    borderRadius: 10,
     padding: 16,
-    marginBottom: 20,
+    marginBottom: 15,
   },
 
   myProgressTitle: {
-    color: "white",
+    color: "#cccccc",
     fontWeight: "bold",
-    fontSize: 18,
+    fontSize: 16,
+    textAlign: "center",
+    textTransform: "uppercase",
     marginBottom: 10,
   },
 
   myProgressRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 5,
+    justifyContent: "center", 
+    paddingVertical: 4,
   },
 
   myProgressValue: {
-    color: "purple",
+    color: "#69188E",
     fontSize: 22,
     fontWeight: "bold",
   },
@@ -90,10 +92,8 @@ const styles = StyleSheet.create({
     gap: 80,
   },
 
-  podiumFirst: {
+podiumFirst: {
     alignItems: "center",
-    marginHorizontal: 10,
-    justifyContent: "flex-end",
   },
 
   podiumSecond: {
@@ -109,47 +109,44 @@ const styles = StyleSheet.create({
   },
 
   podiumPlace: {
-    fontSize: 28,
-    marginBottom: 4,
+    fontSize: 30,
+    marginBottom: 5,
   },
 
   podiumName: {
-    color: "white",
+    color: "#cccccc",
     fontWeight: "bold",
+    textTransform: "uppercase",
+    fontSize: 14,
     marginBottom: 2,
   },
 
   podiumClasses: {
-    color: "purple",
+    color: "#555555",
     fontWeight: "bold",
   },
 
-  segmentedControl: {
-    flexDirection: "row",
+  rankingCard: {
     backgroundColor: "#2a2a2a",
     borderRadius: 10,
-    marginBottom: 15,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
   },
 
-  segmentButton: {
-    flex: 1,
-    paddingVertical: 8,
-    alignItems: "center",
-    borderRadius: 10,
+    rankingRow: {
+    flexDirection: "row",
+    paddingVertical: 10,
+    borderBottomWidth: 0.5,
+    borderBottomColor: "#555555",
   },
 
-  segmentActive: {
-    backgroundColor: "purple",
-  },
+position: { width: 30, color: "#ccc", fontWeight: "bold" },
 
-  segmentText: {
-    color: "#ccc",
-    fontWeight: "600",
-  },
+  userName: { flex: 1, color: "#ccc", fontWeight: "600" },
 
-  segmentTextActive: {
-    color: "white",
-  },
+  classes: { color: "#ccc", fontWeight: "bold" },
+
+  diffText: { color: "#555555", fontSize: 11 },
 });
 
 export default styles;

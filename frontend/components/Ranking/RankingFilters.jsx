@@ -52,7 +52,7 @@ export default function RankingFilters({
           selectedValue={selectedLesson}
           dropdownIconColor="white"
           onValueChange={(itemValue) => setSelectedLesson(itemValue)}
-          style={{ color: "white" }}
+          style={{ color: "#CCCCCC" }}
         >
           <Picker.Item label="Todas las clases" value={null} />
           {lessons.map((lesson) => (
