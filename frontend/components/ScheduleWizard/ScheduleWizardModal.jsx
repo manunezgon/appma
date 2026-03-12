@@ -1,17 +1,16 @@
 import {
   ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { useScheduleWizard } from "../hooks/useScheduleWizard";
-import Step1Mode from "./ScheduleWizard/Step1Mode.jsx";
-import Step2Select from "./ScheduleWizard/Step2Select.jsx";
-import Step3Lesson from "./ScheduleWizard/Step3Lesson.jsx";
-import Step4Schedule from "./ScheduleWizard/Step4Schedule.jsx";
-import Step5Confirm from "./ScheduleWizard/Step5Confirm.jsx";
-import style from "./ScheduleWizard/Styles.jsx";
+import { useScheduleWizard } from "../../hooks/useScheduleWizard.jsx";
+import Step1Mode from "./Step1Mode.jsx";
+import Step2Select from "./Step2Select.jsx";
+import Step3Lesson from "./Step3Lesson.jsx";
+import Step4Schedule from "./Step4Schedule.jsx";
+import Step5Confirm from "./Step5Confirm.jsx";
+import style from "./Styles.jsx";
 
 
 export default function ScheduleWizardModal({ onClose }) {

@@ -10,9 +10,9 @@ import {
   View,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import ScheduleWizardModal from "../../components/ScheduleWizard/ScheduleWizardModal.jsx";
 import { useUser } from "../../context/UserContext";
 import { API_BASE_URL } from "../config";
-import ScheduleWizardModal from "../../components/ScheduleWizardModal";
 
 export default function Sessions() {
   const { user } = useUser();

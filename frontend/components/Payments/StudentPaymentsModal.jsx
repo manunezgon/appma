@@ -1,5 +1,11 @@
-import React from "react";
-import { Modal, View, Text, FlatList, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  FlatList,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { PaymentRow } from "./PaymentRow";
 
@@ -11,7 +17,12 @@ export const StudentPaymentsModal = ({
   onClose,
   loadingPayments,
 }) => (
-  <Modal visible={!!student} animationType="fade" transparent onRequestClose={onClose}>
+  <Modal
+    visible={!!student}
+    animationType="fade"
+    transparent
+    onRequestClose={onClose}
+  >
     <View style={styles.modalOverlay}>
       <View style={styles.modalContent}>
         <Text style={styles.modalTitle}>{student?.name}</Text>
@@ -24,7 +35,9 @@ export const StudentPaymentsModal = ({
           <FlatList
             data={payments}
             keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => <PaymentRow payment={item} onDelete={onDelete} />}
+            renderItem={({ item }) => (
+              <PaymentRow payment={item} onDelete={onDelete} />
+            )}
             style={styles.paymentsList}
           />
         )}

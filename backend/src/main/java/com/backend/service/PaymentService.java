@@ -3,6 +3,7 @@ package com.backend.service;
 import com.backend.exception.UserNotFoundException;
 import com.backend.model.Lesson;
 import com.backend.model.Payment;
+import com.backend.model.PaymentType;
 import com.backend.model.User;
 import com.backend.repository.PaymentRepository;
 import com.backend.repository.UserRepository;
@@ -22,15 +23,28 @@ public class PaymentService {
     private final UserRepository userRepository;
 
     @Transactional
-    public Payment registerPayment(User user, Lesson lesson, YearMonth month) {
+    public Payment registerPayment(User user, Lesson lesson, YearMonth month, PaymentType type) {
 
-        if(paymentRepository.existsByUserAndLessonAndMonthPaid(user, lesson, month)) {
-            throw new RuntimeException("Ya existe un pago para esta modalidad y mes");
+        // Verificar si ya existe cualquier pago para este usuario en el mes
+        boolean exists = paymentRepository.existsByUserAndMonthPaid(user, month);
+        if (exists) {
+            throw new RuntimeException("Ya existe un pago para este usuario en este mes");
+        }
+
+        // Si es pago de lección, lesson no puede ser null
+        if (type == PaymentType.LESSON && lesson == null) {
+            throw new IllegalArgumentException("Lesson is required for LESSON payment");
+        }
+
+        // Si es GLOBAL, lesson debe ser null
+        if (type == PaymentType.GLOBAL) {
+            lesson = null;
         }
 
         Payment payment = new Payment();
         payment.setUser(user);
         payment.setLesson(lesson);
+        payment.setType(type);
         payment.setMonthPaid(month);
         payment.setPaymentDate(LocalDateTime.now());
 
@@ -43,9 +57,22 @@ public class PaymentService {
     }
 
     public boolean hasUserPaidForMonth(User user, YearMonth month) {
+        return hasUserPaidForMonth(user, month, null); 
+    }
+
+    public boolean hasUserPaidForMonth(User user, YearMonth month, Lesson lesson) {
         validateUser(user);
         validateMonth(month);
-        return paymentRepository.existsByUserAndMonthPaid(user, month);
+
+        if (paymentRepository.existsByUserAndTypeAndMonthPaid(user, PaymentType.GLOBAL, month)) {
+            return true;
+        };
+
+        if (lesson == null) {
+            return false;
+        };
+
+        return paymentRepository.existsByUserAndLessonAndMonthPaid(user, lesson, month);
     }
 
     public List<Payment> getPaymentsForMonth(YearMonth month) {
@@ -75,12 +102,6 @@ public class PaymentService {
     private void validateMonth(YearMonth month) {
         if (month == null) {
             throw new IllegalArgumentException("Month cannot be null");
-        }
-    }
-
-    private void validateLesson(Lesson lesson) {
-        if (lesson == null) {
-            throw new IllegalArgumentException("Lesson cannot be null");
         }
     }
 }

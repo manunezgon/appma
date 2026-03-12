@@ -54,13 +54,14 @@ public class EnrollmentService {
         YearMonth yearMonth = YearMonth.from(date);
         Lesson lesson = template.getLesson();
 
-        boolean hasPaid = paymentRepository
-                .existsByUserAndLessonAndMonthPaid(user, lesson, yearMonth);
+        boolean hasLessonPayment =
+                paymentRepository.existsByUserAndLessonAndMonthPaid(user, lesson, yearMonth);
 
-        if (!hasPaid) {
-            throw new IllegalArgumentException(
-                    "User has not paid for this lesson for month " + yearMonth
-            );
+        boolean hasGlobalPayment =
+                paymentRepository.existsByUserAndTypeAndMonthPaid(user, PaymentType.GLOBAL, yearMonth);
+
+        if (!hasLessonPayment && !hasGlobalPayment) {
+            throw new IllegalArgumentException("User has not paid this lesson or global pass");
         }
 
         if (!template.getDayOfWeek().equals(date.getDayOfWeek())) {
