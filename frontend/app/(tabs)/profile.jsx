@@ -1,5 +1,5 @@
-import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   Alert,
@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Ionicons from "react-native-vector-icons/Ionicons";
 import EditProfileModal from "../../components/Profile/EditProfileModal.jsx";
 import styles from "../../components/Profile/Styles.jsx";
 import { useUser } from "../../context/UserContext";
@@ -155,18 +156,33 @@ export default function Profile() {
     <>
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.header}>
-          <Image
-            source={
-              user.profileImageUrl ? { uri: user.profileImageUrl } : profilePic
-            }
-            style={styles.profileImage}
-          />
+          <TouchableOpacity onPress={pickProfileImage}>
+            <View style={{ position: "relative" }}>
+              <Image
+                source={
+                  user.profileImageUrl
+                    ? { uri: user.profileImageUrl }
+                    : profilePic
+                }
+                style={styles.profileImage}
+              />
+              <View
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  right: 0,
+                  backgroundColor: "#69188E",
+                  borderRadius: 12,
+                  padding: 4,
+                }}
+              >
+                <Ionicons name="add" size={16} color="#fff" />
+              </View>
+            </View>
+          </TouchableOpacity>
           <View style={styles.headerText}>
             <Text style={styles.name}>{user.name}</Text>
           </View>
-          <TouchableOpacity onPress={pickProfileImage}>
-            <Text style={{ color: "#69188E", marginTop: 5 }}>Change Photo</Text>
-          </TouchableOpacity>
         </View>
 
         <View style={styles.infoBox}>

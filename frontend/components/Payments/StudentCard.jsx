@@ -2,7 +2,6 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 export const StudentCard = ({ student, onPress }) => {
-  console.log(student);
   return (
     <TouchableOpacity style={styles.card} onPress={() => onPress(student)}>
       <View style={styles.infoContainer}>
