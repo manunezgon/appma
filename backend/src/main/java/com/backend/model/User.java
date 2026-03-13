@@ -41,11 +41,13 @@ public class User {
     @Column(nullable = false)
     private Role role = Role.MEMBER;
 
+    private String profileImageUrl;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Enrollment> enrollments;
+
     public enum Role {
         ADMIN,
         MEMBER
     }
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Enrollment> enrollments;
 }
