@@ -1,4 +1,5 @@
 import { useRouter } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
 import { useEffect, useState } from "react";
 import {
   Alert,
@@ -7,7 +8,6 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Keyboard 
 } from "react-native";
 import EditProfileModal from "../../components/Profile/EditProfileModal.jsx";
 import styles from "../../components/Profile/Styles.jsx";
@@ -16,7 +16,7 @@ import profilePic from "../assets/images/white_logo_circle.png";
 import { API_BASE_URL } from "../config.jsx";
 
 export default function Profile() {
-  const { user, setUser, logout, token } = useUser();
+  const { user, setUser, logout, token, updateProfileImage } = useUser();
   const router = useRouter();
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -131,6 +131,20 @@ export default function Profile() {
     }
   };
 
+  const pickProfileImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      const file = result.assets[0];
+      updateProfileImage(file);
+    }
+  };
+
   if (!user)
     return (
       <View style={styles.container}>
@@ -141,10 +155,18 @@ export default function Profile() {
     <>
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.header}>
-          <Image source={profilePic} style={styles.profileImage} />
+          <Image
+            source={
+              user.profileImageUrl ? { uri: user.profileImageUrl } : profilePic
+            }
+            style={styles.profileImage}
+          />
           <View style={styles.headerText}>
             <Text style={styles.name}>{user.name}</Text>
           </View>
+          <TouchableOpacity onPress={pickProfileImage}>
+            <Text style={{ color: "#69188E", marginTop: 5 }}>Change Photo</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.infoBox}>
