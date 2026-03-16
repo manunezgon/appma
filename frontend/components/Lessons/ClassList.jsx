@@ -16,7 +16,6 @@ export default function ClassList({
   onRefresh,
   onEnroll,
   userRole,
-  onEditClass,
   onDeleteClass,
 }) {
   const [confirmVisible, setConfirmVisible] = useState(false);

@@ -5,9 +5,10 @@ import { Stack, usePathname, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Text, TextInput, View } from "react-native";
 import { LessonsProvider } from "../context/LessonsContext";
+import { PaymentsProvider } from "../context/PaymentsContext";
 import { SchedulesProvider } from "../context/SchedulesContext";
 import { UserProvider, useUser } from "../context/UserContext";
-import { PaymentsProvider } from "../context/PaymentsContext";
+import { EnrollmentsProvider } from "../context/EnrollmentsContext";
 
 function RootGuard({ children }) {
   const { user } = useUser();
@@ -51,19 +52,27 @@ export default function RootLayout() {
 
   return (
     <UserProvider>
-      <PaymentsProvider>
-        <LessonsProvider>
-          <SchedulesProvider>
-            <RootGuard>
-              <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen name="login" options={{ headerShown: false }} />
-                <Stack.Screen name="register" options={{ headerShown: false }} />
-              </Stack>
-            </RootGuard>
-         </SchedulesProvider>
-       </LessonsProvider>
-      </PaymentsProvider>
+      <EnrollmentsProvider>
+        <PaymentsProvider>
+          <LessonsProvider>
+            <SchedulesProvider>
+              <RootGuard>
+                <Stack screenOptions={{ headerShown: false }}>
+                  <Stack.Screen
+                    name="(tabs)"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen name="login" options={{ headerShown: false }} />
+                  <Stack.Screen
+                    name="register"
+                    options={{ headerShown: false }}
+                  />
+                </Stack>
+              </RootGuard>
+            </SchedulesProvider>
+          </LessonsProvider>
+        </PaymentsProvider>
+      </EnrollmentsProvider>
     </UserProvider>
   );
 }
