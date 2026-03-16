@@ -142,6 +142,14 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional
+    public User updateProfileImage(Long userId, String imageUrl) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+        user.setProfileImageUrl(imageUrl);
+        return userRepository.save(user);
+    }
+
     // --- Validations ---
     private void validateName(String name) {
         if (name == null || name.trim().isEmpty()) {

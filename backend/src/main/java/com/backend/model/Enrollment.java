@@ -30,4 +30,7 @@ public class Enrollment {
 
     @Column(nullable = false)
     private LocalDate date;
+
+    @Column(nullable = false)
+    private boolean attended = false;
 }

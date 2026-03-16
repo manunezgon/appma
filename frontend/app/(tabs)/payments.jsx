@@ -7,7 +7,7 @@ import { API_BASE_URL } from "../config";
 
 import { PaymentModal } from "../../components/Payments/PaymentModal";
 import { StudentPaymentsModal } from "../../components/Payments/StudentPaymentsModal";
-import { StudentCard } from "../../components/StudentCard";
+import { StudentCard } from "../../components/Payments/StudentCard";
 
 const generateMonths = () => {
   const months = [];
@@ -73,6 +73,7 @@ export default function Payments() {
           name: u.name,
           email: u.email,
           phone: u.phone,
+          profileImageUrl: u.profileImageUrl,
         }));
 
       setStudents(studentsOnly);
