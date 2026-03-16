@@ -3,6 +3,7 @@ import { useCallback, useState } from "react";
 import { Image, RefreshControl, ScrollView, Text, View } from "react-native";
 import AdminInput from "../../components/news/AdminInput";
 import AnnouncementCard from "../../components/news/AnnouncementCard";
+import CarouselEditorModal from "../../components/news/CarouselEditorModal";
 import Carousel from "../../components/news/Carrousel";
 import style from "../../components/news/Styles";
 import { useUser } from "../../context/UserContext";
@@ -13,6 +14,7 @@ export default function News() {
   const [announcements, setAnnouncements] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [newMessage, setNewMessage] = useState("");
+  const [showCarouselEditor, setShowCarouselEditor] = useState(false);
 
   const images = [
     require("../assets/carrousel/img1.jpg"),
@@ -87,10 +89,23 @@ export default function News() {
         <Text style={style.title}>La Forja</Text>
       </View>
 
-      <Carousel images={images} interval={3000} />
+      <Carousel
+        images={images}
+        interval={3000}
+        isAdmin={user?.role === "ADMIN"}
+        onEdit={() => setShowCarouselEditor(true)}
+      />
+
+      <CarouselEditorModal
+        visible={showCarouselEditor}
+        onClose={() => setShowCarouselEditor(false)}
+        images={images}
+        onAdd={() => console.log("Añadir foto")}
+        onDelete={(idx) => console.log("Borrar foto", idx)}
+      />
 
       <Text style={style.subtitle}>Noticias</Text>
-      
+
       {user?.role === "ADMIN" && (
         <AdminInput
           value={newMessage}
