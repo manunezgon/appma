@@ -1,16 +1,23 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Dimensions } from "react-native";
 import { useRef, useState } from "react";
+import {
+  Dimensions,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 export default function WeekCalendar({ selectedDay, setSelectedDay }) {
-  const daysShort = ["L", "M", "X", "J", "V", "S", "D"];
+  const daysShort = ["M", "T", "W", "T", "F", "S", "S"];
   const flatListRef = useRef(null);
 
   const today = new Date();
 
   const generateWeek = (weekOffset = 0) => {
-    const currentDay = today.getDay(); 
+    const currentDay = today.getDay();
     const monday = new Date(today);
     monday.setDate(today.getDate() - ((currentDay + 6) % 7) + weekOffset * 7);
 
@@ -29,7 +36,12 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
   const [currentWeekIndex, setCurrentWeekIndex] = useState(10);
 
   const [currentMonthName, setCurrentMonthName] = useState(
-    weeks[currentWeekIndex][0].toLocaleDateString("es-ES", { month: "long", year: "numeric" })
+    weeks[currentWeekIndex][0]
+      .toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric",
+      })
+      .replace(" ", " · "),
   );
 
   const formatDate = (date) => date.toISOString().split("T")[0];
@@ -39,7 +51,7 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
     setCurrentWeekIndex(10);
     flatListRef.current?.scrollToIndex({ index: 10, animated: true });
     setCurrentMonthName(
-      today.toLocaleDateString("es-ES", { month: "long", year: "numeric" })
+      today.toLocaleDateString("en-US", { month: "long", year: "numeric" }),
     );
   };
 
@@ -48,7 +60,7 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
     setCurrentWeekIndex(index);
 
     const firstDayOfWeek = weeks[index][0];
-    const newMonthName = firstDayOfWeek.toLocaleDateString("es-ES", {
+    const newMonthName = firstDayOfWeek.toLocaleDateString("en-US", {
       month: "long",
       year: "numeric",
     });
@@ -60,7 +72,7 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
       <View style={styles.header}>
         <Text style={styles.monthTitle}>{currentMonthName}</Text>
         <TouchableOpacity style={styles.todayButton} onPress={goToToday}>
-          <Text style={styles.todayText}>Hoy</Text>
+          <Text style={styles.todayText}>Today</Text>
         </TouchableOpacity>
       </View>
 
@@ -88,10 +100,14 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
                   style={[styles.dayBox, isSelected && styles.selectedBox]}
                   onPress={() => setSelectedDay(day)}
                 >
-                  <Text style={[styles.dayText, isSelected && styles.activeText]}>
+                  <Text
+                    style={[styles.dayText, isSelected && styles.activeText]}
+                  >
                     {daysShort[index]}
                   </Text>
-                  <Text style={[styles.dateText, isSelected && styles.activeText]}>
+                  <Text
+                    style={[styles.dateText, isSelected && styles.activeText]}
+                  >
                     {day.getDate()}
                   </Text>
                 </TouchableOpacity>
@@ -105,8 +121,8 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    marginBottom: 10 
+  container: {
+    marginBottom: 10,
   },
   header: {
     flexDirection: "row",
@@ -115,11 +131,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginBottom: 10,
   },
-  monthTitle: { 
-    fontSize: 15, 
+  monthTitle: {
+    fontSize: 15,
     fontWeight: "bold",
-    color:"#CCCCCC",
-    textTransform: "uppercase" 
+    color: "#CCCCCC",
+    textTransform: "uppercase",
   },
   todayButton: {
     backgroundColor: "#7c23b0ff",
@@ -127,9 +143,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 8,
   },
-  todayText: { 
-    color: "#CCCCCC", 
-    fontWeight: "600" 
+  todayText: {
+    color: "#CCCCCC",
+    fontWeight: "600",
   },
   weekContainer: {
     flexDirection: "row",
@@ -144,19 +160,19 @@ const styles = StyleSheet.create({
     backgroundColor: "#555555",
     width: 45,
   },
-  selectedBox: { 
-    backgroundColor: "#7c23b0ff" 
+  selectedBox: {
+    backgroundColor: "#7c23b0ff",
   },
-  dayText: { 
-    fontSize: 14, 
-    fontWeight: "bold", 
-    color: "#0A0A0A" 
+  dayText: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#0A0A0A",
   },
-  dateText: { 
-    fontSize: 16, 
-    color: "#CCCCCC" 
+  dateText: {
+    fontSize: 16,
+    color: "#CCCCCC",
   },
-  activeText: { 
-    color: "#CCCCCC" 
+  activeText: {
+    color: "#CCCCCC",
   },
 });

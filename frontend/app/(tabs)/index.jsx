@@ -6,17 +6,23 @@ import Modal from "react-native-modal";
 import AdminCreateClassModal from "../../components/Lessons/AdminCreateClassModal";
 import ClassList from "../../components/Lessons/ClassList";
 import Calendar from "../../components/Lessons/WeekCalendar";
+import { useEnrollments } from "../../context/EnrollmentsContext";
 import { useLessons } from "../../context/LessonsContext";
 import { useSchedules } from "../../context/SchedulesContext";
-import { useEnrollments } from "../../context/EnrollmentsContext"; 
 import { useUser } from "../../context/UserContext";
 
 export default function HomeScreen() {
   const [selectedDay, setSelectedDay] = useState(new Date());
   const [classes, setClasses] = useState([]);
   const { lessons, createLesson } = useLessons();
-  const { daySchedules, fetchSchedulesByDay, createSchedule, updateSchedule, createScheduleException } = useSchedules();
-  const { enrollUser } = useEnrollments(); 
+  const {
+    daySchedules,
+    fetchSchedulesByDay,
+    createSchedule,
+    updateSchedule,
+    createScheduleException,
+  } = useSchedules();
+  const { enrollUser } = useEnrollments();
   const { user } = useUser();
 
   const [refreshing, setRefreshing] = useState(false);
@@ -70,7 +76,7 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       fetchSchedulesByDay(selectedDay);
-    }, [selectedDay])
+    }, [selectedDay]),
   );
 
   const onRefresh = async () => {
@@ -83,10 +89,10 @@ export default function HomeScreen() {
   const handleEnroll = async (scheduleTemplateId) => {
     try {
       await enrollUser(scheduleTemplateId, selectedDay);
-      setClasses(prev =>
-        prev.map(cls =>
-          cls.id === scheduleTemplateId ? { ...cls, isEnrolled: true } : cls
-        )
+      setClasses((prev) =>
+        prev.map((cls) =>
+          cls.id === scheduleTemplateId ? { ...cls, isEnrolled: true } : cls,
+        ),
       );
     } catch (err) {
       setErrorMessage("Mes en curso no pagado");
@@ -109,10 +115,20 @@ export default function HomeScreen() {
     }
   };
 
-  const handleModalSubmit = async ({ dayOfWeek, startTime, endTime, lessonId }) => {
+  const handleModalSubmit = async ({
+    dayOfWeek,
+    startTime,
+    endTime,
+    lessonId,
+  }) => {
     try {
       if (modalData.id) {
-        await updateSchedule(modalData.id, { dayOfWeek, startTime, endTime, lessonId });
+        await updateSchedule(modalData.id, {
+          dayOfWeek,
+          startTime,
+          endTime,
+          lessonId,
+        });
       } else {
         await createSchedule({ dayOfWeek, startTime, endTime, lessonId });
       }
@@ -160,7 +176,7 @@ export default function HomeScreen() {
           style={styles.addButton}
           onPress={() => setAdminModalVisible(true)}
         >
-          <Text style={styles.addButtonText}>+ Crear Clase</Text>
+          <Ionicons name="add" size={20} color="#fff" />
         </TouchableOpacity>
       )}
       <ClassList
@@ -232,14 +248,15 @@ const styles = StyleSheet.create({
   },
   Title: { color: "#fff", fontWeight: "bold", fontSize: 22 },
   Content: { color: "#ccc", fontWeight: "bold", textAlign: "center" },
-  closenonpaidIcon: { color: "purple" },
-  addButtonText: { color: "white", fontSize: 16, textAlign: "center" },
+  closenonpaidIcon: { color: "#69188E" },
   addButton: {
-    backgroundColor: "purple",
-    padding: 12,
-    borderRadius: 8,
+    width: 30,
+    height: 30,
+    borderRadius: 15, 
+    backgroundColor: "#69188E",
     alignSelf: "center",
-    width: "90%",
-    marginVertical: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 10,
   },
 });
