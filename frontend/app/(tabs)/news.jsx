@@ -1,12 +1,22 @@
-import { useFocusEffect } from '@react-navigation/native';
-import { useCallback, useState } from "react";
-import { FlatList, RefreshControl, StyleSheet, Text, View, Button, TextInput, TouchableOpacity } from "react-native";
-import { useUser } from '../../context/UserContext';
-import { API_BASE_URL } from "../config";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  Dimensions,
+  FlatList,
+  Image,
+  Keyboard,
+  Modal,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import PagerView from "react-native-pager-view";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { Keyboard } from "react-native";
-import { Modal } from 'react-native';
-
+import { useUser } from "../../context/UserContext";
+import { API_BASE_URL } from "../config";
 
 export default function News() {
   const [announcements, setAnnouncements] = useState([]);
@@ -15,7 +25,8 @@ export default function News() {
   const { user } = useUser();
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
-
+  const pagerRef = useRef(null);
+  const [page, setPage] = useState(0);
 
   const fetchAnnouncements = async () => {
     try {
@@ -24,7 +35,11 @@ export default function News() {
       });
       if (!response.ok) return setAnnouncements([]);
       const data = await response.json();
-      setAnnouncements(Array.isArray(data) ? data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) : []);
+      setAnnouncements(
+        Array.isArray(data)
+          ? data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          : [],
+      );
     } catch (error) {
       console.error("Error fetching announcements:", error);
       setAnnouncements([]);
@@ -32,7 +47,9 @@ export default function News() {
   };
 
   useFocusEffect(
-    useCallback(() => { fetchAnnouncements(); }, [user])
+    useCallback(() => {
+      fetchAnnouncements();
+    }, [user]),
   );
 
   const onRefresh = async () => {
@@ -44,10 +61,13 @@ export default function News() {
   const createAnnouncement = async () => {
     if (!newMessage.trim()) return;
     try {
-      await fetch(`${API_BASE_URL}/announcements?message=${encodeURIComponent(newMessage)}`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${user?.token}` },
-      });
+      await fetch(
+        `${API_BASE_URL}/announcements?message=${encodeURIComponent(newMessage)}`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${user?.token}` },
+        },
+      );
       setNewMessage("");
       Keyboard.dismiss();
       fetchAnnouncements();
@@ -78,24 +98,82 @@ export default function News() {
     }
   };
 
-
   const renderItem = ({ item }) => (
     <View style={styles.card}>
       <Text style={styles.message}>{item.message}</Text>
-      <Text style={styles.date}>{new Date(item.createdAt).toLocaleString("es-ES")}</Text>
+      <Text style={styles.date}>
+        {new Date(item.createdAt).toLocaleString("es-ES")}
+      </Text>
       {user?.role === "ADMIN" && (
-        <TouchableOpacity onPress={() => confirmDelete(item.id)} style={styles.deleteButton}>
+        <TouchableOpacity
+          onPress={() => confirmDelete(item.id)}
+          style={styles.deleteButton}
+        >
           <Ionicons name="trash-outline" size={28} color="#FF3B30" />
         </TouchableOpacity>
       )}
     </View>
   );
 
+  const width = Dimensions.get("window").width;
+
+  const images = [
+    require("../assets/carrousel/img1.jpg"),
+    require("../assets/carrousel/img2.jpg"),
+    require("../assets/carrousel/img3.jpg"),
+    require("../assets/carrousel/img4.jpg"),
+  ];
+
+  const pageRef = useRef(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const nextPage =
+        pageRef.current + 1 >= images.length ? 0 : pageRef.current + 1;
+      pagerRef.current?.setPage(nextPage);
+      pageRef.current = nextPage;
+      setPage(nextPage); // solo para actualizar indicador
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Noticias</Text>
+        <Image
+          source={require("../assets/images/white_logo.png")}
+          style={styles.logo}
+        />
+        <Text style={styles.gymName}>La Forja</Text>
       </View>
+
+      <View style={styles.carouselContainer}>
+        <PagerView
+          ref={pagerRef}
+          style={styles.pager}
+          initialPage={0}
+          onPageSelected={(e) => {
+            pageRef.current = e.nativeEvent.position; // mantener ref sincronizada
+            setPage(e.nativeEvent.position);
+          }}
+        >
+          {images.map((img, index) => (
+            <View key={index} style={styles.page}>
+              <Image source={img} style={styles.image} />
+            </View>
+          ))}
+        </PagerView>
+        <View style={styles.indicatorContainer}>
+          {images.map((_, index) => (
+            <View
+              key={index}
+              style={[styles.indicator, { opacity: page === index ? 1 : 0.3 }]}
+            />
+          ))}
+        </View>
+      </View>
+      <Text style={styles.title}>Noticias</Text>
       {user?.role === "ADMIN" && (
         <View style={styles.adminBox}>
           <TextInput
@@ -104,10 +182,13 @@ export default function News() {
             value={newMessage}
             onChangeText={setNewMessage}
           />
-          <TouchableOpacity onPress={createAnnouncement} disabled={!newMessage.trim()} style={{ opacity: newMessage.trim() ? 1 : 0.4 }}>
+          <TouchableOpacity
+            onPress={createAnnouncement}
+            disabled={!newMessage.trim()}
+            style={{ opacity: newMessage.trim() ? 1 : 0.4 }}
+          >
             <Ionicons name="megaphone-outline" size={28} color="#7c23b0ff" />
           </TouchableOpacity>
-
         </View>
       )}
 
@@ -120,7 +201,9 @@ export default function News() {
           data={announcements}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
         />
       )}
 
@@ -131,12 +214,18 @@ export default function News() {
 
             <View style={styles.modalButtons}>
               <TouchableOpacity
-                onPress={() => { setConfirmVisible(false); setSelectedAnnouncement(null); }}
+                onPress={() => {
+                  setConfirmVisible(false);
+                  setSelectedAnnouncement(null);
+                }}
               >
                 <Ionicons name="close" size={28} color="#7c23b0ff" />
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={handleDelete} style={styles.modalButton}>
+              <TouchableOpacity
+                onPress={handleDelete}
+                style={styles.modalButton}
+              >
                 <Ionicons name="trash-outline" size={28} color="#FF3B30" />
               </TouchableOpacity>
             </View>
@@ -148,65 +237,118 @@ export default function News() {
 }
 
 const styles = StyleSheet.create({
-  header: { 
-    paddingTop: 20,
-    paddingBottom: 10,
+  indicatorContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 10,
+    gap: 6, // separación entre los puntos
   },
-  title: { 
-    fontSize: 16, 
+  indicator: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#7c23b0", // color principal de la app
+    marginBottom: 10,
+  },
+  carouselContainer: {
+    height: 200,
+    marginBottom: 20,
+    borderRadius: 16,
+    overflow: "hidden",
+    backgroundColor: "#111",
+    elevation: 5,
+  },
+
+  pager: {
+    flex: 1,
+  },
+
+  page: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  image: {
+    width: "100%",
+    height: "100%",
+  },
+
+  header: {
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  title: {
+    fontSize: 16,
     fontWeight: "bold",
-    color:"#CCCCCC",
+    color: "#CCCCCC",
     textTransform: "uppercase",
     justifyContent: "center",
-    textAlign: "center"
+    textAlign: "center",
+    marginBottom: 15,
   },
 
-  container: { 
-    flex: 1, 
-    backgroundColor: "#1E1E1E", 
-    paddingHorizontal: 20, 
-    paddingTop: 50 
+  logo: {
+    width: 70,
+    height: 70,
+    resizeMode: "contain",
   },
 
-  adminBox: { 
-  flexDirection: 'row',
-  alignItems: 'center',
-  marginBottom: 20,
-  backgroundColor: "#CCCCCC",
-  padding: 10,
-  borderRadius: 10,
-  gap: 10,
-},
-
-  input: { 
-  flex: 1,
-  backgroundColor: "#ececec",
-  padding: 10,
-  borderRadius: 10,
-},
-
-  card: { 
-    backgroundColor: "#ececec", 
-    borderRadius: 10, 
-    padding: 10, 
-    marginBottom: 10, 
+  gymName: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#7c23b0",
+    letterSpacing: 1,
   },
 
-  message: { 
-    fontSize: 14, 
-    fontWeight: "600", 
+  container: {
+    flex: 1,
+    backgroundColor: "#1E1E1E",
+    paddingHorizontal: 20,
+    paddingTop: 50,
+  },
+
+  adminBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+    backgroundColor: "#2A2A2A",
+    padding: 10,
+    borderRadius: 12,
+    gap: 10,
+  },
+
+  input: {
+    flex: 1,
+    backgroundColor: "#1E1E1E",
+    padding: 10,
+    borderRadius: 10,
+    color: "#fff",
+  },
+
+  card: {
+    backgroundColor: "#2A2A2A",
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: "#7c23b0",
+  },
+
+  message: {
+    fontSize: 15,
+    fontWeight: "600",
     marginBottom: 6,
-    color: "#1E1E1E" 
+    color: "#FFFFFF",
   },
 
-  date: { 
-    fontSize: 12, 
-    color: "#555" 
+  date: {
+    fontSize: 12,
+    color: "#555",
   },
 
-  deleteButton: { 
-    padding: 6, 
-    alignSelf: "flex-end" 
+  deleteButton: {
+    padding: 6,
+    alignSelf: "flex-end",
   },
 
   modalOverlay: {
@@ -230,18 +372,18 @@ const styles = StyleSheet.create({
   },
 
   modalButtons: {
-    flexDirection: "row", 
-    justifyContent: "space-between", 
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
 
-  emptyContainer: { 
-    flex: 1, 
-    justifyContent: 'center', 
-    alignItems: 'center' 
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 
-  empty: { 
-    fontSize: 16, 
-    color: "#CCCCCC" 
+  empty: {
+    fontSize: 16,
+    color: "#CCCCCC",
   },
 });
