@@ -1,14 +1,19 @@
+import { Ionicons } from "@expo/vector-icons";
+import { Picker } from "@react-native-picker/picker";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useState } from "react";
-import { StyleSheet, View, TouchableOpacity, Text, TextInput } from "react-native";
-import { Picker } from "@react-native-picker/picker";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import Modal from "react-native-modal";
 import ClassList from "../../components/ClassList";
 import Calendar from "../../components/WeekCalendar";
-import ClassModal from "../../components/ClassModal";
 import { useUser } from "../../context/usercontext";
 import { API_BASE_URL } from "../config";
-import Modal from "react-native-modal";
-import { Ionicons } from "@expo/vector-icons";
 
 export default function HomeScreen() {
   const [selectedDay, setSelectedDay] = useState(new Date());
@@ -25,12 +30,12 @@ export default function HomeScreen() {
   const [newStartTime, setNewStartTime] = useState("");
   const [newEndTime, setNewEndTime] = useState("");
   const [selectedLessonId, setSelectedLessonId] = useState(null);
-  
-  const [createMode, setCreateMode] = useState(null); 
-// "new" | "existing"
 
-const [newLessonName, setNewLessonName] = useState("");
-const [newProfessorName, setNewProfessorName] = useState("");
+  const [createMode, setCreateMode] = useState(null);
+  // "new" | "existing"
+
+  const [newLessonName, setNewLessonName] = useState("");
+  const [newProfessorName, setNewProfessorName] = useState("");
 
   const { user } = useUser();
 
@@ -72,12 +77,17 @@ const [newProfessorName, setNewProfessorName] = useState("");
   const fetchClasses = async () => {
     try {
       const dateStr = selectedDay.toISOString().split("T")[0];
-      const res = await fetch(`${API_BASE_URL}/scheduleTemplates/day?date=${dateStr}`, {
-        headers: { Authorization: `Bearer ${user?.token}` },
-      });
+      const res = await fetch(
+        `${API_BASE_URL}/scheduleTemplates/day?date=${dateStr}`,
+        {
+          headers: { Authorization: `Bearer ${user?.token}` },
+        },
+      );
 
       const data = await res.json();
-      const mapped = data.map(mapClassData).sort((a, b) => a.startMinutes - b.startMinutes);
+      const mapped = data
+        .map(mapClassData)
+        .sort((a, b) => a.startMinutes - b.startMinutes);
       setClasses(mapped);
     } catch (error) {
       console.error("Error fetching classes:", error);
@@ -102,7 +112,7 @@ const [newProfessorName, setNewProfessorName] = useState("");
     useCallback(() => {
       fetchClasses();
       fetchLessons();
-    }, [selectedDay, user])
+    }, [selectedDay, user]),
   );
 
   const onRefresh = async () => {
@@ -146,59 +156,112 @@ const [newProfessorName, setNewProfessorName] = useState("");
     }
   };
 
+  // --- Enroll ---
+  const handleEnroll = async (scheduleTemplateId) => {
+    try {
+      const dateStr = selectedDay.toISOString().split("T")[0];
+      const response = await fetch(`${API_BASE_URL}/enrollments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user?.token}`,
+        },
+        body: JSON.stringify({ scheduleTemplateId, date: dateStr }),
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        setErrorMessage("Mes en curso no pagado");
+        setErrorModalVisible(true);
+        return;
+      }
+      setClasses((prev) =>
+        prev.map((cls) =>
+          cls.id === scheduleTemplateId ? { ...cls, isEnrolled: true } : cls,
+        ),
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const onDeleteClass = async (cls) => {
+    try {
+      const dateStr = selectedDay.toISOString().split("T")[0];
+      await fetch(`${API_BASE_URL}/scheduleExceptions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user?.token}`,
+        },
+        body: JSON.stringify({
+          date: dateStr,
+          startTime: cls.startTime,
+          endTime: cls.endTime,
+          lessonId: cls.lessonId,
+          cancelled: true,
+        }),
+      });
+
+      fetchClasses();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleCreateNewLessonAndException = async () => {
-  try {
-    if (!newLessonName || !newProfessorName || !newStartTime || !newEndTime) return;
+    try {
+      if (!newLessonName || !newProfessorName || !newStartTime || !newEndTime)
+        return;
 
-    // 1️⃣ Crear lesson
-    const lessonResponse = await fetch(`${API_BASE_URL}/lessons`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${user?.token}`,
-      },
-      body: JSON.stringify({
-        lessonName: newLessonName,
-        professorName: newProfessorName,
-      }),
-    });
+      // 1️⃣ Crear lesson
+      const lessonResponse = await fetch(`${API_BASE_URL}/lessons`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user?.token}`,
+        },
+        body: JSON.stringify({
+          lessonName: newLessonName,
+          professorName: newProfessorName,
+        }),
+      });
 
-    if (!lessonResponse.ok) throw new Error("Error creating lesson");
+      if (!lessonResponse.ok) throw new Error("Error creating lesson");
 
-    const savedLesson = await lessonResponse.json();
+      const savedLesson = await lessonResponse.json();
 
-    // 2️⃣ Crear excepción con la nueva lesson
-    const dateStr = selectedDay.toISOString().split("T")[0];
+      // 2️⃣ Crear excepción con la nueva lesson
+      const dateStr = selectedDay.toISOString().split("T")[0];
 
-    await fetch(`${API_BASE_URL}/scheduleExceptions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${user?.token}`,
-      },
-      body: JSON.stringify({
-        date: dateStr,
-        startTime: newStartTime,
-        endTime: newEndTime,
-        lessonId: savedLesson.id,
-        cancelled: false,
-      }),
-    });
+      await fetch(`${API_BASE_URL}/scheduleExceptions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user?.token}`,
+        },
+        body: JSON.stringify({
+          date: dateStr,
+          startTime: newStartTime,
+          endTime: newEndTime,
+          lessonId: savedLesson.id,
+          cancelled: false,
+        }),
+      });
 
-    // Reset
-    setAdminModalVisible(false);
-    setCreateMode(null);
-    setNewLessonName("");
-    setNewProfessorName("");
-    setNewStartTime("");
-    setNewEndTime("");
+      // Reset
+      setAdminModalVisible(false);
+      setCreateMode(null);
+      setNewLessonName("");
+      setNewProfessorName("");
+      setNewStartTime("");
+      setNewEndTime("");
 
-    fetchLessons();
-    fetchClasses();
-  } catch (error) {
-    console.error(error);
-  }
-};
+      fetchLessons();
+      fetchClasses();
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -219,120 +282,132 @@ const [newProfessorName, setNewProfessorName] = useState("");
         refreshing={refreshing}
         onRefresh={onRefresh}
         userRole={user?.role}
+        onEnroll={handleEnroll}
+        onDeleteClass={onDeleteClass}
       />
 
       {/* 🔥 MODAL CREAR CLASE ADMIN */}
-<Modal
-  isVisible={adminModalVisible}
-  onBackdropPress={() => {
-    setAdminModalVisible(false);
-    setCreateMode(null);
-  }}
->
-  <View style={styles.adminModal}>
-    <Text style={styles.Title}>Crear Clase</Text>
+      <Modal
+        isVisible={adminModalVisible}
+        onBackdropPress={() => {
+          setAdminModalVisible(false);
+          setCreateMode(null);
+        }}
+      >
+        <View style={styles.adminModal}>
+          <Text style={styles.Title}>Crear Clase</Text>
 
-    {/* 🔹 Selección de modo */}
-    {!createMode && (
-      <>
-        <TouchableOpacity
-          style={styles.modeButton}
-          onPress={() => setCreateMode("new")}
-        >
-          <Text style={styles.modeButtonText}>Crear nueva clase</Text>
-        </TouchableOpacity>
+          {/* 🔹 Selección de modo */}
+          {!createMode && (
+            <>
+              <TouchableOpacity
+                style={styles.modeButton}
+                onPress={() => setCreateMode("new")}
+              >
+                <Text style={styles.modeButtonText}>Crear nueva clase</Text>
+              </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.modeButton}
-          onPress={() => setCreateMode("existing")}
-        >
-          <Text style={styles.modeButtonText}>Usar clase existente</Text>
-        </TouchableOpacity>
-      </>
-    )}
+              <TouchableOpacity
+                style={styles.modeButton}
+                onPress={() => setCreateMode("existing")}
+              >
+                <Text style={styles.modeButtonText}>Usar clase existente</Text>
+              </TouchableOpacity>
+            </>
+          )}
 
-    {/* 🔹 CREAR NUEVA LESSON */}
-    {createMode === "new" && (
-      <>
-        <TextInput
-          placeholder="Nombre de la clase"
-          placeholderTextColor="#888"
-          value={newLessonName}
-          onChangeText={setNewLessonName}
-          style={styles.input}
-        />
+          {/* 🔹 CREAR NUEVA LESSON */}
+          {createMode === "new" && (
+            <>
+              <TextInput
+                placeholder="Nombre de la clase"
+                placeholderTextColor="#888"
+                value={newLessonName}
+                onChangeText={setNewLessonName}
+                style={styles.input}
+              />
 
-        <TextInput
-          placeholder="Profesor"
-          placeholderTextColor="#888"
-          value={newProfessorName}
-          onChangeText={setNewProfessorName}
-          style={styles.input}
-        />
+              <TextInput
+                placeholder="Profesor"
+                placeholderTextColor="#888"
+                value={newProfessorName}
+                onChangeText={setNewProfessorName}
+                style={styles.input}
+              />
 
-        <TextInput
-          placeholder="Hora inicio (HH:MM)"
-          placeholderTextColor="#888"
-          value={newStartTime}
-          onChangeText={setNewStartTime}
-          style={styles.input}
-        />
+              <TextInput
+                placeholder="Hora inicio (HH:MM)"
+                placeholderTextColor="#888"
+                value={newStartTime}
+                onChangeText={setNewStartTime}
+                style={styles.input}
+              />
 
-        <TextInput
-          placeholder="Hora fin (HH:MM)"
-          placeholderTextColor="#888"
-          value={newEndTime}
-          onChangeText={setNewEndTime}
-          style={styles.input}
-        />
+              <TextInput
+                placeholder="Hora fin (HH:MM)"
+                placeholderTextColor="#888"
+                value={newEndTime}
+                onChangeText={setNewEndTime}
+                style={styles.input}
+              />
 
-        <TouchableOpacity style={styles.saveButton} onPress={handleCreateNewLessonAndException}>
-          <Text style={{ color: "white", fontWeight: "bold" }}>Guardar</Text>
-        </TouchableOpacity>
-      </>
-    )}
+              <TouchableOpacity
+                style={styles.saveButton}
+                onPress={handleCreateNewLessonAndException}
+              >
+                <Text style={{ color: "white", fontWeight: "bold" }}>
+                  Guardar
+                </Text>
+              </TouchableOpacity>
+            </>
+          )}
 
-    {/* 🔹 USAR LESSON EXISTENTE */}
-    {createMode === "existing" && (
-      <>
-        <Picker
-          selectedValue={selectedLessonId}
-          onValueChange={(value) => setSelectedLessonId(value)}
-          style={styles.picker}
-        >
-          <Picker.Item label="Selecciona una clase" value={null} />
-          {lessonsList.map((lesson) => (
-            <Picker.Item
-              key={lesson.id}
-              label={`${lesson.lessonName} - ${lesson.professorName}`}
-              value={lesson.id}
-            />
-          ))}
-        </Picker>
+          {/* 🔹 USAR LESSON EXISTENTE */}
+          {createMode === "existing" && (
+            <>
+              <Picker
+                selectedValue={selectedLessonId}
+                onValueChange={(value) => setSelectedLessonId(value)}
+                style={styles.picker}
+              >
+                <Picker.Item label="Selecciona una clase" value={null} />
+                {lessonsList.map((lesson) => (
+                  <Picker.Item
+                    key={lesson.id}
+                    label={`${lesson.lessonName} - ${lesson.professorName}`}
+                    value={lesson.id}
+                  />
+                ))}
+              </Picker>
 
-        <TextInput
-          placeholder="Hora inicio (HH:MM)"
-          placeholderTextColor="#888"
-          value={newStartTime}
-          onChangeText={setNewStartTime}
-          style={styles.input}
-        />
+              <TextInput
+                placeholder="Hora inicio (HH:MM)"
+                placeholderTextColor="#888"
+                value={newStartTime}
+                onChangeText={setNewStartTime}
+                style={styles.input}
+              />
 
-        <TextInput
-          placeholder="Hora fin (HH:MM)"
-          placeholderTextColor="#888"
-          value={newEndTime}
-          onChangeText={setNewEndTime}
-          style={styles.input}
-        />
+              <TextInput
+                placeholder="Hora fin (HH:MM)"
+                placeholderTextColor="#888"
+                value={newEndTime}
+                onChangeText={setNewEndTime}
+                style={styles.input}
+              />
 
-        <TouchableOpacity style={styles.saveButton} onPress={handleCreateException}>
-          <Text style={{ color: "white", fontWeight: "bold" }}>Guardar</Text>
-        </TouchableOpacity>
-      </>
-    )}
-  </View>
-</Modal>
+              <TouchableOpacity
+                style={styles.saveButton}
+                onPress={handleCreateException}
+              >
+                <Text style={{ color: "white", fontWeight: "bold" }}>
+                  Guardar
+                </Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+      </Modal>
 
       {/* MODAL ERROR */}
       <Modal
@@ -435,15 +510,15 @@ const styles = StyleSheet.create({
   },
 
   modeButton: {
-  backgroundColor: "#444",
-  padding: 12,
-  borderRadius: 8,
-  marginBottom: 10,
-  alignItems: "center",
-},
+    backgroundColor: "#444",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 10,
+    alignItems: "center",
+  },
 
-modeButtonText: {
-  color: "white",
-  fontWeight: "bold",
-},
+  modeButtonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
 });
