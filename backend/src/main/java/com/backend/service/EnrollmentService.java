@@ -1,5 +1,6 @@
 package com.backend.service;
 
+import com.backend.dto.AttendanceDTO;
 import com.backend.dto.EnrollmentRequestDTO;
 import com.backend.exception.ResourceNotFoundException;
 import com.backend.model.*;
@@ -7,11 +8,14 @@ import com.backend.repository.*;
 import com.backend.security.JwtUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -54,13 +58,14 @@ public class EnrollmentService {
         YearMonth yearMonth = YearMonth.from(date);
         Lesson lesson = template.getLesson();
 
-        boolean hasPaid = paymentRepository
-                .existsByUserAndLessonAndMonthPaid(user, lesson, yearMonth);
+        boolean hasLessonPayment =
+                paymentRepository.existsByUserAndLessonAndMonthPaid(user, lesson, yearMonth);
 
-        if (!hasPaid) {
-            throw new IllegalArgumentException(
-                    "User has not paid for this lesson for month " + yearMonth
-            );
+        boolean hasGlobalPayment =
+                paymentRepository.existsByUserAndTypeAndMonthPaid(user, PaymentType.GLOBAL, yearMonth);
+
+        if (!hasLessonPayment && !hasGlobalPayment) {
+            throw new IllegalArgumentException("User has not paid this lesson or global pass");
         }
 
         if (!template.getDayOfWeek().equals(date.getDayOfWeek())) {
@@ -84,6 +89,7 @@ public class EnrollmentService {
         enrollment.setUser(user);
         enrollment.setScheduleTemplate(template);
         enrollment.setDate(date);
+        enrollment.setAttended(false);
 
         return enrollmentRepository.save(enrollment);
     }
@@ -99,10 +105,50 @@ public class EnrollmentService {
             throw new IllegalArgumentException("You are not allowed to delete this enrollment");
         }
 
+        if (enrollment.getDate().isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Cannot delete past enrollments");
+        }
+
         enrollmentRepository.delete(enrollment);
     }
 
     public List<Enrollment> getAllEnrollments() {
         return enrollmentRepository.findAll();
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
+    public void markAttendance(AttendanceDTO dto) {
+
+        ScheduleTemplate template = scheduleTemplateRepository.findById(dto.scheduleTemplateId())
+                .orElseThrow(() -> new ResourceNotFoundException("ScheduleTemplate not found"));
+
+        LocalDate date = LocalDate.parse(dto.date());
+
+        List<Enrollment> enrollments = enrollmentRepository
+                .findByScheduleTemplateAndDate(template, date);
+
+        Set<Long> presentUsers = new HashSet<>(dto.presentUserIds());
+
+        for (Enrollment enrollment : enrollments) {
+
+            boolean present = presentUsers.contains(
+                    enrollment.getUser().getId()
+            );
+
+            enrollment.setAttended(present);
+        }
+
+        enrollmentRepository.saveAll(enrollments);
+    }
+
+    public List<Enrollment> getClassEnrollments(Long scheduleTemplateId, String date) {
+
+        ScheduleTemplate template = scheduleTemplateRepository.findById(scheduleTemplateId)
+                .orElseThrow(() -> new ResourceNotFoundException("ScheduleTemplate not found"));
+
+        LocalDate classDate = LocalDate.parse(date);
+
+        return enrollmentRepository.findByScheduleTemplateAndDate(template, classDate);
     }
 }

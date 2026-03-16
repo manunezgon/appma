@@ -12,7 +12,8 @@ import {
 import Modal from "react-native-modal";
 import ClassList from "../../components/ClassList";
 import Calendar from "../../components/WeekCalendar";
-import { useUser } from "../../context/usercontext";
+import ClassModal from "../../components/ClassModal";
+import { useUser } from "../../context/UserContext";
 import { API_BASE_URL } from "../config";
 
 export default function HomeScreen() {

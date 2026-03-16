@@ -10,5 +10,7 @@ public record EnrollmentResponseDTO(
         String lessonName,
         String professorName,
         String time,
-        LocalDate date
+        LocalDate date,
+        boolean attended
+
 ) {}

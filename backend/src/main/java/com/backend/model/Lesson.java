@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Table(name = "lesson")
 @Data
@@ -23,4 +25,7 @@ public class Lesson {
 
     @Column(nullable = false)
     private Double amount_monthly;
+
+    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ScheduleTemplate> scheduleTemplates;
 }

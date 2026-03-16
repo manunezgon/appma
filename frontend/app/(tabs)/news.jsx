@@ -1,7 +1,7 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback, useState } from "react";
 import { FlatList, RefreshControl, StyleSheet, Text, View, Button, TextInput, TouchableOpacity } from "react-native";
-import { useUser } from '../../context/usercontext';
+import { useUser } from '../../context/UserContext';
 import { API_BASE_URL } from "../config";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { Keyboard } from "react-native";

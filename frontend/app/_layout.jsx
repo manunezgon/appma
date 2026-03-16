@@ -4,7 +4,10 @@ import { useFonts } from "expo-font";
 import { Stack, usePathname, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Text, TextInput, View } from "react-native";
-import { UserProvider, useUser } from "../context/usercontext";
+import { LessonsProvider } from "../context/LessonsContext";
+import { SchedulesProvider } from "../context/SchedulesContext";
+import { UserProvider, useUser } from "../context/UserContext";
+import { PaymentsProvider } from "../context/PaymentsContext";
 
 function RootGuard({ children }) {
   const { user } = useUser();
@@ -48,13 +51,19 @@ export default function RootLayout() {
 
   return (
     <UserProvider>
-      <RootGuard>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="login" options={{ headerShown: false }} />
-          <Stack.Screen name="register" options={{ headerShown: false }} />
-        </Stack>
-      </RootGuard>
+      <PaymentsProvider>
+        <LessonsProvider>
+          <SchedulesProvider>
+            <RootGuard>
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="login" options={{ headerShown: false }} />
+                <Stack.Screen name="register" options={{ headerShown: false }} />
+              </Stack>
+            </RootGuard>
+         </SchedulesProvider>
+       </LessonsProvider>
+      </PaymentsProvider>
     </UserProvider>
   );
 }
