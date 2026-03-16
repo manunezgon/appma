@@ -6,7 +6,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
@@ -39,7 +39,7 @@ export default function ClassList({
         data={classes}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => {
-          const handleEnroll = () => onEnroll(item.id);
+          const handleEnrollPress = () => onEnroll(item.id);
 
           return (
             <View style={styles.classCard}>
@@ -51,48 +51,42 @@ export default function ClassList({
               <View style={styles.centerContainer}>
                 <Text style={styles.classTime}>{item.time}</Text>
               </View>
-              
-              {userRole != "ADMIN" && (
-              <View style={styles.rightContainer}>
-                <TouchableOpacity
-                  style={[
-                    styles.enrollButton,
-                    item.isEnrolled && styles.enrollButtonDisabled,
-                  ]}
-                  disabled={item.isEnrolled || item.isPast}
-                  onPress={handleEnroll}
-                >
-                  <Ionicons
-                    name={
-                      item.isEnrolled
-                        ? "checkmark-circle"
-                        : item.isPast
-                          ? "time-outline"
-                          : "add-circle"
-                    }
-                    size={30}
-                    color={
-                      item.isEnrolled
-                        ? "#00923aff"
-                        : item.isPast
-                          ? "#555555"
-                          : "#7c23b0ff"
-                    }
-                  />
-                </TouchableOpacity>
-              </View>
-              )}
 
-              {userRole === "ADMIN" && (
-                <View style={styles.adminButtons}>
-                  <TouchableOpacity
-                    style={styles.editButton}
-                    onPress={() => confirmDelete(item)}
-                  >
+              {/* 🔹 Zona derecha combinada */}
+              <View style={styles.rightContainer}>
+                {userRole === "ADMIN" ? (
+                  <TouchableOpacity onPress={() => confirmDelete(item)}>
                     <Ionicons name="trash-outline" size={30} color="#FF3B30" />
                   </TouchableOpacity>
-                </View>
-              )}
+                ) : (
+                  <TouchableOpacity
+                    style={[
+                      styles.enrollButton,
+                      item.isEnrolled && styles.enrollButtonDisabled,
+                    ]}
+                    disabled={item.isEnrolled || item.isPast}
+                    onPress={handleEnrollPress}
+                  >
+                    <Ionicons
+                      name={
+                        item.isEnrolled
+                          ? "checkmark-circle"
+                          : item.isPast
+                            ? "time-outline"
+                            : "add-circle"
+                      }
+                      size={30}
+                      color={
+                        item.isEnrolled
+                          ? "#00923aff"
+                          : item.isPast
+                            ? "#555555"
+                            : "#7c23b0ff"
+                      }
+                    />
+                  </TouchableOpacity>
+                )}
+              </View>
             </View>
           );
         }}
@@ -142,18 +136,21 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderRadius: 10,
     backgroundColor: "#CCCCCC",
-    flexDirection: "column",
+    flexDirection: "row", 
+    alignItems: "center", 
+    justifyContent: "space-between", 
   },
   leftContainer: {
-    marginBottom: 5,
+    flex: 1, 
   },
   centerContainer: {
-    marginBottom: 5,
+    marginLeft: 10,
+    marginRight: 10,
   },
   rightContainer: {
-    position: "absolute",
-    top: 15,
-    right: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
   },
   adminButtons: {
     flexDirection: "row",

@@ -5,7 +5,6 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Modal from "react-native-modal";
 import AdminCreateClassModal from "../../components/Lessons/AdminCreateClassModal";
 import ClassList from "../../components/Lessons/ClassList";
-import ClassModal from "../../components/Lessons/ClassModal";
 import Calendar from "../../components/Lessons/WeekCalendar";
 import { useLessons } from "../../context/LessonsContext";
 import { useSchedules } from "../../context/SchedulesContext";
@@ -21,8 +20,6 @@ export default function HomeScreen() {
   const { user } = useUser();
 
   const [refreshing, setRefreshing] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalData, setModalData] = useState({});
   const [errorModalVisible, setErrorModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [adminModalVisible, setAdminModalVisible] = useState(false);
@@ -173,13 +170,6 @@ export default function HomeScreen() {
         onEnroll={handleEnroll}
         userRole={user?.role}
         onDeleteClass={onDeleteClass}
-      />
-      <ClassModal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        onSubmit={handleModalSubmit}
-        initialData={modalData}
-        lessons={lessons}
       />
       <Modal
         isVisible={errorModalVisible}
