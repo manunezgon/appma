@@ -7,80 +7,44 @@ import CarouselEditorModal from "../../components/news/CarouselEditorModal";
 import Carousel from "../../components/news/Carrousel";
 import style from "../../components/news/Styles";
 import { useUser } from "../../context/UserContext";
-import { API_BASE_URL } from "../config";
+import { useNewsData } from "../../hooks/useNewsData";
 
 export default function News() {
   const { user } = useUser();
-  const [announcements, setAnnouncements] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const [newMessage, setNewMessage] = useState("");
   const [showCarouselEditor, setShowCarouselEditor] = useState(false);
+  const [newMessage, setNewMessage] = useState("");
 
-  const images = [
-    require("../assets/carrousel/img1.jpg"),
-    require("../assets/carrousel/img2.jpg"),
-    require("../assets/carrousel/img3.jpg"),
-    require("../assets/carrousel/img4.jpg"),
-  ];
-
-  const fetchAnnouncements = async () => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/announcements`, {
-        headers: { Authorization: `Bearer ${user?.token}` },
-      });
-      if (!res.ok) return setAnnouncements([]);
-      const data = await res.json();
-      setAnnouncements(
-        Array.isArray(data)
-          ? [...data].sort(
-              (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
-            )
-          : [],
-      );
-    } catch (err) {
-      console.error(err);
-      setAnnouncements([]);
-    }
-  };
+  const {
+    announcements,
+    carouselImages,
+    fetchAnnouncements,
+    fetchCarouselImages,
+    createAnnouncement,
+    addImage,
+    deleteImage,
+    reorderImages,
+  } = useNewsData();
 
   useFocusEffect(
     useCallback(() => {
       fetchAnnouncements();
-    }, [user]),
+      fetchCarouselImages();
+    }, [fetchAnnouncements, fetchCarouselImages])
   );
-
-  const createAnnouncement = async () => {
-    if (!newMessage.trim()) return;
-    try {
-      await fetch(
-        `${API_BASE_URL}/announcements?message=${encodeURIComponent(newMessage)}`,
-        {
-          method: "POST",
-          headers: { Authorization: `Bearer ${user?.token}` },
-        },
-      );
-      setNewMessage("");
-      fetchAnnouncements();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await fetchAnnouncements();
-    setRefreshing(false);
-  };
 
   return (
     <ScrollView
       style={style.container}
       contentContainerStyle={style.inner}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        <RefreshControl
+          refreshing={false}
+          onRefresh={async () => {
+            await fetchAnnouncements();
+          }}
+        />
       }
     >
-      {/* Header */}
       <View style={style.header}>
         <Image
           source={require("../assets/images/white_logo_nw.png")}
@@ -90,7 +54,7 @@ export default function News() {
       </View>
 
       <Carousel
-        images={images}
+        images={carouselImages}
         interval={3000}
         isAdmin={user?.role === "ADMIN"}
         onEdit={() => setShowCarouselEditor(true)}
@@ -99,12 +63,13 @@ export default function News() {
       <CarouselEditorModal
         visible={showCarouselEditor}
         onClose={() => setShowCarouselEditor(false)}
-        images={images}
-        onAdd={() => console.log("Añadir foto")}
-        onDelete={(idx) => console.log("Borrar foto", idx)}
+        images={carouselImages}
+        onAdd={addImage}
+        onDelete={(idx) => deleteImage(carouselImages[idx].id)}
+        onReorder={reorderImages}
       />
 
-      <Text style={style.subtitle}>Noticias</Text>
+      <Text style={style.subtitle}>News</Text>
 
       {user?.role === "ADMIN" && (
         <AdminInput
@@ -114,7 +79,6 @@ export default function News() {
         />
       )}
 
-      {/* Listado de anuncios */}
       {announcements.length === 0 ? (
         <View style={style.newsContainer}>
           <Text style={style.text}>No hay noticias por ahora</Text>

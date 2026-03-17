@@ -8,18 +8,23 @@ export default function Carousel({ images, interval = 3000, onEdit, isAdmin }) {
   const pagerRef = useRef(null);
   const pageRef = useRef(0);
   const [page, setPage] = useState(0);
+  const [localImages, setLocalImages] = useState(images);
 
   useEffect(() => {
+    setLocalImages(images);
+  }, [images]);
+
+  useEffect(() => {
+    if (!localImages.length) return;
     const timer = setInterval(() => {
-      const nextPage =
-        pageRef.current + 1 >= images.length ? 0 : pageRef.current + 1;
+      const nextPage = (pageRef.current + 1) % localImages.length;
       pagerRef.current?.setPage(nextPage);
       pageRef.current = nextPage;
       setPage(nextPage);
     }, interval);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [interval, localImages.length]);
 
   return (
     <View style={style.carruselWrapper}>
@@ -33,9 +38,12 @@ export default function Carousel({ images, interval = 3000, onEdit, isAdmin }) {
             setPage(e.nativeEvent.position);
           }}
         >
-          {images.map((img, idx) => (
+          {localImages.map((img, idx) => (
             <View key={idx} style={style.page}>
-              <Image source={img} style={style.image} />
+              <Image
+                source={{ uri: img.imageUrl || img }}
+                style={style.image}
+              />
             </View>
           ))}
         </PagerView>
@@ -48,7 +56,7 @@ export default function Carousel({ images, interval = 3000, onEdit, isAdmin }) {
       )}
 
       <View style={style.indicatorContainer}>
-        {images.map((_, idx) => (
+        {localImages.map((_, idx) => (
           <View
             key={idx}
             style={[style.indicator, { opacity: page === idx ? 1 : 0.3 }]}

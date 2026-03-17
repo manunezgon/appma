@@ -8,7 +8,7 @@ export default function AdminInput({ value, onChange, onSend }) {
       <TextInput
         style={style.input}
         placeholderTextColor="#888"
-        placeholder="Escribe un anuncio..."
+        placeholder="Share a message..."
         value={value}
         onChangeText={onChange}
       />
