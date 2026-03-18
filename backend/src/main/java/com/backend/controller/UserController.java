@@ -112,7 +112,7 @@ public class UserController {
             @RequestParam("file") MultipartFile file
     ) {
         try {
-            String url = cloudinaryService.uploadFile(file);
+            String url = cloudinaryService.uploadProfileFile(file);
 
             User updatedUser = userService.updateProfileImage(id, url);
 
