@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { View, Text, TouchableOpacity, Modal, StyleSheet } from "react-native";
+import { Modal, Text, TouchableOpacity, View } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { useUser } from "../../context/UserContext";
 import { API_BASE_URL } from "../../app/config";
-import style from "./Styles";
+import { useUser } from "../../context/UserContext";
+import style from "../../Styles/NewsStyles";
 
 export default function AnnouncementCard({ announcement, onDeleted }) {
   const { user } = useUser();

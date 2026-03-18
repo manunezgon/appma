@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import style from "./Styles";
+import style from "../../Styles/NewsStyles";
 
 export default function CarouselEditorModal({
   visible,
