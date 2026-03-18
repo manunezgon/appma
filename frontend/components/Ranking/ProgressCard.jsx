@@ -1,5 +1,5 @@
 import { Text, View } from "react-native";
-import styles from "./Styles";
+import styles from "../../Styles/RankingStyles";
 
 export default function ProgressCard({ position, classes }) {
   if (position == null) return null;
@@ -14,7 +14,7 @@ export default function ProgressCard({ position, classes }) {
 
       <View style={styles.myProgressRow}>
         <Text style={styles.myProgressLabel}>{classes}</Text>
-        <Text style={styles.myProgressLabel}>attended classes</Text>
+        <Text style={styles.myProgressLabel}>Attended classes</Text>
       </View>
     </View>
   );
