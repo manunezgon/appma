@@ -4,13 +4,13 @@ import {
   Modal,
   RefreshControl,
   SectionList,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import ScheduleWizardModal from "../../components/ScheduleWizard/ScheduleWizardModal.jsx";
+import styles from "../../Styles/SessionStyle.jsx"
 import { useUser } from "../../context/UserContext";
 import { API_BASE_URL } from "../config";
 
@@ -60,9 +60,9 @@ export default function Sessions() {
 
       const sectionsData = [];
       if (todayClasses.length)
-        sectionsData.push({ title: "Hoy", data: todayClasses });
+        sectionsData.push({ title: "Today", data: todayClasses });
       if (nextClasses.length)
-        sectionsData.push({ title: "Próximas clases", data: nextClasses });
+        sectionsData.push({ title: "Upcoming classes", data: nextClasses });
 
       setSections(sectionsData);
     } catch (error) {
@@ -140,7 +140,7 @@ export default function Sessions() {
 
   if (!user)
     return (
-      <Text style={{ textAlign: "center", marginTop: 50 }}>Cargando...</Text>
+      <Text style={styles.loading}>Loading...</Text>
     );
 
   return (
@@ -154,7 +154,7 @@ export default function Sessions() {
             renderSectionHeader={renderSectionHeader}
             ListEmptyComponent={
               <Text style={styles.noClasses}>
-                No tienes clases hoy ni próximamente.
+                No classes today or upcoming.
               </Text>
             }
             refreshControl={
@@ -166,7 +166,7 @@ export default function Sessions() {
             <View style={styles.modalOverlay}>
               <View style={styles.modalContent}>
                 <Text style={styles.modalText}>
-                  ¿Seguro que quieres desapuntarte de esta clase?
+                  Are you sure you want to unenroll from this class?
                 </Text>
                 <View style={styles.modalButtons}>
                   <TouchableOpacity
@@ -176,7 +176,7 @@ export default function Sessions() {
                     }}
                     style={styles.modalButton}
                   >
-                    <Ionicons name="close" size={28} color="#7c23b0ff" />
+                    <Ionicons name="close" size={28} color="#69188E" />
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={handleUnenroll}
@@ -199,55 +199,3 @@ export default function Sessions() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#1E1E1E",
-    paddingTop: 50,
-    paddingHorizontal: 20,
-  },
-  sectionHeaderContainer: { paddingTop: 20, paddingBottom: 10 },
-  sectionHeader: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#CCCCCC",
-    textTransform: "uppercase",
-    justifyContent: "center",
-    textAlign: "center",
-  },
-  classCard: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 15,
-    marginBottom: 10,
-    borderRadius: 10,
-    backgroundColor: "#CCCCCC",
-  },
-  className: { fontSize: 16, fontWeight: "600" },
-  professorName: { fontSize: 14, color: "#555" },
-  date: { fontSize: 14, color: "#555" },
-  time: { fontSize: 14, color: "#555" },
-  noClasses: {
-    textAlign: "center",
-    marginTop: 20,
-    fontSize: 16,
-    color: "#555",
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    backgroundColor: "#CCCCCC",
-    padding: 20,
-    borderRadius: 10,
-    width: "80%",
-  },
-  modalText: { fontSize: 16, marginBottom: 20, textAlign: "center" },
-  modalButtons: { flexDirection: "row", justifyContent: "space-between" },
-  modalButton: { padding: 5 },
-});

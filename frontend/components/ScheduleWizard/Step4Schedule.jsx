@@ -1,6 +1,6 @@
 import { Text, TouchableOpacity } from "react-native";
+import style from "../../Styles/ScheduleStyles.jsx";
 import DayPicker from "./DayPicker.jsx";
-import style from "./Styles.jsx";
 import TextInputField from "./TextInputField.jsx";
 
 const daysOfWeek = [

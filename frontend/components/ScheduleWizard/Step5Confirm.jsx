@@ -1,6 +1,6 @@
 import { Text, TouchableOpacity } from "react-native";
+import style from "../../Styles/ScheduleStyles.jsx";
 import LessonSummary from "./LessonSummary.jsx";
-import style from "./Styles.jsx";
 
 export default function Step5Confirm({
   mode,

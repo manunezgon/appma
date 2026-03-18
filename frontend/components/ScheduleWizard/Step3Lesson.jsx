@@ -1,7 +1,7 @@
 import { Alert, Text, TouchableOpacity, View } from "react-native";
+import style from "../../Styles/ScheduleStyles.jsx";
 import LessonSummary from "./LessonSummary.jsx";
 import SelectableList from "./SelectableList.jsx";
-import style from "./Styles.jsx";
 import TextInputField from "./TextInputField.jsx";
 
 export default function Step3Lesson({
@@ -129,7 +129,7 @@ export default function Step3Lesson({
               selectedId={selectedLessonId}
               onSelect={(id) => {
                 const lesson = lessons.find((l) => l.id === id);
-                if (!lesson) return; 
+                if (!lesson) return;
 
                 setSelectedLessonId(id);
                 setNewLessonName(lesson.lessonName);

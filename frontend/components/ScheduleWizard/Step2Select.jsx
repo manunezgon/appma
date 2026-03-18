@@ -1,6 +1,6 @@
 import { Text, TouchableOpacity, View } from "react-native";
+import style from "../../Styles/ScheduleStyles.jsx";
 import SelectableList from "./SelectableList.jsx";
-import style from "./Styles.jsx";
 
 export default function Step2Select({
   mode,
@@ -137,7 +137,7 @@ export default function Step2Select({
             selectedId={selectedLessonId}
             onSelect={(id) => {
               const lesson = lessons.find((l) => l.id === id);
-              if (!lesson) return; 
+              if (!lesson) return;
 
               setSelectedLessonId(id);
               setNewLessonName(lesson.lessonName);
