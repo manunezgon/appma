@@ -31,7 +31,7 @@ export default function Step2Select({
     "SATURDAY",
     "SUNDAY",
   ];
-  // --- Create Mode: choose between new or existing lesson ---
+
   if (mode === "create") {
     return (
       <>
@@ -60,12 +60,10 @@ export default function Step2Select({
     );
   }
 
-  // --- Edit Schedule Mode ---
   if (mode === "editSchedule") {
     if (loadingSchedules) return <Text>Loading schedules...</Text>;
     if (!schedules.length) return <Text>No schedules available</Text>;
 
-    // --- Group schedules by day and sort by startTime ---
     const schedulesByDay = schedules.reduce((acc, s) => {
       acc[s.dayOfWeek] = acc[s.dayOfWeek] || [];
       acc[s.dayOfWeek].push(s);
@@ -126,7 +124,6 @@ export default function Step2Select({
     );
   }
 
-  // --- Edit Lesson Mode: select lesson to edit ---
   if (mode === "editLesson") {
     return (
       <>
@@ -140,7 +137,7 @@ export default function Step2Select({
             selectedId={selectedLessonId}
             onSelect={(id) => {
               const lesson = lessons.find((l) => l.id === id);
-              if (!lesson) return; // safety check
+              if (!lesson) return; 
 
               setSelectedLessonId(id);
               setNewLessonName(lesson.lessonName);
@@ -151,13 +148,11 @@ export default function Step2Select({
             }}
             renderItem={(l) => (
               <View style={style.classContainer}>
-                {/* Left side */}
                 <View style={style.classNameContainer}>
                   <Text style={style.className}>{l.lessonName}</Text>
                   <Text style={style.professorName}>{l.professorName}</Text>
                 </View>
 
-                {/* Right side */}
                 <Text style={style.amount}>{l.amountMonthly}€</Text>
               </View>
             )}

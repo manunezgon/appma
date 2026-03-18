@@ -24,17 +24,14 @@ export default function Step4Schedule({
 }) {
   return (
     <>
-      {/* --- Section Title --- */}
       <Text style={style.subtitle}>Select Day and Time</Text>
 
-      {/* --- Day Picker --- */}
       <DayPicker
         days={daysOfWeek}
         selectedDay={selectedDay}
         onSelect={setSelectedDay}
       />
 
-      {/* --- Start Time Input --- */}
       <Text style={style.subtitle2}>Start Time</Text>
       <TextInputField
         value={startTime}
@@ -43,7 +40,6 @@ export default function Step4Schedule({
         style={style.inputField}
       />
 
-      {/* --- End Time Input --- */}
       <Text style={style.subtitle2}>End Time</Text>
       <TextInputField
         value={endTime}
@@ -52,7 +48,6 @@ export default function Step4Schedule({
         style={style.inputField}
       />
 
-      {/* --- Next Button --- */}
       <TouchableOpacity
         style={[style.button, { marginTop: 10 }]}
         onPress={() => setStep(5)}

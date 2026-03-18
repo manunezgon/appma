@@ -53,9 +53,6 @@ export default function Payments() {
 
   const [months] = useState(generateMonths());
 
-  // ===========================
-  // Fetch functions
-  // ===========================
   const fetchStudents = async () => {
     try {
       setLoadingStudents(true);
@@ -84,26 +81,19 @@ export default function Payments() {
     }
   };
 
-  // ===========================
-  // Effects
-  // ===========================
   useEffect(() => {
     if (user?.token) fetchStudents();
   }, [user]);
 
-  // ===========================
-  // Filtered students
-  // ===========================
   const filteredStudents = students.filter((s) =>
     s.name.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
     <View style={styles.container}>
-      {/* Header */}
+
       <Text style={styles.title}>Alumnos</Text>
 
-      {/* Buscador */}
       <View style={styles.searchBox}>
         <TextInput
           placeholder="Buscar alumno..."
@@ -114,7 +104,6 @@ export default function Payments() {
         />
       </View>
 
-      {/* Lista de alumnos */}
       {loadingStudents ? (
         <Text style={styles.loadingText}>Cargando alumnos...</Text>
       ) : (
@@ -134,7 +123,6 @@ export default function Payments() {
         />
       )}
 
-      {/* Modal pagos del alumno */}
       <StudentPaymentsModal
         student={selectedStudent}
         payments={payments}

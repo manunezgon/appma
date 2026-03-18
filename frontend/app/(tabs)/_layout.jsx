@@ -65,7 +65,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="card" size={size} color={color} />
           ),
-          href: isAdmin ? undefined : null, // ← CLAVE
+          href: isAdmin ? undefined : null,
         }}
       />
       <Tabs.Screen

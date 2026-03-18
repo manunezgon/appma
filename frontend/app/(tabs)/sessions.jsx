@@ -21,9 +21,8 @@ export default function Sessions() {
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [selectedEnrollment, setSelectedEnrollment] = useState(null);
 
-  // ------------------- FETCH SOLO PARA MEMBERS -------------------
   const fetchEnrollments = async () => {
-    if (!user || user.role !== "MEMBER") return; // solo fetch si es member
+    if (!user || user.role !== "MEMBER") return; 
     try {
       const response = await fetch(`${API_BASE_URL}/enrollments/me`, {
         headers: { Authorization: `Bearer ${user?.token}` },
@@ -84,7 +83,6 @@ export default function Sessions() {
     setRefreshing(false);
   };
 
-  // ------------------- FUNCIONES DESAPUNTARSE SOLO PARA MEMBERS -------------------
   const confirmUnenroll = (enrollmentId) => {
     setSelectedEnrollment(enrollmentId);
     setConfirmVisible(true);
@@ -120,7 +118,6 @@ export default function Sessions() {
     }
   };
 
-  // ------------------- RENDERS -------------------
   const renderItem = ({ item }) => (
     <View style={styles.classCard}>
       <View>
@@ -146,7 +143,6 @@ export default function Sessions() {
       <Text style={{ textAlign: "center", marginTop: 50 }}>Cargando...</Text>
     );
 
-  // ------------------- JSX PRINCIPAL -------------------
   return (
     <View style={styles.container}>
       {user.role === "MEMBER" ? (
@@ -166,7 +162,6 @@ export default function Sessions() {
             }
           />
 
-          {/* Modal de confirmación solo para members */}
           <Modal visible={confirmVisible} transparent animationType="fade">
             <View style={styles.modalOverlay}>
               <View style={styles.modalContent}>
@@ -199,14 +194,12 @@ export default function Sessions() {
           </Modal>
         </>
       ) : (
-        // Admin → wizard fullscreen
         <ScheduleWizardModal visible={true} onClose={() => {}} />
       )}
     </View>
   );
 }
 
-// ------------------- ESTILOS -------------------
 const styles = StyleSheet.create({
   container: {
     flex: 1,

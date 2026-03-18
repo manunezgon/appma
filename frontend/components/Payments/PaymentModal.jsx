@@ -15,7 +15,7 @@ export const PaymentModal = ({
   student,
   lessons,
   months,
-  paidMonths, // 👈 nuevo
+  paidMonths,
   selectedLessonId,
   setSelectedLessonId,
   selectedMonth,
@@ -26,7 +26,6 @@ export const PaymentModal = ({
 }) => {
   const [isGlobal, setIsGlobal] = useState(false);
 
-  // Reiniciar estado cuando se cierra el modal
   useEffect(() => {
     if (!visible) {
       setIsGlobal(false);
@@ -55,13 +54,11 @@ export const PaymentModal = ({
           <Text style={styles.modalTitle}>Registrar pago</Text>
           <Text style={styles.modalSubtitle}>Alumno: {student?.name}</Text>
 
-          {/* Switch para pago global */}
           <View style={styles.globalSwitchContainer}>
             <Switch value={isGlobal} onValueChange={setIsGlobal} />
             <Text style={styles.globalSwitchLabel}>Pago global</Text>
           </View>
 
-          {/* Selección de lección solo si no es global */}
           {!isGlobal && (
             <>
               <Text style={styles.modalSubtitle}>Selecciona lección</Text>
@@ -84,7 +81,6 @@ export const PaymentModal = ({
             </>
           )}
 
-          {/* Selección de mes */}
           <Text style={styles.modalSubtitle}>Selecciona mes</Text>
           <View style={styles.pickerContainer}>
             <Picker
@@ -108,7 +104,6 @@ export const PaymentModal = ({
             </Picker>
           </View>
 
-          {/* Botón de confirmar */}
           <TouchableOpacity
             style={styles.registerButton}
             onPress={handleConfirm}
@@ -121,7 +116,6 @@ export const PaymentModal = ({
             </Text>
           </TouchableOpacity>
 
-          {/* Botón cerrar */}
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
             <Ionicons name="close" size={28} color="#7c23b0" />
           </TouchableOpacity>

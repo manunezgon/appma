@@ -22,14 +22,12 @@ export default function ScheduleWizardModal({ onClose }) {
       <ScrollView contentContainerStyle={style.inner}>
         <Text style={style.title}>Schedule Management</Text>
 
-        {/* --- Render the current step component --- */}
         {step === 1 && <Step1Mode {...wizard} />}
         {step === 2 && <Step2Select {...wizard} />}
         {step === 3 && <Step3Lesson {...wizard} />}
         {step === 4 && <Step4Schedule {...wizard} />}
         {step === 5 && <Step5Confirm {...wizard} />}
 
-        {/* --- Navigation Buttons: Back / Cancel --- */}
         <View style={style.bottomButtons}>
           {step > 1 && (
             <TouchableOpacity style={[style.button, style.backButton]} onPress={goBack}>

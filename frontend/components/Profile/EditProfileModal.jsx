@@ -26,7 +26,7 @@ export default function EditProfileModal({
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
-          {/* Tabs */}
+
           <View style={styles.tabsContainer}>
             <TouchableOpacity
               style={[styles.tabButton, activeTab === "profile" && styles.tabActive]}

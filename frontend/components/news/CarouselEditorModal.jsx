@@ -76,7 +76,6 @@ export default function CarouselEditorModal({
                   style={style.imagePreview}
                 />
 
-                {/* Botones de mover */}
                 <View style={style.reorderButtonsContainer}>
                   <TouchableOpacity
                     style={style.reorderButton}
@@ -96,7 +95,6 @@ export default function CarouselEditorModal({
                   </TouchableOpacity>
                 </View>
 
-                {/* Botón borrar */}
                 <TouchableOpacity
                   style={style.deleteImageButton}
                   onPress={() => handleDelete(idx)}
@@ -106,7 +104,6 @@ export default function CarouselEditorModal({
               </View>
             ))}
 
-            {/* Botón añadir */}
             <TouchableOpacity style={style.addImageButton} onPress={onAdd}>
               <Ionicons name="add-outline" size={30} color="#fff" />
             </TouchableOpacity>
