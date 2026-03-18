@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FlatList, StyleSheet, Text, TextInput, View } from "react-native";
+import { FlatList, Text, TextInput, View } from "react-native";
 import { useLessons } from "../../context/LessonsContext";
 import { usePayments } from "../../context/PaymentsContext";
 import { useUser } from "../../context/UserContext";
@@ -8,6 +8,7 @@ import { API_BASE_URL } from "../config";
 import { PaymentModal } from "../../components/Payments/PaymentModal";
 import { StudentPaymentsModal } from "../../components/Payments/StudentPaymentsModal";
 import { StudentCard } from "../../components/Payments/StudentCard";
+import style from "../../Styles/PaymentStyle"
 
 const generateMonths = () => {
   const months = [];
@@ -16,12 +17,12 @@ const generateMonths = () => {
   for (let i = 0; i <= 12; i++) {
     const date = new Date(now.getFullYear(), now.getMonth() + i, 1);
     const value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-    const label = date.toLocaleString("es-ES", {
+    const label = date.toLocaleString("en-US", {
       month: "long",
       year: "numeric",
     });
     months.push({
-      label: label.charAt(0).toUpperCase() + label.slice(1),
+      label,
       value,
     });
   }
@@ -60,7 +61,7 @@ export default function Payments() {
         headers: { Authorization: `Bearer ${user.token}` },
       });
 
-      if (!response.ok) throw new Error("Error cargando usuarios");
+      if (!response.ok) throw new Error("Error loading users");
       const data = await response.json();
 
       const studentsOnly = data
@@ -90,22 +91,22 @@ export default function Payments() {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={style.container}>
 
-      <Text style={styles.title}>Alumnos</Text>
+      <Text style={style.title}>Students</Text>
 
-      <View style={styles.searchBox}>
+      <View style={style.searchBox}>
         <TextInput
-          placeholder="Buscar alumno..."
+          placeholder="Search students..."
           placeholderTextColor="#888"
-          style={styles.searchInput}
+          style={style.searchInput}
           value={search}
           onChangeText={setSearch}
         />
       </View>
 
       {loadingStudents ? (
-        <Text style={styles.loadingText}>Cargando alumnos...</Text>
+        <Text style={style.loadingText}>Loading students...</Text>
       ) : (
         <FlatList
           data={filteredStudents}
@@ -119,7 +120,7 @@ export default function Payments() {
               }}
             />
           )}
-          ListEmptyComponent={<Text style={styles.empty}>No hay alumnos</Text>}
+          ListEmptyComponent={<Text style={style.empty}>No students</Text>}
         />
       )}
 
@@ -160,42 +161,3 @@ export default function Payments() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#1E1E1E",
-    paddingHorizontal: 20,
-    paddingTop: 50,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#CCCCCC",
-    textTransform: "uppercase",
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  searchBox: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#2A2A2A",
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    marginBottom: 20,
-  },
-  searchInput: {
-    flex: 1,
-    padding: 10,
-    color: "#fff",
-  },
-  loadingText: {
-    color: "#ccc",
-    marginTop: 10,
-  },
-  empty: {
-    textAlign: "center",
-    color: "#888",
-    marginTop: 20,
-  },
-});

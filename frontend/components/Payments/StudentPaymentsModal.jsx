@@ -1,13 +1,13 @@
 import {
   FlatList,
   Modal,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { PaymentRow } from "./PaymentRow";
+import style from "../../Styles/PaymentStyle"
 
 export const StudentPaymentsModal = ({
   student,
@@ -23,14 +23,14 @@ export const StudentPaymentsModal = ({
     transparent
     onRequestClose={onClose}
   >
-    <View style={styles.modalOverlay}>
-      <View style={styles.modalContent}>
-        <Text style={styles.modalTitle}>{student?.name}</Text>
+    <View style={style.modalOverlay}>
+      <View style={style.modalContent}>
+        <Text style={style.modalTitle}>{student?.name}</Text>
 
         {loadingPayments ? (
-          <Text style={styles.loadingText}>Cargando pagos...</Text>
+          <Text style={style.loadingText}>Loading payments...</Text>
         ) : payments.length === 0 ? (
-          <Text style={styles.noPaymentsText}>No tiene pagos registrados</Text>
+          <Text style={style.noPaymentsText}>No payments registered</Text>
         ) : (
           <FlatList
             data={payments}
@@ -38,71 +38,18 @@ export const StudentPaymentsModal = ({
             renderItem={({ item }) => (
               <PaymentRow payment={item} onDelete={onDelete} />
             )}
-            style={styles.paymentsList}
+            style={style.paymentsList}
           />
         )}
 
-        <TouchableOpacity style={styles.registerButton} onPress={onRegister}>
-          <Text style={styles.registerButtonText}>Registrar pago</Text>
+        <TouchableOpacity style={style.registerButton} onPress={onRegister}>
+          <Text style={style.registerButtonText}>Register Payment</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-          <Ionicons name="close" size={28} color="#7c23b0" />
+        <TouchableOpacity style={style.closeButton} onPress={onClose}>
+          <Ionicons name="close" size={28} color="#69188E" />
         </TouchableOpacity>
       </View>
     </View>
   </Modal>
 );
-
-const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    backgroundColor: "#2A2A2A",
-    padding: 20,
-    borderRadius: 10,
-    width: "90%",
-    alignItems: "center",
-    position: "relative",
-    maxHeight: "80%",
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#fff",
-    marginBottom: 10,
-  },
-  loadingText: {
-    color: "#ccc",
-    marginTop: 10,
-  },
-  noPaymentsText: {
-    color: "#888",
-    marginTop: 10,
-  },
-  paymentsList: {
-    width: "100%",
-    marginTop: 15,
-  },
-  registerButton: {
-    marginTop: 15,
-    backgroundColor: "#00923aff",
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-  },
-  registerButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  closeButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-  },
-});
