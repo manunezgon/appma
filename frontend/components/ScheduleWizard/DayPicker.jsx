@@ -1,5 +1,5 @@
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
-import style from "./Styles.jsx";
+import { Text, TouchableOpacity } from "react-native";
+import style from "../../Styles/ScheduleStyles.jsx";
 
 export default function DayPicker({ days, selectedDay, onSelect }) {
   return (

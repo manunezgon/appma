@@ -1,6 +1,6 @@
-import { View, Text, TouchableOpacity } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import styles from "./Styles";
+import { Text, TouchableOpacity, View } from "react-native";
+import styles from "../../Styles/RankingStyles";
 
 export default function RankingFilters({
   selectedType,
@@ -54,7 +54,7 @@ export default function RankingFilters({
           onValueChange={(itemValue) => setSelectedLesson(itemValue)}
           style={{ color: "#CCCCCC" }}
         >
-          <Picker.Item label="Todas las clases" value={null} />
+          <Picker.Item label="All lessons" value={null} />
           {lessons.map((lesson) => (
             <Picker.Item
               key={lesson.id}

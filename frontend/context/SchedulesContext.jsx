@@ -19,7 +19,6 @@ const authFetch = async (url, options = {}, token) => {
     throw new Error(text || "Request failed");
   }
 
-  // Check if response has content
   const text = await res.text();
   try {
     return text ? JSON.parse(text) : null;

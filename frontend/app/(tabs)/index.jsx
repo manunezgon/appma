@@ -21,7 +21,6 @@ export default function HomeScreen() {
 
   const { user } = useUser();
 
-  // --- Helpers ---
   const formatTime = (time) => time.slice(0, 5);
 
   const toMinutes = (timeString) => {
@@ -55,7 +54,6 @@ export default function HomeScreen() {
     };
   };
 
-  // --- Fetch clases ---
   const fetchClasses = async () => {
     try {
       const dateStr = selectedDay.toISOString().split("T")[0];
@@ -100,7 +98,6 @@ export default function HomeScreen() {
     setRefreshing(false);
   };
 
-  // --- Enroll ---
   const handleEnroll = async (scheduleTemplateId) => {
     try {
       const dateStr = selectedDay.toISOString().split("T")[0];

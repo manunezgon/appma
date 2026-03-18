@@ -4,9 +4,9 @@ import Podium from "../../components/Ranking/Podium";
 import ProgressCard from "../../components/Ranking/ProgressCard";
 import RankingFilters from "../../components/Ranking/RankingFilters";
 import RankingList from "../../components/Ranking/RankingList";
-import styles from "../../components/Ranking/Styles";
 import { useLessons } from "../../context/LessonsContext";
 import { useUser } from "../../context/UserContext";
+import styles from "../../Styles/RankingStyles";
 import { API_BASE_URL } from "../config";
 
 export default function Ranking() {
@@ -68,7 +68,7 @@ export default function Ranking() {
   }, [selectedType, selectedLesson, user?.token]);
 
   return (
-    <ScrollView style={styles.container } contentContainerStyle={styles.content}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.title}>
         Ranking · {selectedType === "month" ? formattedMonth : year}
       </Text>

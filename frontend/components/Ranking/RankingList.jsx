@@ -1,5 +1,5 @@
-import { View, Text } from "react-native";
-import styles from "./Styles";
+import { Text, View } from "react-native";
+import styles from "../../Styles/RankingStyles";
 
 export default function RankingList({ rest, ranking }) {
   return (
@@ -17,10 +17,10 @@ export default function RankingList({ rest, ranking }) {
             <Text style={styles.userName}>{r.userName}</Text>
 
             <View style={{ alignItems: "flex-end" }}>
-              <Text style={styles.classes}>{r.totalClasses}</Text>
+              <Text style={styles.classes}>{r.totalClasses} classes</Text>
 
               {diff > 0 && (
-                <Text style={styles.diffText}>+{diff} to move up</Text>
+                <Text style={styles.diffText}>+{diff} to advance</Text>
               )}
             </View>
           </View>

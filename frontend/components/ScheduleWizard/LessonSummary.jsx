@@ -1,5 +1,5 @@
 import { Text, View } from "react-native";
-import style from "./Styles.jsx";
+import style from "../../Styles/ScheduleStyles.jsx";
 
 export default function LessonSummary({
   lesson,

@@ -4,7 +4,6 @@ import { useUser } from "./UserContext";
 
 const LessonsContext = createContext();
 
-// Helper for authenticated fetch
 const authFetch = async (url, options = {}, token) => {
   const res = await fetch(url, {
     ...options,

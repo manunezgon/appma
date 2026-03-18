@@ -7,10 +7,10 @@ export function useScheduleWizard(onClose) {
   const { lessons, loadingLessons, createLesson, updateLesson, deleteLesson } = useLessons();
   const { schedules, loadingSchedules, createSchedule, updateSchedule, deleteSchedule } = useSchedules();
 
-  // --- State ---
+
   const [step, setStep] = useState(1);
-  const [mode, setMode] = useState(null); // create | editSchedule | editLesson
-  const [lessonMode, setLessonMode] = useState(null); // new | existing
+  const [mode, setMode] = useState(null); 
+  const [lessonMode, setLessonMode] = useState(null); 
 
   const [selectedLessonId, setSelectedLessonId] = useState(null);
   const [selectedScheduleId, setSelectedScheduleId] = useState(null);
@@ -22,7 +22,6 @@ export function useScheduleWizard(onClose) {
   const [newProfessorName, setNewProfessorName] = useState("");
   const [newAmountMonthly, setNewAmountMonthly] = useState("");
 
-  // --- Helper: reset all state ---
   const resetState = () => {
     setStep(1);
     setMode(null);
@@ -42,10 +41,8 @@ export function useScheduleWizard(onClose) {
     onClose();
   };
 
-  // --- Helper: show error message ---
   const showError = (message) => Alert.alert(message || "An error occurred");
 
-  // --- Save schedule ---
   const handleSaveSchedule = async () => {
     if (!selectedDay || !startTime || !endTime) {
       Alert.alert("Please complete day, start time, and end time");
@@ -55,7 +52,6 @@ export function useScheduleWizard(onClose) {
     try {
       let lessonId = selectedLessonId;
 
-      // Create new lesson if needed
       if (lessonMode === "new") {
         if (!newLessonName || !newProfessorName || !newAmountMonthly) {
           Alert.alert("Please complete all lesson fields");
@@ -77,7 +73,6 @@ export function useScheduleWizard(onClose) {
         lessonId = lesson.id;
       }
 
-      // Create or update schedule
       if (mode === "editSchedule") {
         await updateSchedule(selectedScheduleId, { lessonId, dayOfWeek: selectedDay, startTime, endTime });
         Alert.alert("Schedule updated successfully");
@@ -92,7 +87,6 @@ export function useScheduleWizard(onClose) {
     }
   };
 
-  // --- Delete schedule ---
   const handleDeleteSchedule = () => {
     Alert.alert("Delete schedule", "Are you sure?", [
       { text: "Cancel", style: "cancel" },
@@ -112,7 +106,6 @@ export function useScheduleWizard(onClose) {
     ]);
   };
 
-  // --- Update lesson ---
   const handleUpdateLesson = async () => {
     if (!newLessonName || !newProfessorName || !newAmountMonthly) {
       Alert.alert("Please complete all fields");
@@ -139,7 +132,6 @@ export function useScheduleWizard(onClose) {
     }
   };
 
-  // --- Delete lesson ---
   const handleDeleteLesson = () => {
     Alert.alert(
       "Delete lesson",
@@ -163,17 +155,14 @@ export function useScheduleWizard(onClose) {
     );
   };
 
-  // --- Go back one step ---
   const goBack = () => setStep((prev) => Math.max(prev - 1, 1));
 
-  // --- Selected lesson object helper ---
   const selectedLessonObj =
     lessonMode === "new"
       ? { lessonName: newLessonName, professorName: newProfessorName, amountMonthly: parseFloat(newAmountMonthly) }
       : lessons.find((l) => l.id === selectedLessonId);
 
   return {
-    // State
     step,
     mode,
     lessonMode,
@@ -186,7 +175,6 @@ export function useScheduleWizard(onClose) {
     newProfessorName,
     newAmountMonthly,
 
-    // Setters
     setStep,
     setMode,
     setLessonMode,
@@ -199,7 +187,6 @@ export function useScheduleWizard(onClose) {
     setNewProfessorName,
     setNewAmountMonthly,
 
-    // Actions
     handleClose,
     handleSaveSchedule,
     handleDeleteSchedule,
@@ -207,7 +194,6 @@ export function useScheduleWizard(onClose) {
     handleDeleteLesson,
     goBack,
 
-    // Data
     lessons,
     schedules,
     loadingLessons,

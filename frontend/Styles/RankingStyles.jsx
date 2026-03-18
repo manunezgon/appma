@@ -144,7 +144,7 @@ position: { width: 30, color: "#ccc", fontWeight: "bold" },
 
   userName: { flex: 1, color: "#ccc", fontWeight: "600" },
 
-  classes: { color: "#ccc", fontWeight: "bold" },
+  classes: { color: "#ccc" },
 
   diffText: { color: "#555555", fontSize: 11 },
 });

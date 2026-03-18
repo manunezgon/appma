@@ -1,6 +1,6 @@
 import { Text, TouchableOpacity } from "react-native";
+import style from "../../Styles/ScheduleStyles.jsx";
 import LessonSummary from "./LessonSummary.jsx";
-import style from "./Styles.jsx";
 
 export default function Step5Confirm({
   mode,
@@ -12,12 +12,10 @@ export default function Step5Confirm({
 }) {
   return (
     <>
-      {/* --- Step Title --- */}
       <Text style={style.subtitle}>
         {mode === "editSchedule" ? "Confirm Changes" : "Confirm Schedule"}
       </Text>
 
-      {/* --- Lesson & Schedule Summary --- */}
       <LessonSummary
         lesson={selectedLessonObj}
         day={selectedDay}
@@ -25,7 +23,6 @@ export default function Step5Confirm({
         endTime={endTime}
       />
 
-      {/* --- Save Button --- */}
       <TouchableOpacity
         style={[style.button, { marginTop: 10 }]}
         onPress={handleSaveSchedule}

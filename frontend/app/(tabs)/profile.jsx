@@ -11,8 +11,8 @@ import {
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import EditProfileModal from "../../components/Profile/EditProfileModal.jsx";
-import styles from "../../components/Profile/Styles.jsx";
 import { useUser } from "../../context/UserContext";
+import styles from "../../Styles/ProfileStyles.jsx";
 import profilePic from "../assets/images/white_logo_circle.png";
 import { API_BASE_URL } from "../config.jsx";
 
@@ -60,7 +60,7 @@ export default function Profile() {
   const handleSaveProfile = async () => {
     if (!currentPassword || currentPassword.length < 6) {
       Alert.alert(
-        "Debes introducir tu contraseña actual (mínimo 6 caracteres) para guardar cambios",
+        "You must enter your current password (minimum 6 characters) to save changes",
       );
       return;
     }
@@ -87,18 +87,18 @@ export default function Profile() {
       } else {
         const text = await res.text();
         console.error("Error backend:", text);
-        Alert.alert("Error al actualizar perfil");
+        Alert.alert("Error updating profile");
       }
     } catch (error) {
       console.error(error);
-      Alert.alert("Error al actualizar perfil");
+      Alert.alert("Error updating profile");
     }
   };
 
   const handleChangePassword = async () => {
     if (!oldPassword || !newPassword || newPassword.length < 6) {
       Alert.alert(
-        "Rellena la contraseña actual y una nueva de mínimo 6 caracteres",
+        "Please fill in the current password and a new password with at least 6 characters",
       );
       return;
     }
@@ -117,18 +117,18 @@ export default function Profile() {
       );
 
       if (res.ok) {
-        Alert.alert("Contraseña actualizada");
+        Alert.alert("Password updated");
         setOldPassword("");
         setNewPassword("");
         setModalVisible(false);
       } else {
         const text = await res.text();
         console.error("Error backend:", text);
-        Alert.alert("Error al actualizar contraseña");
+        Alert.alert("Error updating password");
       }
     } catch (error) {
       console.error(error);
-      Alert.alert("Error al actualizar contraseña");
+      Alert.alert("Error updating password");
     }
   };
 

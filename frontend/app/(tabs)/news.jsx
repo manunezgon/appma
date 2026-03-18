@@ -5,7 +5,7 @@ import AdminInput from "../../components/news/AdminInput";
 import AnnouncementCard from "../../components/news/AnnouncementCard";
 import CarouselEditorModal from "../../components/news/CarouselEditorModal";
 import Carousel from "../../components/news/Carrousel";
-import style from "../../components/news/Styles";
+import style from "../../Styles/NewsStyles";
 import { useUser } from "../../context/UserContext";
 import { useNewsData } from "../../hooks/useNewsData";
 
@@ -29,7 +29,7 @@ export default function News() {
     useCallback(() => {
       fetchAnnouncements();
       fetchCarouselImages();
-    }, [fetchAnnouncements, fetchCarouselImages])
+    }, [fetchAnnouncements, fetchCarouselImages]),
   );
 
   return (
