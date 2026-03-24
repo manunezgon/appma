@@ -1,5 +1,6 @@
 package com.backend.service;
 
+import com.backend.dto.ScheduleItemDTO;
 import com.backend.dto.ScheduleTemplateRequestDTO;
 import com.backend.dto.ScheduleTemplateResponseDTO;
 import com.backend.exception.InvalidScheduleException;
@@ -81,46 +82,46 @@ public class ScheduleTemplateService {
                 .toList();
     }
 
-    public List<ScheduleTemplateResponseDTO> getScheduleForDay(LocalDate date, Long userId) {
-        DayOfWeek dayOfWeek = date.getDayOfWeek();
-        List<ScheduleTemplate> baseSchedules = scheduleTemplateRepository.findByDayOfWeek(dayOfWeek);
-        List<ScheduleException> exceptions = scheduleExceptionRepository.findByDate(date);
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + userId));
-
-        Set<Long> enrolledTemplateIds = enrollmentRepository.findByUserAndDate(user, date)
+    public List<ScheduleItemDTO> getSchedulesForDay(LocalDate date, Long userId) {
+        // Traer templates y mapear a DTO
+        List<ScheduleItemDTO> templates = scheduleTemplateRepository.findByDayOfWeek(date.getDayOfWeek())
                 .stream()
-                .map(e -> e.getScheduleTemplate().getId())
-                .collect(Collectors.toSet());
+                .map(ScheduleItemDTO::fromTemplate)
+                .collect(Collectors.toList());
 
-        return baseSchedules.stream()
-                .flatMap(schedule -> {
-                    Optional<ScheduleException> exception = exceptions.stream()
-                            .filter(e -> e.getLesson().getId().equals(schedule.getLesson().getId()))
-                            .findFirst();
+        // Traer excepciones de ese día
+        List<ScheduleItemDTO> exceptions = scheduleExceptionRepository.findByDate(date)
+                .stream()
+                .map(ScheduleItemDTO::fromException)
+                .collect(Collectors.toList());
 
-                    if (exception.isPresent() && Boolean.TRUE.equals(exception.get().getCancelled())) {
-                        return Stream.empty();
-                    }
+        // --- Merge: reemplazar templates canceladas ---
+        Map<Long, ScheduleItemDTO> templateMap = templates.stream()
+                .collect(Collectors.toMap(ScheduleItemDTO::lessonId, t -> t));
 
-                    LocalTime start = exception.map(ScheduleException::getStartTime).orElse(schedule.getStartTime());
-                    LocalTime end = exception.map(ScheduleException::getEndTime).orElse(schedule.getEndTime());
+        for (ScheduleItemDTO e : exceptions) {
+            if (e.lessonId() != null && templateMap.containsKey(e.lessonId())) {
+                if (e.cancelled()) {
+                    templateMap.remove(e.lessonId()); // eliminar si cancelada
+                } else {
+                    templateMap.put(e.lessonId(), e); // reemplazar por excepción
+                }
+            } else {
+                templates.add(e); // excepción sin template
+            }
+        }
 
-                    boolean isEnrolled = enrolledTemplateIds.contains(schedule.getId());
+        // Combinar resultados
+        List<ScheduleItemDTO> combined = new ArrayList<>(templateMap.values());
+        exceptions.stream()
+                .filter(e -> e.lessonId() == null || !templateMap.containsKey(e.lessonId()))
+                .forEach(combined::add);
 
-                    return Stream.of(new ScheduleTemplateResponseDTO(
-                            schedule.getId(),
-                            schedule.getDayOfWeek(),
-                            start,
-                            end,
-                            schedule.getLesson().getId(),
-                            schedule.getLesson().getLessonName(),
-                            schedule.getLesson().getProfessorName(),
-                            isEnrolled
-                    ));
-                })
-                .toList();
+        // Ordenar por hora
+        combined.sort(Comparator.comparing(ScheduleItemDTO::startTime));
+
+        return combined;
     }
 
 

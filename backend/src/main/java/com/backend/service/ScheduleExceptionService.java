@@ -27,6 +27,47 @@ public class ScheduleExceptionService {
     private final EnrollmentRepository enrollmentRepository;
     private final ScheduleTemplateRepository scheduleTemplateRepository;
 
+    private void handleCancellation(ScheduleException exception) {
+        if (!Boolean.TRUE.equals(exception.getCancelled())) {
+            return;
+        }
+
+        String lessonName = exception.getLesson() != null
+                ? exception.getLesson().getLessonName()
+                : exception.getDescription();
+
+        String message = String.format(
+                "The %s class on %s at %s has been canceled.",
+                lessonName,
+                exception.getDate(),
+                exception.getStartTime()
+        );
+
+        announcementService.createAutomaticAnnouncement(message);
+
+        if (exception.getLesson() != null) {
+            dropEnrollmentsCancelled(exception);
+        }
+    }
+
+    private void mapDtoToEntity(ScheduleException exception, ScheduleExceptionRequestDTO dto) {
+
+        Lesson lesson = null;
+
+        if (dto.lessonId() != null) {
+            lesson = lessonRepository.findById(dto.lessonId())
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException("Lesson not found with id " + dto.lessonId()));
+        }
+
+        exception.setDate(dto.date());
+        exception.setStartTime(dto.startTime());
+        exception.setEndTime(dto.endTime());
+        exception.setCancelled(dto.cancelled());
+        exception.setLesson(lesson);
+        exception.setDescription(dto.lessonId() == null ? dto.description() : null);
+    }
+
     public List<ScheduleException> getAllExceptions() {
         return scheduleExceptionRepository.findAll();
     }
@@ -47,32 +88,15 @@ public class ScheduleExceptionService {
 
     @Transactional
     public ScheduleException createException(ScheduleExceptionRequestDTO dto) {
-        Lesson lesson = lessonRepository.findById(dto.lessonId())
-                .orElseThrow(() -> new ResourceNotFoundException("Lesson not found with id " + dto.lessonId()));
 
-        ScheduleException exception = new ScheduleException(
-                null,
-                dto.date(),
-                dto.startTime(),
-                dto.endTime(),
-                dto.cancelled(),
-                lesson
-        );
+        ScheduleException exception = new ScheduleException();
+        mapDtoToEntity(exception, dto);
 
         validateException(exception);
 
         ScheduleException saved = scheduleExceptionRepository.save(exception);
 
-        if (Boolean.TRUE.equals(saved.getCancelled())) {
-            String message = String.format(
-                    "The %s class on %s at %s has been canceled.",
-                    saved.getLesson().getLessonName(),
-                    saved.getDate(),
-                    saved.getStartTime()
-            );
-            announcementService.createAutomaticAnnouncement(message);
-            dropEnrollmentsCancelled(saved);
-        }
+        handleCancellation(saved);
 
         return saved;
     }
@@ -80,31 +104,14 @@ public class ScheduleExceptionService {
     @Transactional
     public ScheduleException updateException(Long id, ScheduleExceptionRequestDTO dto) {
         validateId(id);
+
         ScheduleException existing = getExceptionById(id);
-
-        Lesson lesson = lessonRepository.findById(dto.lessonId())
-                .orElseThrow(() -> new ResourceNotFoundException("Lesson not found with id " + dto.lessonId()));
-
-        existing.setDate(dto.date());
-        existing.setStartTime(dto.startTime());
-        existing.setEndTime(dto.endTime());
-        existing.setCancelled(dto.cancelled());
-        existing.setLesson(lesson);
+        mapDtoToEntity(existing, dto);
 
         validateException(existing);
 
         ScheduleException saved = scheduleExceptionRepository.save(existing);
-
-        if (Boolean.TRUE.equals(saved.getCancelled())) {
-            String message = String.format(
-                    "The %s class on %s at %s has been canceled.",
-                    saved.getLesson().getLessonName(),
-                    saved.getDate(),
-                    saved.getStartTime()
-            );
-            announcementService.createAutomaticAnnouncement(message);
-            dropEnrollmentsCancelled(saved);
-        }
+        handleCancellation(saved);
 
         return saved;
     }
@@ -124,23 +131,26 @@ public class ScheduleExceptionService {
     }
 
     private void validateException(ScheduleException exception) {
-        if (exception.getDate() == null) {
+
+        if (exception.getDate() == null)
             throw new InvalidScheduleException("Date cannot be null");
-        }
-        if (exception.getStartTime() == null) {
+
+        if (exception.getStartTime() == null)
             throw new InvalidScheduleException("Start time cannot be null");
-        }
-        if (exception.getEndTime() == null) {
+
+        if (exception.getEndTime() == null)
             throw new InvalidScheduleException("End time cannot be null");
-        }
-        if (exception.getEndTime().isBefore(exception.getStartTime())) {
+
+        if (exception.getEndTime().isBefore(exception.getStartTime()))
             throw new InvalidScheduleException("End time must be after start time");
-        }
-        if (exception.getLesson() == null) {
-            throw new InvalidScheduleException("Lesson cannot be null");
-        }
-        if (exception.getCancelled() == null) {
+
+        if (exception.getCancelled() == null)
             throw new InvalidScheduleException("Cancelled field cannot be null");
-        }
+
+        if (exception.getLesson() == null && exception.getDescription() == null)
+            throw new InvalidScheduleException("Either lesson or description must be provided");
+
+        if (exception.getLesson() != null && exception.getDescription() != null)
+            throw new InvalidScheduleException("Provide either lesson or description, not both");
     }
 }

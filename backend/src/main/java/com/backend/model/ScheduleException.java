@@ -1,5 +1,6 @@
 package com.backend.model;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -32,6 +33,9 @@ public class ScheduleException {
     private Boolean cancelled = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lesson_id", nullable = false)
+    @JoinColumn(name = "lesson_id", nullable = true)
     private Lesson lesson;
+
+    @Nullable
+    private String description;
 }
