@@ -41,19 +41,28 @@ public class ScheduleTemplateService {
 
     public List<ScheduleTemplateResponseDTO> getScheduleForDay(LocalDate date) {
         DayOfWeek dayOfWeek = date.getDayOfWeek();
+
+        // 1️⃣ Traer templates del día
         List<ScheduleTemplate> baseSchedules = scheduleTemplateRepository.findByDayOfWeek(dayOfWeek);
+
+        // 2️⃣ Traer excepciones del día
         List<ScheduleException> exceptions = scheduleExceptionRepository.findByDate(date);
 
         return baseSchedules.stream()
                 .flatMap(schedule -> {
+                    Long scheduleLessonId = schedule.getLesson() != null ? schedule.getLesson().getId() : null;
+
+                    // Buscar excepción asociada a esta clase, solo si tiene lesson asignada
                     Optional<ScheduleException> exception = exceptions.stream()
-                            .filter(e -> e.getLesson().getId().equals(schedule.getLesson().getId()))
+                            .filter(e -> e.getLesson() != null && e.getLesson().getId().equals(scheduleLessonId))
                             .findFirst();
 
+                    // Si hay excepción cancelada, no mostrar la clase
                     if (exception.isPresent() && Boolean.TRUE.equals(exception.get().getCancelled())) {
                         return Stream.empty();
                     }
 
+                    // Si hay excepción no cancelada → usar sus datos
                     if (exception.isPresent()) {
                         ScheduleException e = exception.get();
                         return Stream.of(new ScheduleTemplateResponseDTO(
@@ -61,13 +70,15 @@ public class ScheduleTemplateService {
                                 schedule.getDayOfWeek(),
                                 e.getStartTime(),
                                 e.getEndTime(),
-                                schedule.getLesson().getId(),
-                                schedule.getLesson().getLessonName(),
-                                schedule.getLesson().getProfessorName(),
+                                e.getLesson() != null ? e.getLesson().getId() : null,
+                                e.getLesson() != null ? e.getLesson().getLessonName() : e.getDescription(),
+                                e.getLesson() != null ? e.getLesson().getProfessorName() : "",
                                 false
                         ));
                     }
 
+                    // No hay excepción → usar template normal
+                    if (schedule.getLesson() == null) return Stream.empty(); // proteger contra null
                     return Stream.of(new ScheduleTemplateResponseDTO(
                             schedule.getId(),
                             schedule.getDayOfWeek(),
@@ -84,47 +95,39 @@ public class ScheduleTemplateService {
 
 
     public List<ScheduleItemDTO> getSchedulesForDay(LocalDate date, Long userId) {
-        // Traer templates y mapear a DTO
-        List<ScheduleItemDTO> templates = scheduleTemplateRepository.findByDayOfWeek(date.getDayOfWeek())
+
+        // 1️⃣ Traer templates del día
+        List<ScheduleItemDTO> templates = scheduleTemplateRepository
+                .findByDayOfWeek(date.getDayOfWeek())
                 .stream()
                 .map(ScheduleItemDTO::fromTemplate)
                 .collect(Collectors.toList());
 
-        // Traer excepciones de ese día
-        List<ScheduleItemDTO> exceptions = scheduleExceptionRepository.findByDate(date)
+        // 2️⃣ Traer excepciones del día
+        List<ScheduleItemDTO> exceptions = scheduleExceptionRepository
+                .findByDate(date)
                 .stream()
                 .map(ScheduleItemDTO::fromException)
                 .collect(Collectors.toList());
 
-        // --- Merge: reemplazar templates canceladas ---
-        Map<Long, ScheduleItemDTO> templateMap = templates.stream()
-                .collect(Collectors.toMap(ScheduleItemDTO::lessonId, t -> t));
+        // 3️⃣ Combinar templates y excepciones
+        List<ScheduleItemDTO> combined = new ArrayList<>(templates);
 
         for (ScheduleItemDTO e : exceptions) {
-            if (e.lessonId() != null && templateMap.containsKey(e.lessonId())) {
-                if (e.cancelled()) {
-                    templateMap.remove(e.lessonId()); // eliminar si cancelada
-                } else {
-                    templateMap.put(e.lessonId(), e); // reemplazar por excepción
-                }
+            if (e.cancelled()) {
+                // eliminar todos los templates/excepciones que coincidan con lessonId
+                combined.removeIf(t -> t.lessonId() != null && t.lessonId().equals(e.lessonId()));
             } else {
-                templates.add(e); // excepción sin template
+                // agregar la excepción encima
+                combined.add(e);
             }
         }
 
-        // Combinar resultados
-        List<ScheduleItemDTO> combined = new ArrayList<>(templateMap.values());
-        exceptions.stream()
-                .filter(e -> e.lessonId() == null || !templateMap.containsKey(e.lessonId()))
-                .forEach(combined::add);
-
-        // Ordenar por hora
+        // 4️⃣ Ordenar por startTime
         combined.sort(Comparator.comparing(ScheduleItemDTO::startTime));
 
         return combined;
     }
-
-
 
     @Transactional
     public ScheduleTemplate createScheduleTemplate(ScheduleTemplateRequestDTO dto) {

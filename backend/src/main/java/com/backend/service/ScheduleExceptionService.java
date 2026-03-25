@@ -64,8 +64,15 @@ public class ScheduleExceptionService {
         exception.setStartTime(dto.startTime());
         exception.setEndTime(dto.endTime());
         exception.setCancelled(dto.cancelled());
+
         exception.setLesson(lesson);
-        exception.setDescription(dto.lessonId() == null ? dto.description() : null);
+
+        // descripción solo si no hay lesson
+        if (lesson == null) {
+            exception.setDescription(dto.description());
+        } else {
+            exception.setDescription(null);
+        }
     }
 
     public List<ScheduleException> getAllExceptions() {

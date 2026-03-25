@@ -33,8 +33,7 @@ export default function HomeScreen() {
   const [newStartTime, setNewStartTime] = useState("");
   const [newEndTime, setNewEndTime] = useState("");
   const [selectedLessonId, setSelectedLessonId] = useState(null);
-  const [newLessonName, setNewLessonName] = useState("");
-  const [newProfessorName, setNewProfessorName] = useState("");
+  const [newDescription, setNewDescription] = useState("");
 
   // --- Helpers ---
   const formatTime = (time) => time.slice(0, 5);
@@ -42,26 +41,31 @@ export default function HomeScreen() {
     const [hours, minutes] = timeString.split(":").map(Number);
     return hours * 60 + minutes;
   };
+
   const mapClassData = (item) => {
     const start = formatTime(item.startTime);
     const end = formatTime(item.endTime);
+
     const startMinutes = toMinutes(start);
+
     const classDateTime = new Date(selectedDay);
     classDateTime.setHours(Math.floor(startMinutes / 60));
     classDateTime.setMinutes(startMinutes % 60);
+
     const isPast = classDateTime < new Date();
+
     return {
-      id: String(item.id ?? ""),
-      lessonName: item.lessonName,
-      professorName: item.professorName,
+      id: String(item.id),
+      lessonName: item.lessonName ?? item.description ?? "Special Class",
+      professorName: item.professorName ?? "",
       time: `${start} - ${end}`,
       startMinutes,
-      isEnrolled: item.isEnrolled,
+      isEnrolled: false, // backend aún no lo envía
       isPast,
-      dayOfWeek: item.dayOfWeek,
       lessonId: item.lessonId,
       startTime: start,
       endTime: end,
+      isException: item.date !== null, // 👈 clave
     };
   };
 
@@ -146,25 +150,35 @@ export default function HomeScreen() {
       cancelled: false,
       date: selectedDay,
     });
+    await fetchSchedulesByDay(selectedDay);
     setAdminModalVisible(false);
   };
 
-  const handleCreateNewLessonAndException = async () => {
+  const handleCreateNewException = async () => {
+    if (!newStartTime || !newEndTime || !newDescription) {
+      alert("Completa los campos obligatorios");
+      return;
+    }
+
     try {
-      const savedLesson = await createLesson({
-        lessonName: newLessonName,
-        professorName: newProfessorName,
-      });
       await createScheduleException({
-        lessonId: savedLesson.id,
+        lessonId: null,
+        description: newDescription,
         startTime: newStartTime,
         endTime: newEndTime,
         cancelled: false,
         date: selectedDay,
       });
+
+      await fetchSchedulesByDay(selectedDay);
+
+      setNewDescription("");
+      setNewStartTime("");
+      setNewEndTime("");
+      setCreateMode(null);
       setAdminModalVisible(false);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error("Error creating exception:", err);
     }
   };
 
@@ -213,6 +227,10 @@ export default function HomeScreen() {
         onClose={() => {
           setAdminModalVisible(false);
           setCreateMode(null);
+          setSelectedLessonId(null);
+          setNewStartTime("");
+          setNewEndTime("");
+          setNewDescription("");
         }}
         createMode={createMode}
         setCreateMode={setCreateMode}
@@ -223,12 +241,10 @@ export default function HomeScreen() {
         setNewStartTime={setNewStartTime}
         newEndTime={newEndTime}
         setNewEndTime={setNewEndTime}
-        newLessonName={newLessonName}
-        setNewLessonName={setNewLessonName}
-        newProfessorName={newProfessorName}
-        setNewProfessorName={setNewProfessorName}
+        newDescription={newDescription}
+        setNewDescription={setNewDescription}
         onCreateExisting={handleCreateException}
-        onCreateNew={handleCreateNewLessonAndException}
+        onCreateNew={handleCreateNewException}
       />
     </View>
   );
@@ -252,7 +268,7 @@ const styles = StyleSheet.create({
   addButton: {
     width: 30,
     height: 30,
-    borderRadius: 15, 
+    borderRadius: 15,
     backgroundColor: "#69188E",
     alignSelf: "center",
     justifyContent: "center",

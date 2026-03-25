@@ -1,6 +1,12 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
-import Modal from "react-native-modal";
 import { Picker } from "@react-native-picker/picker";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import Modal from "react-native-modal";
 
 export default function AdminCreateClassModal({
   visible,
@@ -18,10 +24,8 @@ export default function AdminCreateClassModal({
   newEndTime,
   setNewEndTime,
 
-  newLessonName,
-  setNewLessonName,
-  newProfessorName,
-  setNewProfessorName,
+  newDescription,
+  setNewDescription,
 
   onCreateExisting,
   onCreateNew,
@@ -45,9 +49,7 @@ export default function AdminCreateClassModal({
               style={styles.modeButton}
               onPress={() => setCreateMode("existing")}
             >
-              <Text style={styles.modeButtonText}>
-                Usar clase existente
-              </Text>
+              <Text style={styles.modeButtonText}>Usar clase existente</Text>
             </TouchableOpacity>
           </>
         )}
@@ -56,18 +58,10 @@ export default function AdminCreateClassModal({
         {createMode === "new" && (
           <>
             <TextInput
-              placeholder="Nombre de la clase"
+              placeholder="Descripción"
               placeholderTextColor="#888"
-              value={newLessonName}
-              onChangeText={setNewLessonName}
-              style={styles.input}
-            />
-
-            <TextInput
-              placeholder="Profesor"
-              placeholderTextColor="#888"
-              value={newProfessorName}
-              onChangeText={setNewProfessorName}
+              value={newDescription}
+              onChangeText={setNewDescription}
               style={styles.input}
             />
 
