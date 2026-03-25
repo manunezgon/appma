@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { API_BASE_URL } from "../app/config";
 import { useUser } from "./UserContext";
 
@@ -6,19 +6,37 @@ const EnrollmentsContext = createContext();
 
 export const EnrollmentsProvider = ({ children }) => {
   const { token } = useUser();
+  const [enrollments, setEnrollments] = useState([]); // 🟢 guardamos enrollments del usuario
+
+  // --- Traer enrollments del usuario ---
+  const fetchMyEnrollments = async () => {
+    if (!token) return;
+
+    const res = await fetch(`${API_BASE_URL}/enrollments/me`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      console.error("Error fetching enrollments");
+      return;
+    }
+
+    const data = await res.json();
+    setEnrollments(data); // guardamos en el state
+  };
 
   // --- Función genérica para enroll ---
   const enrollUser = async (scheduleTemplateId, date, exceptionId = null) => {
     if (!token) throw new Error("No user token found");
 
-    // Si es una clase normal, enviamos scheduleTemplateId + date
-    // Si es exception, enviamos solo el exceptionId por la URL
     let url = exceptionId
       ? `${API_BASE_URL}/enrollments/exception/${exceptionId}`
       : `${API_BASE_URL}/enrollments`;
 
     let body = exceptionId
-      ? {} // backend solo necesita path param
+      ? {}
       : { scheduleTemplateId, date: date.toISOString().split("T")[0] };
 
     const res = await fetch(url, {
@@ -31,7 +49,6 @@ export const EnrollmentsProvider = ({ children }) => {
     });
 
     if (!res.ok) {
-      // Intentamos leer JSON si existe, si no fallback a texto
       let errorText;
       try {
         const data = await res.json();
@@ -42,11 +59,42 @@ export const EnrollmentsProvider = ({ children }) => {
       throw new Error(errorText || "Error al inscribirse");
     }
 
-    return await res.json();
+    const enrollment = await res.json();
+
+    // 🔹 actualizar el state después de enroll
+    setEnrollments((prev) => [...prev, enrollment]);
+
+    return enrollment;
   };
 
+  // --- Opcional: eliminar enrollment ---
+  const deleteEnrollment = async (enrollmentId) => {
+    if (!token) return;
+
+    const res = await fetch(`${API_BASE_URL}/enrollments/${enrollmentId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) throw new Error("Error deleting enrollment");
+
+    // 🔹 actualizar state
+    setEnrollments((prev) =>
+      prev.filter((e) => e.id !== enrollmentId)
+    );
+  };
+
+  // 🔹 Traer enrollments al cargar el contexto
+  useEffect(() => {
+    fetchMyEnrollments();
+  }, [token]);
+
   return (
-    <EnrollmentsContext.Provider value={{ enrollUser }}>
+    <EnrollmentsContext.Provider
+      value={{ enrollments, fetchMyEnrollments, enrollUser, deleteEnrollment }}
+    >
       {children}
     </EnrollmentsContext.Provider>
   );

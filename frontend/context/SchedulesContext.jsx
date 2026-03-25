@@ -97,7 +97,6 @@ export const SchedulesProvider = ({ children }) => {
         {},
         token,
       );
-      console.log("Schedules for day fetched:", data);
       setDaySchedules(data);
     } catch (err) {
       console.error("Error fetching schedules for the day:", err);

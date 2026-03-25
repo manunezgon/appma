@@ -15,7 +15,6 @@ export default function ClassList({
   refreshing,
   onRefresh,
   onEnroll,
-  onEnrollException,
   userRole,
   onDeleteClass,
 }) {
@@ -40,12 +39,7 @@ export default function ClassList({
         data={classes}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => {
-          const handleEnrollPress = () => {
-            if (item.isException && onEnrollException) {
-              onEnrollException(item.id);  // enroll en exceptions
-            } else {
-              onEnroll(item.id);            // enroll normal
-            }};
+          const handleEnrollPress = () => onEnroll(item.id, item.isException);
 
           return (
             <View style={styles.classCard}>
@@ -71,7 +65,7 @@ export default function ClassList({
                       item.isEnrolled && styles.enrollButtonDisabled,
                     ]}
                     disabled={item.isEnrolled || item.isPast}
-                    onPress={handleEnrollPress}
+                    onPress={() => onEnroll(item.id, item.isException)}
                   >
                     <Ionicons
                       name={
@@ -142,12 +136,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderRadius: 10,
     backgroundColor: "#CCCCCC",
-    flexDirection: "row", 
-    alignItems: "center", 
-    justifyContent: "space-between", 
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   leftContainer: {
-    flex: 1, 
+    flex: 1,
   },
   centerContainer: {
     marginLeft: 10,

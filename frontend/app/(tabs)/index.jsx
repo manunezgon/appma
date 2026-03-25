@@ -1,10 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useEffect, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import Modal from "react-native-modal";
 import AdminCreateClassModal from "../../components/Lessons/AdminCreateClassModal";
 import ClassList from "../../components/Lessons/ClassList";
+import styles from "../../components/Lessons/Styles.jsx";
 import Calendar from "../../components/Lessons/WeekCalendar";
 import { useEnrollments } from "../../context/EnrollmentsContext";
 import { useLessons } from "../../context/LessonsContext";
@@ -15,14 +16,9 @@ export default function HomeScreen() {
   const [selectedDay, setSelectedDay] = useState(new Date());
   const [classes, setClasses] = useState([]);
   const { lessons, createLesson } = useLessons();
-  const {
-    daySchedules,
-    fetchSchedulesByDay,
-    createSchedule,
-    updateSchedule,
-    createScheduleException,
-  } = useSchedules();
-  const { enrollUser } = useEnrollments();
+  const { daySchedules, fetchSchedulesByDay, createScheduleException } =
+    useSchedules();
+  const { enrollments, enrollUser, fetchMyEnrollments } = useEnrollments();
   const { user } = useUser();
 
   const [refreshing, setRefreshing] = useState(false);
@@ -42,40 +38,43 @@ export default function HomeScreen() {
     return hours * 60 + minutes;
   };
 
-  const mapClassData = (item) => {
-    const start = formatTime(item.startTime);
-    const end = formatTime(item.endTime);
-
-    const startMinutes = toMinutes(start);
-
-    const classDateTime = new Date(selectedDay);
-    classDateTime.setHours(Math.floor(startMinutes / 60));
-    classDateTime.setMinutes(startMinutes % 60);
-
-    const isPast = classDateTime < new Date();
-
-    return {
-      id: String(item.id),
-      lessonName: item.lessonName ?? item.description ?? "Special Class",
-      professorName: item.professorName ?? "",
-      time: `${start} - ${end}`,
-      startMinutes,
-      isEnrolled: false, // backend aún no lo envía
-      isPast,
-      lessonId: item.lessonId,
-      startTime: start,
-      endTime: end,
-      isException: item.date !== null, // 👈 clave
-    };
-  };
-
   // --- Mapeo y actualización de clases ---
   useEffect(() => {
     const mapped = daySchedules
-      .map(mapClassData)
+      .map((item) => {
+        const start = formatTime(item.startTime);
+        const end = formatTime(item.endTime);
+        const startMinutes = toMinutes(start);
+
+        const classDateTime = new Date(selectedDay);
+        classDateTime.setHours(Math.floor(startMinutes / 60));
+        classDateTime.setMinutes(startMinutes % 60);
+
+
+        const enrolled = enrollments.some(
+          (e) =>
+            e.scheduleTemplateId === item.id ||
+            e.scheduleExceptionId === item.id,
+        );
+
+        return {
+          id: String(item.id),
+          lessonName: item.lessonName ?? item.description ?? "Special Class",
+          professorName: item.professorName ?? "",
+          time: `${start} - ${end}`,
+          startMinutes,
+          isEnrolled: enrolled, // 🔹 usamos la info del contexto
+          isPast: classDateTime < new Date(),
+          lessonId: item.lessonId,
+          startTime: start,
+          endTime: end,
+          isException: item.date !== null,
+        };
+      })
       .sort((a, b) => a.startMinutes - b.startMinutes);
+
     setClasses(mapped);
-  }, [daySchedules, selectedDay]);
+  }, [daySchedules, selectedDay, enrollments]); // 🔹 agregamos enrollments como dependencia
 
   useFocusEffect(
     useCallback(() => {
@@ -90,35 +89,25 @@ export default function HomeScreen() {
   };
 
   // --- Enroll ---
-  const handleEnroll = async (scheduleTemplateId) => {
+  const handleEnroll = async (scheduleId, isException = false) => {
     try {
-      await enrollUser(scheduleTemplateId, selectedDay);
-      setClasses((prev) =>
-        prev.map((cls) =>
-          cls.id === scheduleTemplateId ? { ...cls, isEnrolled: true } : cls,
-        ),
-      );
+      if (isException) {
+        await enrollUser(null, selectedDay, scheduleId);
+      } else {
+        await enrollUser(scheduleId, selectedDay);
+      }
+
+      // Opcional: refrescar schedules si quieres mostrar cambios recientes
+      await fetchSchedulesByDay(selectedDay);
     } catch (err) {
-      setErrorMessage("Mes en curso no pagado");
+      setErrorMessage(
+        isException
+          ? "Error enrolling in special class"
+          : "Current month not paid",
+      );
       setErrorModalVisible(true);
     }
   };
-
-  // --- Enroll para exceptions ---
-  const handleEnrollException = async (exceptionId) => {
-    try {
-      await enrollUser(null, selectedDay, exceptionId); // pasamos null para templateId y exceptionId
-      setClasses((prev) =>
-        prev.map((cls) =>
-          cls.id === exceptionId ? { ...cls, isEnrolled: true } : cls,
-        ),
-      );
-    } catch (err) {
-      setErrorMessage("Error al inscribirse en la clase especial");
-      setErrorModalVisible(true);
-    }
-  };
-
   const onDeleteClass = async (cls) => {
     try {
       await createScheduleException({
@@ -129,28 +118,6 @@ export default function HomeScreen() {
         date: selectedDay,
       });
       await fetchSchedulesByDay(selectedDay);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleModalSubmit = async ({
-    dayOfWeek,
-    startTime,
-    endTime,
-    lessonId,
-  }) => {
-    try {
-      if (modalData.id) {
-        await updateSchedule(modalData.id, {
-          dayOfWeek,
-          startTime,
-          endTime,
-          lessonId,
-        });
-      } else {
-        await createSchedule({ dayOfWeek, startTime, endTime, lessonId });
-      }
     } catch (err) {
       console.error(err);
     }
@@ -213,7 +180,6 @@ export default function HomeScreen() {
         refreshing={refreshing}
         onRefresh={onRefresh}
         onEnroll={handleEnroll}
-        onEnrollException={handleEnrollException}
         userRole={user?.role}
         onDeleteClass={onDeleteClass}
       />
@@ -265,30 +231,3 @@ export default function HomeScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#1E1E1E", paddingTop: 50 },
-  modalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 16,
-    alignItems: "center",
-  },
-  errorModal: {
-    backgroundColor: "#2a2a2a",
-    borderRadius: 12,
-  },
-  Title: { color: "#fff", fontWeight: "bold", fontSize: 22 },
-  Content: { color: "#ccc", fontWeight: "bold", textAlign: "center" },
-  closenonpaidIcon: { color: "#69188E" },
-  addButton: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: "#69188E",
-    alignSelf: "center",
-    justifyContent: "center",
-    alignItems: "center",
-    marginVertical: 10,
-  },
-});
