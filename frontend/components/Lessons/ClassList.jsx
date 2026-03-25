@@ -15,6 +15,7 @@ export default function ClassList({
   refreshing,
   onRefresh,
   onEnroll,
+  onEnrollException,
   userRole,
   onDeleteClass,
 }) {
@@ -39,7 +40,12 @@ export default function ClassList({
         data={classes}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => {
-          const handleEnrollPress = () => onEnroll(item.id);
+          const handleEnrollPress = () => {
+            if (item.isException && onEnrollException) {
+              onEnrollException(item.id);  // enroll en exceptions
+            } else {
+              onEnroll(item.id);            // enroll normal
+            }};
 
           return (
             <View style={styles.classCard}>

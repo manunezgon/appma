@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "enrollments", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"user_id", "schedule_template_id", "date"})
+        @UniqueConstraint(columnNames = {"user_id", "schedule_template_id", "schedule_exception_id", "date"})
 })
 @Data
 @NoArgsConstructor
@@ -25,8 +25,12 @@ public class Enrollment {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "schedule_template_id", nullable = false)
+    @JoinColumn(name = "schedule_template_id")
     private ScheduleTemplate scheduleTemplate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "schedule_exception_id")
+    private ScheduleException scheduleException;
 
     @Column(nullable = false)
     private LocalDate date;

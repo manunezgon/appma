@@ -56,6 +56,20 @@ public class EnrollmentController {
         }
     }
 
+    @PostMapping("/exception/{exceptionId}")
+    public ResponseEntity<?> enrollInException(
+            @PathVariable Long exceptionId,
+            @RequestHeader("Authorization") String authHeader) {
+
+        try {
+            Enrollment enrollment = enrollmentService.enrollUserInException(exceptionId, authHeader);
+            return ResponseEntity.ok(toDTO(enrollment));
+
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(400).body(Map.of("error", ex.getMessage()));
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEnrollment(
             @PathVariable Long id,
@@ -65,17 +79,37 @@ public class EnrollmentController {
     }
 
     private EnrollmentResponseDTO toDTO(Enrollment e) {
-        return new EnrollmentResponseDTO(
-                e.getId(),
-                e.getUser().getId(),
-                e.getUser().getName(),
-                e.getScheduleTemplate().getId(),
-                e.getScheduleTemplate().getLesson().getLessonName(),
-                e.getScheduleTemplate().getLesson().getProfessorName(),
-                e.getScheduleTemplate().getStartTime() + " - " + e.getScheduleTemplate().getEndTime(),
-                e.getDate(),
-                e.isAttended()
-        );
+
+        if (e.getScheduleTemplate() != null) {
+
+            return new EnrollmentResponseDTO(
+                    e.getId(),
+                    e.getUser().getId(),
+                    e.getUser().getName(),
+                    e.getScheduleTemplate().getId(),
+                    null,
+                    e.getScheduleTemplate().getLesson().getLessonName(),
+                    e.getScheduleTemplate().getLesson().getProfessorName(),
+                    e.getScheduleTemplate().getStartTime() + " - " + e.getScheduleTemplate().getEndTime(),
+                    e.getDate(),
+                    e.isAttended()
+            );
+
+        } else {
+
+            return new EnrollmentResponseDTO(
+                    e.getId(),
+                    e.getUser().getId(),
+                    e.getUser().getName(),
+                    null,
+                    e.getScheduleException().getId(),
+                    e.getScheduleException().getDescription(),
+                    "",
+                    e.getScheduleException().getStartTime() + " - " + e.getScheduleException().getEndTime(),
+                    e.getDate(),
+                    e.isAttended()
+            );
+        }
     }
 
     @PreAuthorize("hasRole('ADMIN')")

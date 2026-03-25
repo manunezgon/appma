@@ -104,6 +104,21 @@ export default function HomeScreen() {
     }
   };
 
+  // --- Enroll para exceptions ---
+  const handleEnrollException = async (exceptionId) => {
+    try {
+      await enrollUser(null, selectedDay, exceptionId); // pasamos null para templateId y exceptionId
+      setClasses((prev) =>
+        prev.map((cls) =>
+          cls.id === exceptionId ? { ...cls, isEnrolled: true } : cls,
+        ),
+      );
+    } catch (err) {
+      setErrorMessage("Error al inscribirse en la clase especial");
+      setErrorModalVisible(true);
+    }
+  };
+
   const onDeleteClass = async (cls) => {
     try {
       await createScheduleException({
@@ -198,6 +213,7 @@ export default function HomeScreen() {
         refreshing={refreshing}
         onRefresh={onRefresh}
         onEnroll={handleEnroll}
+        onEnrollException={handleEnrollException}
         userRole={user?.role}
         onDeleteClass={onDeleteClass}
       />

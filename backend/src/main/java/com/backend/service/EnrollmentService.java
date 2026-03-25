@@ -94,6 +94,34 @@ public class EnrollmentService {
         return enrollmentRepository.save(enrollment);
     }
 
+    @Transactional
+    public Enrollment enrollUserInException(Long exceptionId, String authHeader) {
+
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtUtil.extractUserId(token);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        ScheduleException exception = scheduleExceptionRepository.findById(exceptionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Exception not found"));
+
+        boolean alreadyEnrolled =
+                enrollmentRepository.existsByUserAndScheduleException(user, exception);
+
+        if (alreadyEnrolled) {
+            throw new IllegalArgumentException("User already enrolled in this class");
+        }
+
+        Enrollment enrollment = new Enrollment();
+        enrollment.setUser(user);
+        enrollment.setScheduleException(exception);
+        enrollment.setDate(exception.getDate());
+        enrollment.setAttended(false);
+
+        return enrollmentRepository.save(enrollment);
+    }
+
     public void deleteEnrollment(Long id, String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         Long userId = jwtUtil.extractUserId(token);

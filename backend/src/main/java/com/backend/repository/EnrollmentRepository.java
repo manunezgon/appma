@@ -1,6 +1,7 @@
 package com.backend.repository;
 
 import com.backend.model.Enrollment;
+import com.backend.model.ScheduleException;
 import com.backend.model.ScheduleTemplate;
 import com.backend.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,6 +20,8 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     List<Enrollment> findByScheduleTemplateAndDate(ScheduleTemplate template, LocalDate date);
 
     List<Enrollment> findByUserAndDate(User user, LocalDate date);
+
+    boolean existsByUserAndScheduleException(User user, ScheduleException exception);
 
 
     // =========================
