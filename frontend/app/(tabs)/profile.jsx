@@ -1,20 +1,23 @@
+import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   Alert,
-  Modal,
+  Image,
   ScrollView,
-  StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import EditProfileModal from "../../components/Profile/EditProfileModal.jsx";
 import { useUser } from "../../context/UserContext";
+import styles from "../../Styles/ProfileStyles.jsx";
+import profilePic from "../assets/images/white_logo_circle.png";
 import { API_BASE_URL } from "../config.jsx";
 
 export default function Profile() {
-  const { user, setUser, logout, token } = useUser();
+  const { user, setUser, logout, token, updateProfileImage } = useUser();
   const router = useRouter();
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -57,7 +60,7 @@ export default function Profile() {
   const handleSaveProfile = async () => {
     if (!currentPassword || currentPassword.length < 6) {
       Alert.alert(
-        "Debes introducir tu contraseña actual (mínimo 6 caracteres) para guardar cambios",
+        "You must enter your current password (minimum 6 characters) to save changes",
       );
       return;
     }
@@ -84,18 +87,18 @@ export default function Profile() {
       } else {
         const text = await res.text();
         console.error("Error backend:", text);
-        Alert.alert("Error al actualizar perfil");
+        Alert.alert("Error updating profile");
       }
     } catch (error) {
       console.error(error);
-      Alert.alert("Error al actualizar perfil");
+      Alert.alert("Error updating profile");
     }
   };
 
   const handleChangePassword = async () => {
     if (!oldPassword || !newPassword || newPassword.length < 6) {
       Alert.alert(
-        "Rellena la contraseña actual y una nueva de mínimo 6 caracteres",
+        "Please fill in the current password and a new password with at least 6 characters",
       );
       return;
     }
@@ -114,234 +117,119 @@ export default function Profile() {
       );
 
       if (res.ok) {
-        Alert.alert("Contraseña actualizada");
+        Alert.alert("Password updated");
         setOldPassword("");
         setNewPassword("");
         setModalVisible(false);
       } else {
         const text = await res.text();
         console.error("Error backend:", text);
-        Alert.alert("Error al actualizar contraseña");
+        Alert.alert("Error updating password");
       }
     } catch (error) {
       console.error(error);
-      Alert.alert("Error al actualizar contraseña");
+      Alert.alert("Error updating password");
+    }
+  };
+
+  const pickProfileImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      const file = result.assets[0];
+      updateProfileImage(file);
     }
   };
 
   if (!user)
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>Cargando perfil...</Text>
+        <Text style={styles.title}>Loading profile...</Text>
       </View>
     );
-
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Mi Perfil</Text>
-
-      <View style={styles.infoBox}>
-        <Text style={styles.label}>Nombre:</Text>
-        <Text style={styles.value}>{user.name}</Text>
-
-        <Text style={styles.label}>Email:</Text>
-        <Text style={styles.value}>{user.email}</Text>
-
-        <Text style={styles.label}>Rol:</Text>
-        <Text style={styles.value}>{user.role}</Text>
-
-        <Text style={styles.label}>Teléfono:</Text>
-        <Text style={styles.value}>{user.phone}</Text>
-      </View>
-
-      <TouchableOpacity
-        onPress={() => setModalVisible(true)}
-        style={styles.button}
-      >
-        <Text style={styles.buttonText}>Ajustes</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={handleLogout}
-        style={[styles.button, styles.logoutButton]}
-      >
-        <Text style={styles.buttonText}>Cerrar sesión</Text>
-      </TouchableOpacity>
-
-      {/* Settings modal */}
-      <Modal
-        visible={modalVisible}
-        animationType="fade"
-        transparent={true}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <ScrollView contentContainerStyle={styles.modalScroll}>
-              <Text style={styles.modalTitle}>Editar Perfil</Text>
-
-              <View style={styles.modalInner}>
-                {/* Profile settings */}
-                <TextInput
-                  style={styles.input}
-                  placeholder="Nombre"
-                  value={editName}
-                  onChangeText={setEditName}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Email"
-                  value={editEmail}
-                  onChangeText={setEditEmail}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Teléfono (opcional, mínimo 9 caracteres)"
-                  value={editPhone}
-                  onChangeText={setEditPhone}
-                  keyboardType="phone-pad"
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Contraseña actual"
-                  secureTextEntry
-                  value={currentPassword}
-                  onChangeText={setCurrentPassword}
-                />
-                <TouchableOpacity
-                  onPress={handleSaveProfile}
-                  style={styles.button}
-                >
-                  <Text style={styles.buttonText}>Guardar cambios</Text>
-                </TouchableOpacity>
-
-                <View style={styles.separator} />
-
-                {/* Password settings */}
-                <Text style={styles.modalTitle}>Cambiar Contraseña</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Contraseña actual"
-                  secureTextEntry
-                  value={oldPassword}
-                  onChangeText={setOldPassword}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Nueva contraseña"
-                  secureTextEntry
-                  value={newPassword}
-                  onChangeText={setNewPassword}
-                />
-                <TouchableOpacity
-                  onPress={handleChangePassword}
-                  style={styles.button}
-                >
-                  <Text style={styles.buttonText}>Actualizar contraseña</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => setModalVisible(false)}
-                  style={[styles.button, styles.cancelButton]}
-                >
-                  <Text style={styles.buttonText}>Cerrar ajustes</Text>
-                </TouchableOpacity>
+    <>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={pickProfileImage}>
+            <View style={{ position: "relative" }}>
+              <Image
+                source={
+                  user.profileImageUrl
+                    ? { uri: user.profileImageUrl }
+                    : profilePic
+                }
+                style={styles.profileImage}
+              />
+              <View
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  right: 0,
+                  backgroundColor: "#69188E",
+                  borderRadius: 12,
+                  padding: 4,
+                }}
+              >
+                <Ionicons name="add" size={16} color="#fff" />
               </View>
-            </ScrollView>
+            </View>
+          </TouchableOpacity>
+          <View style={styles.headerText}>
+            <Text style={styles.name}>{user.name}</Text>
           </View>
         </View>
-      </Modal>
-    </ScrollView>
+
+        <View style={styles.infoBox}>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Email:</Text>
+            <Text style={styles.value}>{user.email}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Phone:</Text>
+            <Text style={styles.value}>{user.phone || "-"}</Text>
+          </View>
+        </View>
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            onPress={() => setModalVisible(true)}
+            style={styles.button}
+          >
+            <Text style={styles.buttonText}>Edit profile</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={handleLogout}
+            style={[styles.button, styles.logoutButton]}
+          >
+            <Text style={styles.buttonText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+      <EditProfileModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        editName={editName}
+        setEditName={setEditName}
+        editEmail={editEmail}
+        setEditEmail={setEditEmail}
+        editPhone={editPhone}
+        setEditPhone={setEditPhone}
+        currentPassword={currentPassword}
+        setCurrentPassword={setCurrentPassword}
+        handleSaveProfile={handleSaveProfile}
+        oldPassword={oldPassword}
+        setOldPassword={setOldPassword}
+        newPassword={newPassword}
+        setNewPassword={setNewPassword}
+        handleChangePassword={handleChangePassword}
+      />
+    </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: "#fff",
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 20,
-    fontWeight: "bold",
-  },
-  infoBox: {
-    width: "90%",
-    padding: 20,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    marginBottom: 20,
-    backgroundColor: "#f9f9f9",
-  },
-  label: {
-    fontSize: 14,
-    color: "#555",
-    marginTop: 10,
-  },
-  value: {
-    fontSize: 16,
-    color: "#000",
-  },
-  button: {
-    backgroundColor: "#69188E",
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    width: "70%",
-    marginTop: 10,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    textAlign: "center",
-  },
-  logoutButton: {
-    backgroundColor: "#aaa",
-    marginTop: 20,
-  },
-  cancelButton: {
-    backgroundColor: "#aaa",
-    marginTop: 10,
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  modalContent: {
-    width: "90%",
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 10,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  separator: {
-    marginVertical: 15,
-  },
-  modalScroll: {
-    flexGrow: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalInner: {
-    width: "100%",
-    alignItems: "center",
-  },
-  input: {
-    width: "90%",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 10,
-    marginVertical: 5,
-  },
-});

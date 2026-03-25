@@ -7,13 +7,16 @@ import com.backend.dto.UserRegisterDTO;
 import com.backend.dto.UserResponseDTO;
 import com.backend.model.User;
 import com.backend.security.JwtUtil;
+import com.backend.service.CloudinaryService;
 import com.backend.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -22,11 +25,12 @@ import java.util.stream.Collectors;
 public class UserController {
 
     private final UserService userService;
+    private final CloudinaryService cloudinaryService;
     private final JwtUtil jwtUtil;
 
     // --- Helpers ---
     private UserResponseDTO toDTO(User user) {
-        return new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRole(), user.getPhone());
+        return new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRole(), user.getPhone(), user.getProfileImageUrl());
     }
 
     // --- Endpoints ---
@@ -49,7 +53,7 @@ public class UserController {
         String token = authHeader.substring(7);
         String email = jwtUtil.extractEmail(token);
         User user = userService.getUserByEmail(email);
-        return ResponseEntity.ok(new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRole(), user.getPhone()));
+        return ResponseEntity.ok(new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRole(), user.getPhone(), user.getProfileImageUrl()));
     }
 
 
@@ -100,5 +104,21 @@ public class UserController {
                                                @Valid @RequestBody UpdatePasswordDTO dto) {
         userService.updatePassword(id, dto.getOldPassword(), dto.getNewPassword());
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/upload-image")
+    public ResponseEntity<?> uploadProfilePicture(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file
+    ) {
+        try {
+            String url = cloudinaryService.uploadProfileFile(file);
+
+            User updatedUser = userService.updateProfileImage(id, url);
+
+            return ResponseEntity.ok(Map.of("url", updatedUser.getProfileImageUrl()));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+        }
     }
 }

@@ -1,5 +1,5 @@
-import { View, Text } from "react-native";
-import styles from "./Styles";
+import { Text, View } from "react-native";
+import styles from "../../Styles/RankingStyles";
 
 export default function Podium({ topThree }) {
   if (!topThree.length) return null;
@@ -10,7 +10,7 @@ export default function Podium({ topThree }) {
         <View style={styles.podiumFirst}>
           <Text style={styles.podiumPlace}>🥇</Text>
           <Text style={styles.podiumName}>{topThree[0].userName}</Text>
-          <Text style={styles.podiumClasses}>{topThree[0].totalClasses}</Text>
+          <Text style={styles.podiumClasses}>{topThree[0].totalClasses} classes</Text>
         </View>
       )}
 
@@ -19,9 +19,7 @@ export default function Podium({ topThree }) {
           <View style={styles.podiumSecond}>
             <Text style={styles.podiumPlace}>🥈</Text>
             <Text style={styles.podiumName}>{topThree[1].userName}</Text>
-            <Text style={styles.podiumClasses}>
-              {topThree[1].totalClasses}
-            </Text>
+            <Text style={styles.podiumClasses}>{topThree[1].totalClasses} classes</Text>
           </View>
         )}
 
@@ -29,9 +27,7 @@ export default function Podium({ topThree }) {
           <View style={styles.podiumThird}>
             <Text style={styles.podiumPlace}>🥉</Text>
             <Text style={styles.podiumName}>{topThree[2].userName}</Text>
-            <Text style={styles.podiumClasses}>
-              {topThree[2].totalClasses}
-            </Text>
+            <Text style={styles.podiumClasses}>{topThree[2].totalClasses} classes</Text>
           </View>
         )}
       </View>

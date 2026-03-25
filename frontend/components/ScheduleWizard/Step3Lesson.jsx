@@ -1,7 +1,7 @@
 import { Alert, Text, TouchableOpacity, View } from "react-native";
+import style from "../../Styles/ScheduleStyles.jsx";
 import LessonSummary from "./LessonSummary.jsx";
 import SelectableList from "./SelectableList.jsx";
-import style from "./Styles.jsx";
 import TextInputField from "./TextInputField.jsx";
 
 export default function Step3Lesson({
@@ -26,7 +26,6 @@ export default function Step3Lesson({
   handleDeleteLesson,
   handleDeleteSchedule,
 }) {
-  // --- Validate and go to Step 4 ---
   const handleNext = () => {
     if (lessonMode === "new") {
       if (!newLessonName || !newProfessorName || !newAmountMonthly) {
@@ -43,7 +42,6 @@ export default function Step3Lesson({
     setStep(4);
   };
 
-  // --- Edit Lesson Mode ---
   if (mode === "editLesson") {
     return (
       <>
@@ -90,7 +88,6 @@ export default function Step3Lesson({
 
   return (
     <>
-      {/* --- New Lesson Form --- */}
       {lessonMode === "new" && (
         <>
           <Text style={style.subtitle}>Create New Lesson</Text>
@@ -121,7 +118,6 @@ export default function Step3Lesson({
         </>
       )}
 
-      {/* --- Select Existing Lesson for Creation --- */}
       {lessonMode === "existing" && mode === "create" && (
         <>
           <Text style={style.subtitle}>Select a lesson</Text>
@@ -133,7 +129,7 @@ export default function Step3Lesson({
               selectedId={selectedLessonId}
               onSelect={(id) => {
                 const lesson = lessons.find((l) => l.id === id);
-                if (!lesson) return; // safety check
+                if (!lesson) return;
 
                 setSelectedLessonId(id);
                 setNewLessonName(lesson.lessonName);
@@ -144,13 +140,11 @@ export default function Step3Lesson({
               }}
               renderItem={(l) => (
                 <View style={style.classContainer}>
-                  {/* Left side */}
                   <View style={style.classNameContainer}>
                     <Text style={style.className}>{l.lessonName}</Text>
                     <Text style={style.professorName}>{l.professorName}</Text>
                   </View>
 
-                  {/* Right side */}
                   <Text style={style.amount}>{l.amountMonthly}€</Text>
                 </View>
               )}
@@ -159,7 +153,6 @@ export default function Step3Lesson({
         </>
       )}
 
-      {/* --- Edit Schedule View --- */}
       {lessonMode === "existing" && mode === "editSchedule" && (
         <>
           <Text style={style.subtitle}>Edit Schedule</Text>
@@ -172,7 +165,6 @@ export default function Step3Lesson({
         </>
       )}
 
-      {/* --- Next Button --- */}
       <TouchableOpacity
         style={[style.button, { marginTop: 10 }]}
         onPress={handleNext}
@@ -180,7 +172,6 @@ export default function Step3Lesson({
         <Text style={style.buttonText}>Next</Text>
       </TouchableOpacity>
 
-      {/* --- Delete Schedule Button --- */}
       {mode === "editSchedule" && (
         <TouchableOpacity
           style={[style.button, style.deleteButton]}
