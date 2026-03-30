@@ -21,8 +21,9 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
     List<Enrollment> findByUserAndDate(User user, LocalDate date);
 
-    boolean existsByUserAndScheduleException(User user, ScheduleException exception);
+    List<Enrollment>findByScheduleExceptionId(Long exceptionId);
 
+    boolean existsByUserAndScheduleException(User user, ScheduleException exception);
 
     // =========================
     // METRICS BY USER

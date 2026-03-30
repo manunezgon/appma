@@ -32,7 +32,7 @@ public class ScheduleException {
     @NotNull
     private Boolean cancelled = false;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "lesson_id", nullable = true)
     private Lesson lesson;
 

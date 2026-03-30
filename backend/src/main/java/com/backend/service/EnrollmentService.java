@@ -2,6 +2,7 @@ package com.backend.service;
 
 import com.backend.dto.AttendanceDTO;
 import com.backend.dto.EnrollmentRequestDTO;
+import com.backend.dto.EnrollmentResponseDTO;
 import com.backend.exception.ResourceNotFoundException;
 import com.backend.model.*;
 import com.backend.repository.*;
@@ -28,10 +29,87 @@ public class EnrollmentService {
     private final ScheduleExceptionRepository scheduleExceptionRepository;
     private final JwtUtil jwtUtil;
 
-    public List<Enrollment> getMyEnrollments(String authHeader) {
+    public List<EnrollmentResponseDTO> getMyEnrollmentsDTO(String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         Long userId = jwtUtil.extractUserId(token);
-        return getEnrollmentsByUser(userId);
+        List<Enrollment> enrollments = getEnrollmentsByUser(userId);
+
+        return enrollments.stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
+    public EnrollmentResponseDTO toDTO(Enrollment e) {
+
+        String lessonName = "";
+        String professorName = "";
+        String time = "";
+
+        if (e.getScheduleTemplate() != null) {
+            // Si la inscripción viene de un ScheduleTemplate
+            Lesson lesson = e.getScheduleTemplate().getLesson();
+            lessonName = lesson != null && lesson.getLessonName() != null ? lesson.getLessonName() : "";
+            professorName = lesson != null && lesson.getProfessorName() != null ? lesson.getProfessorName() : "";
+            time = e.getScheduleTemplate().getStartTime() + " - " + e.getScheduleTemplate().getEndTime();
+
+            return new EnrollmentResponseDTO(
+                    e.getId(),
+                    e.getUser().getId(),
+                    e.getUser().getName(),
+                    e.getScheduleTemplate().getId(),
+                    null,
+                    lessonName,
+                    professorName,
+                    time,
+                    e.getDate(),
+                    e.isAttended()
+            );
+
+        } else if (e.getScheduleException() != null) {
+            // Si la inscripción viene de un ScheduleException
+            ScheduleException exception = e.getScheduleException();
+
+            if (exception.getLesson() != null) {
+                // Preferimos usar los datos de la Lesson vinculada
+                Lesson lesson = exception.getLesson();
+                lessonName = lesson.getLessonName() != null ? lesson.getLessonName() : "";
+                professorName = lesson.getProfessorName() != null ? lesson.getProfessorName() : "";
+            } else {
+                // Si no hay Lesson, usamos la descripción del exception
+                lessonName = exception.getDescription() != null ? exception.getDescription() : "";
+                professorName = "";
+            }
+
+            time = exception.getStartTime() + " - " + exception.getEndTime();
+
+            return new EnrollmentResponseDTO(
+                    e.getId(),
+                    e.getUser().getId(),
+                    e.getUser().getName(),
+                    null,
+                    exception.getId(),
+                    lessonName,
+                    professorName,
+                    time,
+                    e.getDate(),
+                    e.isAttended()
+            );
+
+        } else {
+            // fallback por si no hay template ni exception
+            return new EnrollmentResponseDTO(
+                    e.getId(),
+                    e.getUser().getId(),
+                    e.getUser().getName(),
+                    null,
+                    null,
+                    "",
+                    "",
+                    "",
+                    e.getDate(),
+                    e.isAttended()
+            );
+        }
     }
 
     public List<Enrollment> getEnrollmentsByUser(Long userId) {

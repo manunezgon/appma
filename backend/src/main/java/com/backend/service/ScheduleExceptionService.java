@@ -16,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 @RequiredArgsConstructor
@@ -27,8 +29,15 @@ public class ScheduleExceptionService {
     private final EnrollmentRepository enrollmentRepository;
     private final ScheduleTemplateRepository scheduleTemplateRepository;
 
+    private static final Logger log = LoggerFactory.getLogger(ScheduleExceptionService.class);
+
     private void handleCancellation(ScheduleException exception) {
+
+        log.info("handleCancellation called for exception id={} cancelled={}",
+                exception.getId(), exception.getCancelled());
+
         if (!Boolean.TRUE.equals(exception.getCancelled())) {
+            log.info("Exception is not cancelled, skipping...");
             return;
         }
 
@@ -43,11 +52,13 @@ public class ScheduleExceptionService {
                 exception.getStartTime()
         );
 
+        log.info("Creating announcement: {}", message);
+
         announcementService.createAutomaticAnnouncement(message);
 
-        if (exception.getLesson() != null) {
-            dropEnrollmentsCancelled(exception);
-        }
+        log.info("Calling dropEnrollmentsCancelled...");
+
+        dropEnrollmentsCancelled(exception);
     }
 
     private void mapDtoToEntity(ScheduleException exception, ScheduleExceptionRequestDTO dto) {
@@ -86,10 +97,44 @@ public class ScheduleExceptionService {
     }
 
     private void dropEnrollmentsCancelled(ScheduleException scheduleException) {
-        List<ScheduleTemplate> templates = scheduleTemplateRepository.findByStartTime(scheduleException.getStartTime());
+
+        log.info("dropEnrollmentsCancelled for exception id={}", scheduleException.getId());
+
+        // 1️⃣ exception enrollments
+        List<Enrollment> exceptionEnrollments =
+                enrollmentRepository.findByScheduleExceptionId(scheduleException.getId());
+
+        log.info("Found {} enrollments linked to exception",
+                exceptionEnrollments.size());
+
+        enrollmentRepository.deleteAll(exceptionEnrollments);
+
+        log.info("Deleted exception enrollments");
+
+
+        // 2️⃣ template enrollments
+        List<ScheduleTemplate> templates =
+                scheduleTemplateRepository.findByStartTime(scheduleException.getStartTime());
+
+        log.info("Found {} templates with same startTime",
+                templates.size());
+
         for (ScheduleTemplate template : templates) {
-            List<Enrollment> enrollments = enrollmentRepository.findByScheduleTemplateAndDate(template, scheduleException.getDate());
+
+            List<Enrollment> enrollments =
+                    enrollmentRepository.findByScheduleTemplateAndDate(
+                            template,
+                            scheduleException.getDate()
+                    );
+
+            log.info("Template {} has {} enrollments for date {}",
+                    template.getId(),
+                    enrollments.size(),
+                    scheduleException.getDate());
+
             enrollmentRepository.deleteAll(enrollments);
+
+            log.info("Deleted template enrollments");
         }
     }
 
@@ -110,14 +155,24 @@ public class ScheduleExceptionService {
 
     @Transactional
     public ScheduleException updateException(Long id, ScheduleExceptionRequestDTO dto) {
-        validateId(id);
+
+        log.info("Updating exception id={}", id);
 
         ScheduleException existing = getExceptionById(id);
+
+        log.info("Previous cancelled value={}", existing.getCancelled());
+
         mapDtoToEntity(existing, dto);
+
+        log.info("New cancelled value={}", existing.getCancelled());
 
         validateException(existing);
 
         ScheduleException saved = scheduleExceptionRepository.save(existing);
+
+        log.info("Saved exception id={} cancelled={}",
+                saved.getId(), saved.getCancelled());
+
         handleCancellation(saved);
 
         return saved;
