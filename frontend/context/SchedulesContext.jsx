@@ -91,7 +91,7 @@ export const SchedulesProvider = ({ children }) => {
   const fetchSchedulesByDay = async (date) => {
     if (!token) return;
     try {
-      const dateStr = date.toISOString().split("T")[0]; // "YYYY-MM-DD"
+      const dateStr = date.toISOString().split("T")[0]; 
       const data = await authFetch(
         `${API_BASE_URL}/scheduleTemplates/day?date=${dateStr}`,
         {},
@@ -137,6 +137,25 @@ export const SchedulesProvider = ({ children }) => {
     }
   };
 
+  // --- Update schedule exception ---
+  const updateScheduleException = async (id, dto) => {
+    if (!token) return;
+    try {
+      const dateStr = dto.date.toISOString().split("T")[0];
+      await authFetch(
+        `${API_BASE_URL}/scheduleExceptions/${id}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({ ...dto, date: dateStr }),
+        },
+        token,
+      );
+    } catch (err) {
+      console.error("Error updating schedule exception:", err);
+      throw err;
+    }
+  };
+
   return (
     <SchedulesContext.Provider
       value={{
@@ -149,6 +168,7 @@ export const SchedulesProvider = ({ children }) => {
         deleteSchedule,
         createScheduleException,
         loadingSchedules,
+        updateScheduleException,
       }}
     >
       {children}

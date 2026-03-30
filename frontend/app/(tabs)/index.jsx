@@ -10,14 +10,18 @@ import Calendar from "../../components/Lessons/WeekCalendar";
 import { useEnrollments } from "../../context/EnrollmentsContext";
 import { useLessons } from "../../context/LessonsContext";
 import { useSchedules } from "../../context/SchedulesContext";
-import { useUser } from "../../context/UserContext";
+import { useUser } from "../../context/UserContext.jsx";
 
 export default function HomeScreen() {
   const [selectedDay, setSelectedDay] = useState(new Date());
   const [classes, setClasses] = useState([]);
   const { lessons, createLesson } = useLessons();
-  const { daySchedules, fetchSchedulesByDay, createScheduleException } =
-    useSchedules();
+  const {
+    daySchedules,
+    fetchSchedulesByDay,
+    createScheduleException,
+    updateScheduleException,
+  } = useSchedules();
   const { enrollments, enrollUser, fetchMyEnrollments } = useEnrollments();
   const { user } = useUser();
 
@@ -39,6 +43,16 @@ export default function HomeScreen() {
   };
 
   // --- Mapeo y actualización de clases ---
+  const isSameDay = (dateString, compareDate) => {
+    const d1 = new Date(dateString);
+    const d2 = new Date(compareDate);
+    return (
+      d1.getFullYear() === d2.getFullYear() &&
+      d1.getMonth() === d2.getMonth() &&
+      d1.getDate() === d2.getDate()
+    );
+  };
+
   useEffect(() => {
     const mapped = daySchedules
       .map((item) => {
@@ -50,12 +64,25 @@ export default function HomeScreen() {
         classDateTime.setHours(Math.floor(startMinutes / 60));
         classDateTime.setMinutes(startMinutes % 60);
 
+        const enrolled = enrollments.some((e) => {
+          if (!e) return false;
 
-        const enrolled = enrollments.some(
-          (e) =>
-            e.scheduleTemplateId === item.id ||
-            e.scheduleExceptionId === item.id,
-        );
+          if (e.scheduleExceptionId) {
+            return (
+              e.scheduleExceptionId === item.id &&
+              isSameDay(e.date, selectedDay)
+            );
+          }
+
+          if (e.scheduleTemplateId) {
+            return (
+              e.scheduleTemplateId === item.id && // 🔹 usar item.id
+              isSameDay(e.date, selectedDay)
+            );
+          }
+
+          return false;
+        });
 
         return {
           id: String(item.id),
@@ -63,7 +90,7 @@ export default function HomeScreen() {
           professorName: item.professorName ?? "",
           time: `${start} - ${end}`,
           startMinutes,
-          isEnrolled: enrolled, // 🔹 usamos la info del contexto
+          isEnrolled: enrolled,
           isPast: classDateTime < new Date(),
           lessonId: item.lessonId,
           startTime: start,
@@ -74,7 +101,7 @@ export default function HomeScreen() {
       .sort((a, b) => a.startMinutes - b.startMinutes);
 
     setClasses(mapped);
-  }, [daySchedules, selectedDay, enrollments]); // 🔹 agregamos enrollments como dependencia
+  }, [daySchedules, selectedDay, enrollments]);
 
   useFocusEffect(
     useCallback(() => {
@@ -97,34 +124,58 @@ export default function HomeScreen() {
         await enrollUser(scheduleId, selectedDay);
       }
 
-      // Opcional: refrescar schedules si quieres mostrar cambios recientes
+      await fetchMyEnrollments();
       await fetchSchedulesByDay(selectedDay);
     } catch (err) {
-      setErrorMessage(
-        isException
-          ? "Error enrolling in special class"
-          : "Current month not paid",
-      );
-      setErrorModalVisible(true);
+      const message = err.message || "Error enrolling";
+      if (!message.includes("already enrolled")) {
+        setErrorMessage(
+          isException ? "Error enrolling in special class" : message,
+        );
+        setErrorModalVisible(true);
+      }
     }
   };
+
   const onDeleteClass = async (cls) => {
     try {
-      await createScheduleException({
-        lessonId: cls.lessonId,
-        startTime: cls.startTime,
-        endTime: cls.endTime,
-        cancelled: true,
-        date: selectedDay,
-      });
+      const existingException = daySchedules.find(
+        (s) =>
+          s.date &&
+          isSameDay(s.date, selectedDay) &&
+          ((s.lessonId && s.lessonId === cls.lessonId) ||
+            (s.description && s.description === cls.lessonName)),
+      );
+
+      if (existingException) {
+        await updateScheduleException(existingException.id, {
+          cancelled: true,
+          startTime: cls.startTime,
+          endTime: cls.endTime,
+          lessonId: cls.lessonId ?? null,
+          description: cls.isException && !cls.lessonId ? cls.lessonName : null, // 👈 agregar descripción si no hay lesson
+          date: selectedDay,
+        });
+      } else {
+        await createScheduleException({
+          lessonId: cls.lessonId ?? null,
+          startTime: cls.startTime,
+          endTime: cls.endTime,
+          cancelled: true,
+          date: selectedDay,
+          description: cls.isException && !cls.lessonId ? cls.lessonName : null, // 👈 mismo
+        });
+      }
+
       await fetchSchedulesByDay(selectedDay);
     } catch (err) {
-      console.error(err);
+      console.error("Error updating schedule exception:", err);
     }
   };
 
   const handleCreateException = async () => {
     if (!selectedLessonId || !newStartTime || !newEndTime) return;
+
     await createScheduleException({
       lessonId: selectedLessonId,
       startTime: newStartTime,
@@ -132,7 +183,15 @@ export default function HomeScreen() {
       cancelled: false,
       date: selectedDay,
     });
+
     await fetchSchedulesByDay(selectedDay);
+
+    setSelectedLessonId(null);
+    setNewStartTime("");
+    setNewEndTime("");
+    setNewDescription("");
+    setCreateMode(null);
+
     setAdminModalVisible(false);
   };
 
@@ -142,26 +201,24 @@ export default function HomeScreen() {
       return;
     }
 
-    try {
-      await createScheduleException({
-        lessonId: null,
-        description: newDescription,
-        startTime: newStartTime,
-        endTime: newEndTime,
-        cancelled: false,
-        date: selectedDay,
-      });
+    await createScheduleException({
+      lessonId: null,
+      description: newDescription,
+      startTime: newStartTime,
+      endTime: newEndTime,
+      cancelled: false,
+      date: selectedDay,
+    });
 
-      await fetchSchedulesByDay(selectedDay);
+    await fetchSchedulesByDay(selectedDay);
 
-      setNewDescription("");
-      setNewStartTime("");
-      setNewEndTime("");
-      setCreateMode(null);
-      setAdminModalVisible(false);
-    } catch (err) {
-      console.error("Error creating exception:", err);
-    }
+    setNewDescription("");
+    setNewStartTime("");
+    setNewEndTime("");
+    setSelectedLessonId(null);
+    setCreateMode(null);
+
+    setAdminModalVisible(false);
   };
 
   return (
