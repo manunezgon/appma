@@ -1,12 +1,12 @@
 import { Picker } from "@react-native-picker/picker";
 import {
-  StyleSheet,
-  Text,
+    Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import Modal from "react-native-modal";
+import styles from "./Styles.jsx";
 
 export default function AdminCreateClassModal({
   visible,
@@ -33,7 +33,7 @@ export default function AdminCreateClassModal({
   return (
     <Modal isVisible={visible} onBackdropPress={onClose}>
       <View style={styles.adminModal}>
-        <Text style={styles.Title}>Crear Clase</Text>
+        <Text style={styles.titleCenter}>Crear Clase</Text>
 
         {/* Selección modo */}
         {!createMode && (
@@ -141,58 +141,3 @@ export default function AdminCreateClassModal({
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  adminModal: {
-    backgroundColor: "#2a2a2a",
-    borderRadius: 12,
-    padding: 20,
-  },
-
-  Title: {
-    color: "#fff",
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
-  },
-
-  modeButton: {
-    backgroundColor: "#3a3a3a",
-    paddingVertical: 14,
-    borderRadius: 8,
-    marginBottom: 12,
-  },
-
-  modeButtonText: {
-    color: "#fff",
-    textAlign: "center",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-
-  input: {
-    backgroundColor: "#1E1E1E",
-    color: "#fff",
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: "#444",
-  },
-
-  picker: {
-    backgroundColor: "#1E1E1E",
-    color: "#fff",
-    borderRadius: 8,
-    marginBottom: 12,
-  },
-
-  saveButton: {
-    backgroundColor: "#6C3BFF",
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 10,
-  },
-});

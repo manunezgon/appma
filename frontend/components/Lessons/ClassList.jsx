@@ -3,12 +3,12 @@ import {
   FlatList,
   Modal,
   RefreshControl,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import styles from "./Styles.jsx";
 
 export default function ClassList({
   classes,
@@ -34,7 +34,7 @@ export default function ClassList({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.classContainer}>
       <FlatList
         data={classes}
         keyExtractor={(item) => item.id.toString()}
@@ -124,96 +124,3 @@ export default function ClassList({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-  },
-  classCard: {
-    padding: 15,
-    marginBottom: 10,
-    borderRadius: 10,
-    backgroundColor: "#CCCCCC",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  leftContainer: {
-    flex: 1,
-  },
-  centerContainer: {
-    marginLeft: 10,
-    marginRight: 10,
-  },
-  rightContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  adminButtons: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginTop: 10,
-    gap: 10,
-  },
-  editButton: {
-    paddingHorizontal: 5,
-  },
-  editButtonText: {
-    color: "#fff",
-    fontWeight: "600",
-    textAlign: "center",
-  },
-  className: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#555555",
-  },
-  professorName: {
-    fontSize: 14,
-    color: "#555555",
-  },
-  classTime: {
-    fontSize: 14,
-    color: "#555555",
-    marginRight: 10,
-  },
-  enrollButton: {
-    padding: 5,
-  },
-  enrollButtonDisabled: {
-    opacity: 0.5,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  modalContent: {
-    backgroundColor: "#CCCCCC",
-    padding: 20,
-    borderRadius: 10,
-    width: "80%",
-  },
-
-  modalText: {
-    fontSize: 16,
-    marginBottom: 20,
-    textAlign: "center",
-  },
-
-  modalButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  noClasses: {
-    textAlign: "center",
-    marginTop: 20,
-    fontSize: 16,
-    color: "#F5F5F5",
-  },
-});

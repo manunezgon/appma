@@ -15,7 +15,7 @@ import { useUser } from "../../context/UserContext.jsx";
 export default function HomeScreen() {
   const [selectedDay, setSelectedDay] = useState(new Date());
   const [classes, setClasses] = useState([]);
-  const { lessons, createLesson } = useLessons();
+  const { lessons } = useLessons();
   const {
     daySchedules,
     fetchSchedulesByDay,

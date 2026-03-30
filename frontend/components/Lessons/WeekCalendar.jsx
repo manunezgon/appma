@@ -2,11 +2,11 @@ import { useRef, useState } from "react";
 import {
   Dimensions,
   FlatList,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import styles from "./Styles.jsx";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -68,7 +68,7 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.calendarContainer}>
       <View style={styles.header}>
         <Text style={styles.monthTitle}>{currentMonthName}</Text>
         <TouchableOpacity style={styles.todayButton} onPress={goToToday}>
@@ -119,60 +119,3 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 10,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    marginBottom: 10,
-  },
-  monthTitle: {
-    fontSize: 15,
-    fontWeight: "bold",
-    color: "#CCCCCC",
-    textTransform: "uppercase",
-  },
-  todayButton: {
-    backgroundColor: "#7c23b0ff",
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    borderRadius: 8,
-  },
-  todayText: {
-    color: "#CCCCCC",
-    fontWeight: "600",
-  },
-  weekContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    paddingHorizontal: 10,
-  },
-  dayBox: {
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 10,
-    borderRadius: 10,
-    backgroundColor: "#555555",
-    width: 45,
-  },
-  selectedBox: {
-    backgroundColor: "#7c23b0ff",
-  },
-  dayText: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#0A0A0A",
-  },
-  dateText: {
-    fontSize: 16,
-    color: "#CCCCCC",
-  },
-  activeText: {
-    color: "#CCCCCC",
-  },
-});
