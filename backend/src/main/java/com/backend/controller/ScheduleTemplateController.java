@@ -1,5 +1,6 @@
 package com.backend.controller;
 
+import com.backend.dto.ScheduleItemDTO;
 import com.backend.dto.ScheduleTemplateRequestDTO;
 import com.backend.dto.ScheduleTemplateResponseDTO;
 import com.backend.model.ScheduleTemplate;
@@ -48,14 +49,15 @@ public class ScheduleTemplateController {
     }
 
     @GetMapping("/day")
-    public ResponseEntity<List<ScheduleTemplateResponseDTO>> getScheduleForDay(
+    public ResponseEntity<List<ScheduleItemDTO>> getScheduleForDay(
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestHeader("Authorization") String authHeader) {
 
         String token = authHeader.replace("Bearer ", "");
         Long userId = jwtUtil.extractUserId(token);
 
-        return ResponseEntity.ok(scheduleTemplateService.getScheduleForDay(date, userId));
+        List<ScheduleItemDTO> daySchedules = scheduleTemplateService.getSchedulesForDay(date, userId);
+        return ResponseEntity.ok(daySchedules);
     }
 
     @PostMapping

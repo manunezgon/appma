@@ -10,8 +10,8 @@ import {
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import ScheduleWizardModal from "../../components/ScheduleWizard/ScheduleWizardModal.jsx";
-import styles from "../../Styles/SessionStyle.jsx"
 import { useUser } from "../../context/UserContext";
+import styles from "../../Styles/SessionStyle.jsx";
 import { API_BASE_URL } from "../config";
 
 export default function Sessions() {
@@ -22,7 +22,7 @@ export default function Sessions() {
   const [selectedEnrollment, setSelectedEnrollment] = useState(null);
 
   const fetchEnrollments = async () => {
-    if (!user || user.role !== "MEMBER") return; 
+    if (!user || user.role !== "MEMBER") return;
     try {
       const response = await fetch(`${API_BASE_URL}/enrollments/me`, {
         headers: { Authorization: `Bearer ${user?.token}` },
@@ -138,10 +138,7 @@ export default function Sessions() {
     </View>
   );
 
-  if (!user)
-    return (
-      <Text style={styles.loading}>Loading...</Text>
-    );
+  if (!user) return <Text style={styles.loading}>Loading...</Text>;
 
   return (
     <View style={styles.container}>

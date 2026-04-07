@@ -1,16 +1,23 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Dimensions } from "react-native";
 import { useRef, useState } from "react";
+import {
+  Dimensions,
+  FlatList,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import styles from "./Styles.jsx";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 export default function WeekCalendar({ selectedDay, setSelectedDay }) {
-  const daysShort = ["L", "M", "X", "J", "V", "S", "D"];
+  const daysShort = ["M", "T", "W", "T", "F", "S", "S"];
   const flatListRef = useRef(null);
 
   const today = new Date();
 
   const generateWeek = (weekOffset = 0) => {
-    const currentDay = today.getDay(); 
+    const currentDay = today.getDay();
     const monday = new Date(today);
     monday.setDate(today.getDate() - ((currentDay + 6) % 7) + weekOffset * 7);
 
@@ -29,7 +36,12 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
   const [currentWeekIndex, setCurrentWeekIndex] = useState(10);
 
   const [currentMonthName, setCurrentMonthName] = useState(
-    weeks[currentWeekIndex][0].toLocaleDateString("es-ES", { month: "long", year: "numeric" })
+    weeks[currentWeekIndex][0]
+      .toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric",
+      })
+      .replace(" ", " · "),
   );
 
   const formatDate = (date) => date.toISOString().split("T")[0];
@@ -39,7 +51,7 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
     setCurrentWeekIndex(10);
     flatListRef.current?.scrollToIndex({ index: 10, animated: true });
     setCurrentMonthName(
-      today.toLocaleDateString("es-ES", { month: "long", year: "numeric" })
+      today.toLocaleDateString("en-US", { month: "long", year: "numeric" }),
     );
   };
 
@@ -48,7 +60,7 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
     setCurrentWeekIndex(index);
 
     const firstDayOfWeek = weeks[index][0];
-    const newMonthName = firstDayOfWeek.toLocaleDateString("es-ES", {
+    const newMonthName = firstDayOfWeek.toLocaleDateString("en-US", {
       month: "long",
       year: "numeric",
     });
@@ -56,11 +68,11 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.calendarContainer}>
       <View style={styles.header}>
         <Text style={styles.monthTitle}>{currentMonthName}</Text>
         <TouchableOpacity style={styles.todayButton} onPress={goToToday}>
-          <Text style={styles.todayText}>Hoy</Text>
+          <Text style={styles.todayText}>Today</Text>
         </TouchableOpacity>
       </View>
 
@@ -88,10 +100,14 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
                   style={[styles.dayBox, isSelected && styles.selectedBox]}
                   onPress={() => setSelectedDay(day)}
                 >
-                  <Text style={[styles.dayText, isSelected && styles.activeText]}>
+                  <Text
+                    style={[styles.dayText, isSelected && styles.activeText]}
+                  >
                     {daysShort[index]}
                   </Text>
-                  <Text style={[styles.dateText, isSelected && styles.activeText]}>
+                  <Text
+                    style={[styles.dateText, isSelected && styles.activeText]}
+                  >
                     {day.getDate()}
                   </Text>
                 </TouchableOpacity>
@@ -103,60 +119,3 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { 
-    marginBottom: 10 
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    marginBottom: 10,
-  },
-  monthTitle: { 
-    fontSize: 15, 
-    fontWeight: "bold",
-    color:"#CCCCCC",
-    textTransform: "uppercase" 
-  },
-  todayButton: {
-    backgroundColor: "#7c23b0ff",
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    borderRadius: 8,
-  },
-  todayText: { 
-    color: "#CCCCCC", 
-    fontWeight: "600" 
-  },
-  weekContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    paddingHorizontal: 10,
-  },
-  dayBox: {
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 10,
-    borderRadius: 10,
-    backgroundColor: "#555555",
-    width: 45,
-  },
-  selectedBox: { 
-    backgroundColor: "#7c23b0ff" 
-  },
-  dayText: { 
-    fontSize: 14, 
-    fontWeight: "bold", 
-    color: "#0A0A0A" 
-  },
-  dateText: { 
-    fontSize: 16, 
-    color: "#CCCCCC" 
-  },
-  activeText: { 
-    color: "#CCCCCC" 
-  },
-});

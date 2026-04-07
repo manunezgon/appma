@@ -16,6 +16,7 @@ const authFetch = async (url, options = {}, token) => {
 
   if (!res.ok) {
     const text = await res.text();
+    console.error("Backend error text:", text);
     throw new Error(text || "Request failed");
   }
 
@@ -31,8 +32,10 @@ const authFetch = async (url, options = {}, token) => {
 export const SchedulesProvider = ({ children }) => {
   const { token } = useUser();
   const [schedules, setSchedules] = useState([]);
+  const [daySchedules, setDaySchedules] = useState([]);
   const [loadingSchedules, setLoadingSchedules] = useState(false);
 
+  // --- Fetch all schedules ---
   const fetchSchedules = async () => {
     if (!token) return;
     setLoadingSchedules(true);
@@ -56,13 +59,11 @@ export const SchedulesProvider = ({ children }) => {
     else setSchedules([]);
   }, [token]);
 
+  // --- CRUD for schedule templates ---
   const createSchedule = async (scheduleData) => {
     await authFetch(
       `${API_BASE_URL}/scheduleTemplates`,
-      {
-        method: "POST",
-        body: JSON.stringify(scheduleData),
-      },
+      { method: "POST", body: JSON.stringify(scheduleData) },
       token,
     );
     await fetchSchedules();
@@ -71,10 +72,7 @@ export const SchedulesProvider = ({ children }) => {
   const updateSchedule = async (id, scheduleData) => {
     await authFetch(
       `${API_BASE_URL}/scheduleTemplates/${id}`,
-      {
-        method: "PUT",
-        body: JSON.stringify(scheduleData),
-      },
+      { method: "PUT", body: JSON.stringify(scheduleData) },
       token,
     );
     await fetchSchedules();
@@ -83,23 +81,94 @@ export const SchedulesProvider = ({ children }) => {
   const deleteSchedule = async (id) => {
     await authFetch(
       `${API_BASE_URL}/scheduleTemplates/${id}`,
-      {
-        method: "DELETE",
-      },
+      { method: "DELETE" },
       token,
     );
     await fetchSchedules();
+  };
+
+  // --- Fetch schedules by day ---
+  const fetchSchedulesByDay = async (date) => {
+    if (!token) return;
+    try {
+      const dateStr = date.toISOString().split("T")[0]; 
+      const data = await authFetch(
+        `${API_BASE_URL}/scheduleTemplates/day?date=${dateStr}`,
+        {},
+        token,
+      );
+      setDaySchedules(data);
+    } catch (err) {
+      console.error("Error fetching schedules for the day:", err);
+      setDaySchedules([]);
+    }
+  };
+
+  // --- Create schedule exception ---
+  const createScheduleException = async ({
+    lessonId = null,
+    startTime,
+    endTime,
+    cancelled,
+    date,
+    description = null,
+  }) => {
+    if (!token) return;
+    try {
+      const dateStr = date.toISOString().split("T")[0];
+      await authFetch(
+        `${API_BASE_URL}/scheduleExceptions`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            lessonId,
+            startTime,
+            endTime,
+            cancelled,
+            date: dateStr,
+            description,
+          }),
+        },
+        token,
+      );
+    } catch (err) {
+      console.error("Error creating schedule exception:", err);
+      throw err;
+    }
+  };
+
+  // --- Update schedule exception ---
+  const updateScheduleException = async (id, dto) => {
+    if (!token) return;
+    try {
+      const dateStr = dto.date.toISOString().split("T")[0];
+      await authFetch(
+        `${API_BASE_URL}/scheduleExceptions/${id}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({ ...dto, date: dateStr }),
+        },
+        token,
+      );
+    } catch (err) {
+      console.error("Error updating schedule exception:", err);
+      throw err;
+    }
   };
 
   return (
     <SchedulesContext.Provider
       value={{
         schedules,
-        loadingSchedules,
+        daySchedules,
         fetchSchedules,
+        fetchSchedulesByDay,
         createSchedule,
         updateSchedule,
         deleteSchedule,
+        createScheduleException,
+        loadingSchedules,
+        updateScheduleException,
       }}
     >
       {children}

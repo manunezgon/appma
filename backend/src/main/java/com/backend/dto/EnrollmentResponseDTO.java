@@ -7,10 +7,10 @@ public record EnrollmentResponseDTO(
         Long userId,
         String userName,
         Long scheduleTemplateId,
+        Long scheduleExceptionId,
         String lessonName,
         String professorName,
         String time,
         LocalDate date,
         boolean attended
-
 ) {}
