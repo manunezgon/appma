@@ -75,19 +75,36 @@ public class EnrollmentController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/class")
     public ResponseEntity<?> getClassEnrollments(
-            @RequestParam Long scheduleTemplateId,
+            @RequestParam(required = false) Long scheduleTemplateId,
+            @RequestParam(required = false) Long scheduleExceptionId,
             @RequestParam String date) {
-        try {
-            var dtos = enrollmentService
-                    .getClassEnrollments(scheduleTemplateId, date)
-                    .stream()
-                    .map(enrollmentService::toDTO)
-                    .toList();
 
-            return ResponseEntity.ok(dtos);
+        try {
+
+            if (scheduleExceptionId != null) {
+                var dtos = enrollmentService
+                        .getExceptionEnrollments(scheduleExceptionId, date)
+                        .stream()
+                        .map(enrollmentService::toDTO)
+                        .toList();
+                return ResponseEntity.ok(dtos);
+            }
+
+            if (scheduleTemplateId != null) {
+                var dtos = enrollmentService
+                        .getClassEnrollments(scheduleTemplateId, date)
+                        .stream()
+                        .map(enrollmentService::toDTO)
+                        .toList();
+                return ResponseEntity.ok(dtos);
+            }
+
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Missing scheduleTemplateId or scheduleExceptionId"));
 
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+            return ResponseEntity.status(500)
+                    .body(Map.of("error", ex.getMessage()));
         }
     }
 
