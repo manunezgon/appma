@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import styles from "./Styles.jsx";
+import styles from "../../Styles/LessonStyles.jsx";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 

@@ -1,12 +1,7 @@
 import { Picker } from "@react-native-picker/picker";
-import {
-    Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import Modal from "react-native-modal";
-import styles from "./Styles.jsx";
+import styles from "../../Styles/LessonStyles.jsx";
 
 export default function AdminCreateClassModal({
   visible,
@@ -81,10 +76,7 @@ export default function AdminCreateClassModal({
               style={styles.input}
             />
 
-            <TouchableOpacity
-              style={styles.saveButton}
-              onPress={onCreateNew}
-            >
+            <TouchableOpacity style={styles.saveButton} onPress={onCreateNew}>
               <Text style={{ color: "white", fontWeight: "bold" }}>
                 Guardar
               </Text>

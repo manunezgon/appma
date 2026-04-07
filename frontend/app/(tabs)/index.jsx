@@ -4,13 +4,14 @@ import { useCallback, useEffect, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import Modal from "react-native-modal";
 import AdminCreateClassModal from "../../components/Lessons/AdminCreateClassModal";
+import AttendanceModal from "../../components/Lessons/AttendanceModal.jsx";
 import ClassList from "../../components/Lessons/ClassList";
-import styles from "../../components/Lessons/Styles.jsx";
 import Calendar from "../../components/Lessons/WeekCalendar";
 import { useEnrollments } from "../../context/EnrollmentsContext";
 import { useLessons } from "../../context/LessonsContext";
 import { useSchedules } from "../../context/SchedulesContext";
 import { useUser } from "../../context/UserContext.jsx";
+import styles from "../../Styles/LessonStyles.jsx";
 
 export default function HomeScreen() {
   const [selectedDay, setSelectedDay] = useState(new Date());
@@ -34,6 +35,13 @@ export default function HomeScreen() {
   const [newEndTime, setNewEndTime] = useState("");
   const [selectedLessonId, setSelectedLessonId] = useState(null);
   const [newDescription, setNewDescription] = useState("");
+  const [attendanceVisible, setAttendanceVisible] = useState(false);
+  const [selectedClass, setSelectedClass] = useState(null);
+
+  const handleTakeAttendance = (cls) => {
+    setSelectedClass(cls);
+    setAttendanceVisible(true);
+  };
 
   // --- Helpers ---
   const formatTime = (time) => time.slice(0, 5);
@@ -73,14 +81,11 @@ export default function HomeScreen() {
               isSameDay(e.date, selectedDay)
             );
           }
-
           if (e.scheduleTemplateId) {
             return (
-              e.scheduleTemplateId === item.id && // 🔹 usar item.id
-              isSameDay(e.date, selectedDay)
+              e.scheduleTemplateId === item.id && isSameDay(e.date, selectedDay)
             );
           }
-
           return false;
         });
 
@@ -239,6 +244,17 @@ export default function HomeScreen() {
         onEnroll={handleEnroll}
         userRole={user?.role}
         onDeleteClass={onDeleteClass}
+        onTakeAttendance={handleTakeAttendance}
+      />
+      <AttendanceModal
+        visible={attendanceVisible}
+        onClose={() => setAttendanceVisible(false)}
+        classData={selectedClass}
+        selectedDay={selectedDay}
+        onAttendanceSaved={async () => {
+          await fetchMyEnrollments(); // 🔹 actualiza enrollments
+          await fetchSchedulesByDay(selectedDay);
+        }}
       />
       <Modal
         isVisible={errorModalVisible}

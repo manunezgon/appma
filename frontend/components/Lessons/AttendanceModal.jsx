@@ -1,22 +1,23 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import Modal from "react-native-modal";
-import { API_BASE_URL } from "../app/config";
-import { useUser } from "../context/UserContext";
+import { API_BASE_URL } from "../../app/config";
+import { useUser } from "../../context/UserContext";
+import styles from "../../Styles/LessonStyles.jsx";
 
 export default function AttendanceModal({
   visible,
   onClose,
   classData,
   selectedDay,
+  onAttendanceSaved,
 }) {
   const { user } = useUser();
   const [students, setStudents] = useState([]);
@@ -34,16 +35,35 @@ export default function AttendanceModal({
     try {
       const dateStr = selectedDay.toISOString().split("T")[0];
 
-      const res = await fetch(
-        `${API_BASE_URL}/enrollments/class?scheduleTemplateId=${classData.id}&date=${dateStr}`,
-        {
-          headers: {
-            Authorization: `Bearer ${user?.token}`,
-          },
+      let url = `${API_BASE_URL}/enrollments/class?date=${dateStr}`;
+
+      if (classData.isException) {
+        url += `&scheduleExceptionId=${classData.id}`;
+      } else {
+        url += `&scheduleTemplateId=${classData.id}`;
+      }
+
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${user?.token}`,
         },
-      );
+      });
 
       const data = await res.json();
+      console.log("ATTENDANCE RESPONSE:", data);
+      console.log("ATTENDANCE URL:", url);
+
+      if (!res.ok) {
+        console.error("Backend error:", data);
+        setStudents([]);
+        return;
+      }
+
+      if (!Array.isArray(data)) {
+        console.warn("Unexpected response format:", data);
+        setStudents([]);
+        return;
+      }
 
       const formatted = data.map((s) => ({
         id: s.userId,
@@ -74,18 +94,36 @@ export default function AttendanceModal({
         .filter((s) => s.attended)
         .map((s) => s.id);
 
-      await fetch(`${API_BASE_URL}/enrollments/attendance`, {
+      const body = {
+        date: dateStr,
+        presentUserIds,
+        scheduleTemplateId: classData.isException ? null : Number(classData.id),
+        scheduleExceptionId: classData.isException
+          ? Number(classData.id)
+          : null,
+      };
+
+      console.log("Saving attendance with body:", body);
+
+      const res = await fetch(`${API_BASE_URL}/enrollments/attendance`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${user?.token}`,
         },
-        body: JSON.stringify({
-          scheduleTemplateId: classData.id,
-          date: dateStr,
-          presentUserIds,
-        }),
+        body: JSON.stringify(body),
       });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error("Error saving attendance:", errorData);
+        return;
+      }
+
+      // 🔹 Aquí actualizamos los enrollments del contexto
+      if (typeof onAttendanceSaved === "function") {
+        await onAttendanceSaved(); // esto puede llamar fetchSchedulesByDay
+      }
 
       onClose();
     } catch (err) {
@@ -97,9 +135,9 @@ export default function AttendanceModal({
 
   return (
     <Modal isVisible={visible} onBackdropPress={onClose}>
-      <View style={styles.container}>
+      <View style={styles.modalContainer}>
         {/* HEADER */}
-        <View style={styles.header}>
+        <View style={styles.modalHeader}>
           <Text style={styles.title}>{classData?.lessonName}</Text>
           <Ionicons name="close" size={26} color="#fff" onPress={onClose} />
         </View>
@@ -115,7 +153,7 @@ export default function AttendanceModal({
                 style={styles.row}
                 onPress={() => toggleAttendance(student.id)}
               >
-                <Text style={styles.name}>{student.name}</Text>
+                <Text style={styles.studentName}>{student.name}</Text>
 
                 <Ionicons
                   name={student.attended ? "checkbox" : "square-outline"}
@@ -145,53 +183,3 @@ export default function AttendanceModal({
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "#2a2a2a",
-    borderRadius: 16,
-    padding: 16,
-    maxHeight: "80%",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  title: {
-    color: "#fff",
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  list: {
-    marginVertical: 10,
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#444",
-  },
-  name: {
-    color: "#fff",
-    fontSize: 16,
-  },
-  empty: {
-    color: "#aaa",
-    textAlign: "center",
-    marginTop: 20,
-  },
-  saveBtn: {
-    marginTop: 12,
-    backgroundColor: "purple",
-    padding: 14,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  saveText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-});

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FlatList,
   Modal,
@@ -8,7 +8,7 @@ import {
   View,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import styles from "./Styles.jsx";
+import styles from "../../Styles/LessonStyles.jsx";
 
 export default function ClassList({
   classes,
@@ -17,20 +17,32 @@ export default function ClassList({
   onEnroll,
   userRole,
   onDeleteClass,
+  onTakeAttendance,
 }) {
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [selectedClass, setSelectedClass] = useState(null);
 
+  useEffect(() => {
+    console.log("🔹 [ClassList] classes prop changed:", classes);
+  }, [classes]);
+
   const confirmDelete = (item) => {
+    console.log("🔹 [ClassList] confirm delete:", item);
     setSelectedClass(item);
     setConfirmVisible(true);
   };
 
   const handleDelete = () => {
     if (!selectedClass) return;
+    console.log("🔹 [ClassList] deleting class:", selectedClass);
     onDeleteClass(selectedClass);
     setConfirmVisible(false);
     setSelectedClass(null);
+  };
+
+  const handleTakeAttendance = (item) => {
+    console.log("🔹 [ClassList] onTakeAttendance clicked for:", item);
+    onTakeAttendance(item);
   };
 
   return (
@@ -39,7 +51,7 @@ export default function ClassList({
         data={classes}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => {
-          const handleEnrollPress = () => onEnroll(item.id, item.isException);
+          console.log("🔹 [ClassList] rendering class item:", item);
 
           return (
             <View style={styles.classCard}>
@@ -52,12 +64,27 @@ export default function ClassList({
                 <Text style={styles.classTime}>{item.time}</Text>
               </View>
 
-              {/* 🔹 Zona derecha combinada */}
               <View style={styles.rightContainer}>
                 {userRole === "ADMIN" ? (
-                  <TouchableOpacity onPress={() => confirmDelete(item)}>
-                    <Ionicons name="trash-outline" size={30} color="#FF3B30" />
-                  </TouchableOpacity>
+                  <View style={{ flexDirection: "row", gap: 12 }}>
+                    <TouchableOpacity
+                      onPress={() => handleTakeAttendance(item)}
+                    >
+                      <Ionicons
+                        name="clipboard-outline"
+                        size={28}
+                        color="#7c23b0ff"
+                      />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => confirmDelete(item)}>
+                      <Ionicons
+                        name="trash-outline"
+                        size={28}
+                        color="#FF3B30"
+                      />
+                    </TouchableOpacity>
+                  </View>
                 ) : (
                   <TouchableOpacity
                     style={[
