@@ -1,242 +1,290 @@
-import { useFocusEffect } from "@react-navigation/native";
-import { useCallback, useState } from "react";
-import { StyleSheet, View, Button, TouchableOpacity, Text } from "react-native";
-import ClassList from "../../components/ClassList";
-import Calendar from "../../components/WeekCalendar";
-import ClassModal from "../../components/ClassModal";
-import { useUser } from "../../context/UserContext";
-import { API_BASE_URL } from "../config";
-import Modal from "react-native-modal";
 import { Ionicons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback, useEffect, useState } from "react";
+import { Text, TouchableOpacity, View } from "react-native";
+import Modal from "react-native-modal";
+import AdminCreateClassModal from "../../components/Lessons/AdminCreateClassModal";
+import ClassList from "../../components/Lessons/ClassList";
+import styles from "../../components/Lessons/Styles.jsx";
+import Calendar from "../../components/Lessons/WeekCalendar";
+import { useEnrollments } from "../../context/EnrollmentsContext";
+import { useLessons } from "../../context/LessonsContext";
+import { useSchedules } from "../../context/SchedulesContext";
+import { useUser } from "../../context/UserContext.jsx";
 
 export default function HomeScreen() {
   const [selectedDay, setSelectedDay] = useState(new Date());
   const [classes, setClasses] = useState([]);
-  const [lessonsList, setLessonsList] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalData, setModalData] = useState({});
-  const [errorModalVisible, setErrorModalVisible] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-
+  const { lessons } = useLessons();
+  const {
+    daySchedules,
+    fetchSchedulesByDay,
+    createScheduleException,
+    updateScheduleException,
+  } = useSchedules();
+  const { enrollments, enrollUser, fetchMyEnrollments } = useEnrollments();
   const { user } = useUser();
 
-  const formatTime = (time) => time.slice(0, 5);
+  const [refreshing, setRefreshing] = useState(false);
+  const [errorModalVisible, setErrorModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [adminModalVisible, setAdminModalVisible] = useState(false);
+  const [createMode, setCreateMode] = useState(null);
+  const [newStartTime, setNewStartTime] = useState("");
+  const [newEndTime, setNewEndTime] = useState("");
+  const [selectedLessonId, setSelectedLessonId] = useState(null);
+  const [newDescription, setNewDescription] = useState("");
 
+  // --- Helpers ---
+  const formatTime = (time) => time.slice(0, 5);
   const toMinutes = (timeString) => {
     const [hours, minutes] = timeString.split(":").map(Number);
     return hours * 60 + minutes;
   };
 
-  const mapClassData = (item) => {
-    const start = formatTime(item.startTime);
-    const end = formatTime(item.endTime);
-    const startMinutes = toMinutes(start);
-
-    const classDateTime = new Date(selectedDay);
-    classDateTime.setHours(Math.floor(startMinutes / 60));
-    classDateTime.setMinutes(startMinutes % 60);
-
-    const isPast = classDateTime < new Date();
-
-    return {
-      id: String(item.id ?? ""),
-      lessonName: item.lessonName,
-      professorName: item.professorName,
-      time: `${start} - ${end}`,
-      startMinutes,
-      isEnrolled: item.isEnrolled,
-      isPast,
-      dayOfWeek: item.dayOfWeek,
-      lessonId: item.lessonId,
-      startTime: start,
-      endTime: end, 
-    };
+  // --- Mapeo y actualización de clases ---
+  const isSameDay = (dateString, compareDate) => {
+    const d1 = new Date(dateString);
+    const d2 = new Date(compareDate);
+    return (
+      d1.getFullYear() === d2.getFullYear() &&
+      d1.getMonth() === d2.getMonth() &&
+      d1.getDate() === d2.getDate()
+    );
   };
 
-  const fetchClasses = async () => {
-    try {
-      const dateStr = selectedDay.toISOString().split("T")[0];
-      const res = await fetch(`${API_BASE_URL}/scheduleTemplates/day?date=${dateStr}`, {
-        headers: { Authorization: `Bearer ${user?.token}` },
-      });
-      if (!res.ok) throw new Error(`HTTP status ${res.status}`);
-      const data = await res.json();
-      if (!Array.isArray(data)) throw new Error("Data is not an array");
+  useEffect(() => {
+    const mapped = daySchedules
+      .map((item) => {
+        const start = formatTime(item.startTime);
+        const end = formatTime(item.endTime);
+        const startMinutes = toMinutes(start);
 
-      const mapped = data.map(mapClassData).sort((a, b) => a.startMinutes - b.startMinutes);
-      setClasses(mapped);
-    } catch (error) {
-      console.error("Error fetching classes:", error);
-      setClasses([]);
-    }
-  };
+        const classDateTime = new Date(selectedDay);
+        classDateTime.setHours(Math.floor(startMinutes / 60));
+        classDateTime.setMinutes(startMinutes % 60);
 
-  const fetchLessons = async () => {
-    if (user?.role !== "ADMIN") return;
-    try {
-      const res = await fetch(`${API_BASE_URL}/lessons`, {
-        headers: { Authorization: `Bearer ${user?.token}` },
-      });
-      const data = await res.json();
-      setLessonsList(data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+        const enrolled = enrollments.some((e) => {
+          if (!e) return false;
+
+          if (e.scheduleExceptionId) {
+            return (
+              e.scheduleExceptionId === item.id &&
+              isSameDay(e.date, selectedDay)
+            );
+          }
+
+          if (e.scheduleTemplateId) {
+            return (
+              e.scheduleTemplateId === item.id && // 🔹 usar item.id
+              isSameDay(e.date, selectedDay)
+            );
+          }
+
+          return false;
+        });
+
+        return {
+          id: String(item.id),
+          lessonName: item.lessonName ?? item.description ?? "Special Class",
+          professorName: item.professorName ?? "",
+          time: `${start} - ${end}`,
+          startMinutes,
+          isEnrolled: enrolled,
+          isPast: classDateTime < new Date(),
+          lessonId: item.lessonId,
+          startTime: start,
+          endTime: end,
+          isException: item.date !== null,
+        };
+      })
+      .sort((a, b) => a.startMinutes - b.startMinutes);
+
+    setClasses(mapped);
+  }, [daySchedules, selectedDay, enrollments]);
 
   useFocusEffect(
     useCallback(() => {
-      fetchClasses();
-      fetchLessons();
-    }, [selectedDay, user])
+      fetchSchedulesByDay(selectedDay);
+    }, [selectedDay]),
   );
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchClasses();
+    await fetchSchedulesByDay(selectedDay);
     setRefreshing(false);
   };
 
-  const handleEnroll = async (scheduleTemplateId) => {
+  // --- Enroll ---
+  const handleEnroll = async (scheduleId, isException = false) => {
     try {
-      const dateStr = selectedDay.toISOString().split("T")[0];
-      const response = await fetch(`${API_BASE_URL}/enrollments`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user?.token}`,
-        },
-        body: JSON.stringify({ scheduleTemplateId, date: dateStr }),
-      });
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        setErrorMessage("Mes en curso no pagado");
-        setErrorModalVisible(true);
-        return;
+      if (isException) {
+        await enrollUser(null, selectedDay, scheduleId);
+      } else {
+        await enrollUser(scheduleId, selectedDay);
       }
-      setClasses((prev) =>
-        prev.map((cls) =>
-          cls.id === scheduleTemplateId ? { ...cls, isEnrolled: true } : cls
-        )
-      );
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
-  const onEditClass = (cls) => {
-    setModalData(cls);
-    setModalVisible(true);
+      await fetchMyEnrollments();
+      await fetchSchedulesByDay(selectedDay);
+    } catch (err) {
+      const message = err.message || "Error enrolling";
+      if (!message.includes("already enrolled")) {
+        setErrorMessage(
+          isException ? "Error enrolling in special class" : message,
+        );
+        setErrorModalVisible(true);
+      }
+    }
   };
 
   const onDeleteClass = async (cls) => {
     try {
-      const dateStr = selectedDay.toISOString().split("T")[0];
-      await fetch(`${API_BASE_URL}/scheduleExceptions`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user?.token}`},
-        body: JSON.stringify({
-        date: dateStr,
-        startTime: cls.startTime,
-        endTime: cls.endTime,  
-        lessonId: cls.lessonId,
-        cancelled: true,
-      })
-      });
+      const existingException = daySchedules.find(
+        (s) =>
+          s.date &&
+          isSameDay(s.date, selectedDay) &&
+          ((s.lessonId && s.lessonId === cls.lessonId) ||
+            (s.description && s.description === cls.lessonName)),
+      );
 
-      fetchClasses();
+      if (existingException) {
+        await updateScheduleException(existingException.id, {
+          cancelled: true,
+          startTime: cls.startTime,
+          endTime: cls.endTime,
+          lessonId: cls.lessonId ?? null,
+          description: cls.isException && !cls.lessonId ? cls.lessonName : null, // 👈 agregar descripción si no hay lesson
+          date: selectedDay,
+        });
+      } else {
+        await createScheduleException({
+          lessonId: cls.lessonId ?? null,
+          startTime: cls.startTime,
+          endTime: cls.endTime,
+          cancelled: true,
+          date: selectedDay,
+          description: cls.isException && !cls.lessonId ? cls.lessonName : null, // 👈 mismo
+        });
+      }
+
+      await fetchSchedulesByDay(selectedDay);
     } catch (err) {
-      console.error(err);
+      console.error("Error updating schedule exception:", err);
     }
   };
 
-  const handleModalSubmit = async ({ dayOfWeek, startTime, endTime, lessonId }) => {
-    try {
-      const method = modalData.id ? "PUT" : "POST";
-      const url = modalData.id
-        ? `${API_BASE_URL}/scheduleTemplates/${modalData.id}`
-        : `${API_BASE_URL}/scheduleTemplates`;
+  const handleCreateException = async () => {
+    if (!selectedLessonId || !newStartTime || !newEndTime) return;
 
-      await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user?.token}`,
-        },
-        body: JSON.stringify({ dayOfWeek, startTime, endTime, lessonId }),
-      });
-      fetchClasses();
-    } catch (err) {
-      console.error(err);
+    await createScheduleException({
+      lessonId: selectedLessonId,
+      startTime: newStartTime,
+      endTime: newEndTime,
+      cancelled: false,
+      date: selectedDay,
+    });
+
+    await fetchSchedulesByDay(selectedDay);
+
+    setSelectedLessonId(null);
+    setNewStartTime("");
+    setNewEndTime("");
+    setNewDescription("");
+    setCreateMode(null);
+
+    setAdminModalVisible(false);
+  };
+
+  const handleCreateNewException = async () => {
+    if (!newStartTime || !newEndTime || !newDescription) {
+      alert("Completa los campos obligatorios");
+      return;
     }
+
+    await createScheduleException({
+      lessonId: null,
+      description: newDescription,
+      startTime: newStartTime,
+      endTime: newEndTime,
+      cancelled: false,
+      date: selectedDay,
+    });
+
+    await fetchSchedulesByDay(selectedDay);
+
+    setNewDescription("");
+    setNewStartTime("");
+    setNewEndTime("");
+    setSelectedLessonId(null);
+    setCreateMode(null);
+
+    setAdminModalVisible(false);
   };
 
   return (
     <View style={styles.container}>
       <Calendar selectedDay={selectedDay} setSelectedDay={setSelectedDay} />
+      {user?.role === "ADMIN" && (
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => setAdminModalVisible(true)}
+        >
+          <Ionicons name="add" size={20} color="#fff" />
+        </TouchableOpacity>
+      )}
       <ClassList
         classes={classes}
         refreshing={refreshing}
         onRefresh={onRefresh}
         onEnroll={handleEnroll}
         userRole={user?.role}
-        onEditClass={onEditClass}
         onDeleteClass={onDeleteClass}
       />
-
-      <ClassModal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        onSubmit={handleModalSubmit}
-        initialData={modalData}
-        lessons={lessonsList}
-      />
-      
       <Modal
         isVisible={errorModalVisible}
         onBackdropPress={() => setErrorModalVisible(false)}
       >
         <View style={styles.errorModal}>
-           <View style={styles.modalHeader}>
-          <Text style={styles.Title}>{errorMessage}</Text>
-          <Ionicons name="close" size={28} style={styles.closenonpaidIcon} onPress={() => setErrorModalVisible(false)} />
-            </View>
-           <View style={styles.modalContent}>
-            <Text style={styles.Content}> Por favor, paga el mes correspondiente para acceder a esta clase.</Text>
-            </View>
+          <View style={styles.modalHeader}>
+            <Text style={styles.Title}>{errorMessage}</Text>
+            <Ionicons
+              name="close"
+              size={28}
+              style={styles.closenonpaidIcon}
+              onPress={() => setErrorModalVisible(false)}
+            />
+          </View>
+          <View>
+            <Text style={styles.Content}>
+              Por favor, paga el mes correspondiente para acceder a esta clase.
+            </Text>
+          </View>
         </View>
       </Modal>
+      <AdminCreateClassModal
+        visible={adminModalVisible}
+        onClose={() => {
+          setAdminModalVisible(false);
+          setCreateMode(null);
+          setSelectedLessonId(null);
+          setNewStartTime("");
+          setNewEndTime("");
+          setNewDescription("");
+        }}
+        createMode={createMode}
+        setCreateMode={setCreateMode}
+        lessonsList={lessons}
+        selectedLessonId={selectedLessonId}
+        setSelectedLessonId={setSelectedLessonId}
+        newStartTime={newStartTime}
+        setNewStartTime={setNewStartTime}
+        newEndTime={newEndTime}
+        setNewEndTime={setNewEndTime}
+        newDescription={newDescription}
+        setNewDescription={setNewDescription}
+        onCreateExisting={handleCreateException}
+        onCreateNew={handleCreateNewException}
+      />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#1E1E1E", paddingTop: 50 },
-  modalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 16,
-    alignItems: "center",},
-  errorModal: {
-    backgroundColor: "#2a2a2a",
-    borderRadius: 12,
-  },
-  Title: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 22,
-  },
-  Content: {
-    color: "#ccc",
-    fontWeight: "bold",
-    textAlign: "center",
-  },  closenonpaidIcon: {
-    color: "purple",
-  },
-  modalContent: {
-    color: "purple",
-  }
-});

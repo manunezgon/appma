@@ -1,5 +1,6 @@
 package com.backend.dto;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
@@ -10,5 +11,6 @@ public record ScheduleExceptionRequestDTO(
         @NotNull LocalTime startTime,
         @NotNull LocalTime endTime,
         @NotNull Boolean cancelled,
-        @NotNull Long lessonId
+        @Nullable Long lessonId,
+        @Nullable String description
 ) {}

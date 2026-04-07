@@ -21,15 +21,28 @@ public class ScheduleExceptionController {
 
     // --- Helpers ---
     private ScheduleExceptionResponseDTO toDTO(ScheduleException exception) {
+        Long lessonId = null;
+        String lessonName = "";
+        String professorName = "";
+
+        if (exception.getLesson() != null) {
+            lessonId = exception.getLesson().getId();
+            lessonName = exception.getLesson().getLessonName();
+            professorName = exception.getLesson().getProfessorName();
+        } else if (exception.getDescription() != null) {
+            lessonName = exception.getDescription();
+        }
+
         return new ScheduleExceptionResponseDTO(
                 exception.getId(),
                 exception.getDate(),
                 exception.getStartTime(),
                 exception.getEndTime(),
                 exception.getCancelled(),
-                exception.getLesson().getId(),
-                exception.getLesson().getLessonName(),
-                exception.getLesson().getProfessorName()
+                lessonId,
+                lessonName,
+                professorName,
+                exception.getDescription()
         );
     }
 
