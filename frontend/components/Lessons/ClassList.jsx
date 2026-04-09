@@ -8,7 +8,7 @@ import {
   View,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import styles from "./Styles.jsx";
+import styles from "../../Styles/LessonStyles.jsx";
 
 export default function ClassList({
   classes,
@@ -17,6 +17,7 @@ export default function ClassList({
   onEnroll,
   userRole,
   onDeleteClass,
+  onTakeAttendance,
 }) {
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [selectedClass, setSelectedClass] = useState(null);
@@ -33,14 +34,16 @@ export default function ClassList({
     setSelectedClass(null);
   };
 
+  const handleTakeAttendance = (item) => {
+    onTakeAttendance(item);
+  };
+
   return (
     <View style={styles.classContainer}>
       <FlatList
         data={classes}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => {
-          const handleEnrollPress = () => onEnroll(item.id, item.isException);
-
           return (
             <View style={styles.classCard}>
               <View style={styles.leftContainer}>
@@ -52,12 +55,27 @@ export default function ClassList({
                 <Text style={styles.classTime}>{item.time}</Text>
               </View>
 
-              {/* 🔹 Zona derecha combinada */}
               <View style={styles.rightContainer}>
                 {userRole === "ADMIN" ? (
-                  <TouchableOpacity onPress={() => confirmDelete(item)}>
-                    <Ionicons name="trash-outline" size={30} color="#FF3B30" />
-                  </TouchableOpacity>
+                  <View style={{ flexDirection: "row", gap: 12 }}>
+                    <TouchableOpacity
+                      onPress={() => handleTakeAttendance(item)}
+                    >
+                      <Ionicons
+                        name="clipboard-outline"
+                        size={28}
+                        color="#7c23b0ff"
+                      />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => confirmDelete(item)}>
+                      <Ionicons
+                        name="trash-outline"
+                        size={28}
+                        color="#FF3B30"
+                      />
+                    </TouchableOpacity>
+                  </View>
                 ) : (
                   <TouchableOpacity
                     style={[
@@ -91,7 +109,7 @@ export default function ClassList({
           );
         }}
         ListEmptyComponent={
-          <Text style={styles.noClasses}>No hay clases programadas.</Text>
+          <Text style={styles.noClasses}>No classes scheduled.</Text>
         }
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -101,7 +119,7 @@ export default function ClassList({
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalText}>
-              ¿Eliminar la clase "{selectedClass?.lessonName}"?
+              Are you sure you want to delete the class "{selectedClass?.lessonName}"?
             </Text>
 
             <View style={styles.modalButtons}>

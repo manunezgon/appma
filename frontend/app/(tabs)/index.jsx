@@ -4,13 +4,14 @@ import { useCallback, useEffect, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import Modal from "react-native-modal";
 import AdminCreateClassModal from "../../components/Lessons/AdminCreateClassModal";
+import AttendanceModal from "../../components/Lessons/AttendanceModal.jsx";
 import ClassList from "../../components/Lessons/ClassList";
-import styles from "../../components/Lessons/Styles.jsx";
 import Calendar from "../../components/Lessons/WeekCalendar";
 import { useEnrollments } from "../../context/EnrollmentsContext";
 import { useLessons } from "../../context/LessonsContext";
 import { useSchedules } from "../../context/SchedulesContext";
 import { useUser } from "../../context/UserContext.jsx";
+import styles from "../../Styles/LessonStyles.jsx";
 
 export default function HomeScreen() {
   const [selectedDay, setSelectedDay] = useState(new Date());
@@ -34,15 +35,20 @@ export default function HomeScreen() {
   const [newEndTime, setNewEndTime] = useState("");
   const [selectedLessonId, setSelectedLessonId] = useState(null);
   const [newDescription, setNewDescription] = useState("");
+  const [attendanceVisible, setAttendanceVisible] = useState(false);
+  const [selectedClass, setSelectedClass] = useState(null);
 
-  // --- Helpers ---
+  const handleTakeAttendance = (cls) => {
+    setSelectedClass(cls);
+    setAttendanceVisible(true);
+  };
+
   const formatTime = (time) => time.slice(0, 5);
   const toMinutes = (timeString) => {
     const [hours, minutes] = timeString.split(":").map(Number);
     return hours * 60 + minutes;
   };
 
-  // --- Mapeo y actualización de clases ---
   const isSameDay = (dateString, compareDate) => {
     const d1 = new Date(dateString);
     const d2 = new Date(compareDate);
@@ -73,14 +79,11 @@ export default function HomeScreen() {
               isSameDay(e.date, selectedDay)
             );
           }
-
           if (e.scheduleTemplateId) {
             return (
-              e.scheduleTemplateId === item.id && // 🔹 usar item.id
-              isSameDay(e.date, selectedDay)
+              e.scheduleTemplateId === item.id && isSameDay(e.date, selectedDay)
             );
           }
-
           return false;
         });
 
@@ -115,7 +118,6 @@ export default function HomeScreen() {
     setRefreshing(false);
   };
 
-  // --- Enroll ---
   const handleEnroll = async (scheduleId, isException = false) => {
     try {
       if (isException) {
@@ -153,7 +155,7 @@ export default function HomeScreen() {
           startTime: cls.startTime,
           endTime: cls.endTime,
           lessonId: cls.lessonId ?? null,
-          description: cls.isException && !cls.lessonId ? cls.lessonName : null, // 👈 agregar descripción si no hay lesson
+          description: cls.isException && !cls.lessonId ? cls.lessonName : null, 
           date: selectedDay,
         });
       } else {
@@ -163,7 +165,7 @@ export default function HomeScreen() {
           endTime: cls.endTime,
           cancelled: true,
           date: selectedDay,
-          description: cls.isException && !cls.lessonId ? cls.lessonName : null, // 👈 mismo
+          description: cls.isException && !cls.lessonId ? cls.lessonName : null, 
         });
       }
 
@@ -197,7 +199,7 @@ export default function HomeScreen() {
 
   const handleCreateNewException = async () => {
     if (!newStartTime || !newEndTime || !newDescription) {
-      alert("Completa los campos obligatorios");
+      alert("Please fill in the required fields");
       return;
     }
 
@@ -239,6 +241,17 @@ export default function HomeScreen() {
         onEnroll={handleEnroll}
         userRole={user?.role}
         onDeleteClass={onDeleteClass}
+        onTakeAttendance={handleTakeAttendance}
+      />
+      <AttendanceModal
+        visible={attendanceVisible}
+        onClose={() => setAttendanceVisible(false)}
+        classData={selectedClass}
+        selectedDay={selectedDay}
+        onAttendanceSaved={async () => {
+          await fetchMyEnrollments(); 
+          await fetchSchedulesByDay(selectedDay);
+        }}
       />
       <Modal
         isVisible={errorModalVisible}
@@ -256,7 +269,7 @@ export default function HomeScreen() {
           </View>
           <View>
             <Text style={styles.Content}>
-              Por favor, paga el mes correspondiente para acceder a esta clase.
+              Please pay the current month to access this class.
             </Text>
           </View>
         </View>

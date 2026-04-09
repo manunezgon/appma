@@ -1,12 +1,7 @@
 import { Picker } from "@react-native-picker/picker";
-import {
-    Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import Modal from "react-native-modal";
-import styles from "./Styles.jsx";
+import styles from "../../Styles/LessonStyles.jsx";
 
 export default function AdminCreateClassModal({
   visible,
@@ -33,7 +28,7 @@ export default function AdminCreateClassModal({
   return (
     <Modal isVisible={visible} onBackdropPress={onClose}>
       <View style={styles.adminModal}>
-        <Text style={styles.titleCenter}>Crear Clase</Text>
+        <Text style={styles.titleCenter}>Create Class</Text>
 
         {/* Selección modo */}
         {!createMode && (
@@ -42,14 +37,14 @@ export default function AdminCreateClassModal({
               style={styles.modeButton}
               onPress={() => setCreateMode("new")}
             >
-              <Text style={styles.modeButtonText}>Crear nueva clase</Text>
+              <Text style={styles.modeButtonText}>Create new lesson</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.modeButton}
               onPress={() => setCreateMode("existing")}
             >
-              <Text style={styles.modeButtonText}>Usar clase existente</Text>
+              <Text style={styles.modeButtonText}>Use existing lesson</Text>
             </TouchableOpacity>
           </>
         )}
@@ -58,7 +53,7 @@ export default function AdminCreateClassModal({
         {createMode === "new" && (
           <>
             <TextInput
-              placeholder="Descripción"
+              placeholder="Description"
               placeholderTextColor="#888"
               value={newDescription}
               onChangeText={setNewDescription}
@@ -66,7 +61,7 @@ export default function AdminCreateClassModal({
             />
 
             <TextInput
-              placeholder="Hora inicio (HH:MM)"
+              placeholder="Start time (HH:MM)"
               placeholderTextColor="#888"
               value={newStartTime}
               onChangeText={setNewStartTime}
@@ -74,19 +69,16 @@ export default function AdminCreateClassModal({
             />
 
             <TextInput
-              placeholder="Hora fin (HH:MM)"
+              placeholder="End time (HH:MM)"
               placeholderTextColor="#888"
               value={newEndTime}
               onChangeText={setNewEndTime}
               style={styles.input}
             />
 
-            <TouchableOpacity
-              style={styles.saveButton}
-              onPress={onCreateNew}
-            >
+            <TouchableOpacity style={styles.saveButton} onPress={onCreateNew}>
               <Text style={{ color: "white", fontWeight: "bold" }}>
-                Guardar
+                Save
               </Text>
             </TouchableOpacity>
           </>
@@ -100,7 +92,7 @@ export default function AdminCreateClassModal({
               onValueChange={(value) => setSelectedLessonId(value)}
               style={styles.picker}
             >
-              <Picker.Item label="Selecciona una clase" value={null} />
+              <Picker.Item label="Select a class" value={null} />
 
               {lessonsList.map((lesson) => (
                 <Picker.Item

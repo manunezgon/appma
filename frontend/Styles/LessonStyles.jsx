@@ -8,11 +8,12 @@ const styles = StyleSheet.create({
     padding: 16,
     alignItems: "center",
   },
+
   errorModal: {
     backgroundColor: "#2a2a2a",
     borderRadius: 12,
   },
-  Title: { color: "#fff", fontWeight: "bold", fontSize: 22 },
+  title: { color: "#fff", fontWeight: "bold", fontSize: 22 },
   Content: { color: "#ccc", fontWeight: "bold", textAlign: "center" },
   closenonpaidIcon: { color: "#69188E" },
   addButton: {
@@ -79,7 +80,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
 
-   classContainer: {
+  classContainer: {
     flex: 1,
     paddingHorizontal: 15,
     paddingVertical: 10,
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
     color: "#F5F5F5",
   },
 
-calendarContainer: {
+  calendarContainer: {
     marginBottom: 10,
   },
   header: {
@@ -224,7 +225,42 @@ calendarContainer: {
   activeText: {
     color: "#CCCCCC",
   },
+  modalContainer: {
+    backgroundColor: "#2a2a2a",
+    borderRadius: 16,
+    padding: 16,
+    maxHeight: "80%",
+  },
+  list: {
+    marginVertical: 10,
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#444",
+  },
+  studentName: {
+    color: "#fff",
+    fontSize: 16,
+  },
+  empty: {
+    color: "#aaa",
+    textAlign: "center",
+    marginTop: 20,
+  },
+  saveBtn: {
+    marginTop: 12,
+    backgroundColor: "#69188E",
+    padding: 14,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  saveText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
 });
-
 
 export default styles;

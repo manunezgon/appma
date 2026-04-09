@@ -226,22 +226,29 @@ public class EnrollmentService {
     @PreAuthorize("hasRole('ADMIN')")
     public void markAttendance(AttendanceDTO dto) {
 
-        ScheduleTemplate template = scheduleTemplateRepository.findById(dto.scheduleTemplateId())
-                .orElseThrow(() -> new ResourceNotFoundException("ScheduleTemplate not found"));
-
         LocalDate date = LocalDate.parse(dto.date());
+        List<Enrollment> enrollments;
 
-        List<Enrollment> enrollments = enrollmentRepository
-                .findByScheduleTemplateAndDate(template, date);
+        if (dto.scheduleTemplateId() != null) {
+            ScheduleTemplate template = scheduleTemplateRepository.findById(dto.scheduleTemplateId())
+                    .orElseThrow(() -> new ResourceNotFoundException("ScheduleTemplate not found"));
+
+            enrollments = enrollmentRepository.findByScheduleTemplateAndDate(template, date);
+
+        } else if (dto.scheduleExceptionId() != null) {
+            ScheduleException exception = scheduleExceptionRepository.findById(dto.scheduleExceptionId())
+                    .orElseThrow(() -> new ResourceNotFoundException("ScheduleException not found"));
+
+            enrollments = enrollmentRepository.findByScheduleExceptionAndDate(exception, date);
+
+        } else {
+            throw new IllegalArgumentException("No scheduleTemplateId or scheduleExceptionId provided");
+        }
 
         Set<Long> presentUsers = new HashSet<>(dto.presentUserIds());
 
         for (Enrollment enrollment : enrollments) {
-
-            boolean present = presentUsers.contains(
-                    enrollment.getUser().getId()
-            );
-
+            boolean present = presentUsers.contains(enrollment.getUser().getId());
             enrollment.setAttended(present);
         }
 
@@ -256,5 +263,14 @@ public class EnrollmentService {
         LocalDate classDate = LocalDate.parse(date);
 
         return enrollmentRepository.findByScheduleTemplateAndDate(template, classDate);
+    }
+
+    public List<Enrollment> getExceptionEnrollments(Long scheduleExceptionId, String date) {
+        ScheduleException exception = scheduleExceptionRepository.findById(scheduleExceptionId)
+                .orElseThrow(() -> new ResourceNotFoundException("ScheduleException not found"));
+
+        LocalDate classDate = LocalDate.parse(date);
+
+        return enrollmentRepository.findByScheduleExceptionAndDate(exception, classDate);
     }
 }
