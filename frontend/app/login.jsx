@@ -16,7 +16,7 @@ export default function Login() {
   const { user, login, loading } = useUser();
 
   useEffect(() => {
-    if (user) router.replace('/(tabs)');
+    if (user) router.replace('/(tabs)/news');
   }, [user]);
 
   const handleLogin = async () => {
@@ -55,7 +55,7 @@ export default function Login() {
         token: data.token, ...fullUser,
       });
       
-      router.replace('/(tabs)');
+      router.replace('/(tabs)/news');
 
     } catch (error) {
       console.error(error);
