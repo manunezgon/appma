@@ -4,6 +4,7 @@ import {
   Image,
   Modal,
   RefreshControl,
+  ScrollView,
   Text,
   TouchableOpacity,
   View,
@@ -116,15 +117,23 @@ export default function ClassList({
                 </View>
               </View>
               {item.students?.length > 0 && (
-                <View style={styles.studentRow}>
+                <ScrollView
+                  style={styles.studentRow}
+                  horizontal
+                  showsHorizontalScrollIndicator={false} // ⬅️ opcional, oculta la barra de scroll
+                >
                   {item.students.map((s) => (
                     <Image
                       key={s.id}
-                      source={s.profileImageUrl ? { uri: s.profileImageUrl } : defaultProfileImg}
+                      source={
+                        s.profileImageUrl
+                          ? { uri: s.profileImageUrl }
+                          : defaultProfileImg
+                      }
                       style={styles.studentAvatar}
                     />
                   ))}
-                </View>
+                </ScrollView>
               )}
             </View>
           );

@@ -271,8 +271,16 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 16,
     marginRight: 4,
-    borderWidth: 1,
-    borderColor: "#fff",
+  },
+  moreStudents: {
+    backgroundColor: "#ccc",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  moreStudentsText: {
+    fontSize: 12,
+    color: "#000",
+    fontWeight: "bold",
   },
 });
 
