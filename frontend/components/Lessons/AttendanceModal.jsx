@@ -50,8 +50,6 @@ export default function AttendanceModal({
       });
 
       const data = await res.json();
-      console.log("ATTENDANCE RESPONSE:", data);
-      console.log("ATTENDANCE URL:", url);
 
       if (!res.ok) {
         console.error("Backend error:", data);
@@ -103,8 +101,6 @@ export default function AttendanceModal({
           : null,
       };
 
-      console.log("Saving attendance with body:", body);
-
       const res = await fetch(`${API_BASE_URL}/enrollments/attendance`, {
         method: "POST",
         headers: {
@@ -120,9 +116,8 @@ export default function AttendanceModal({
         return;
       }
 
-      // 🔹 Aquí actualizamos los enrollments del contexto
       if (typeof onAttendanceSaved === "function") {
-        await onAttendanceSaved(); // esto puede llamar fetchSchedulesByDay
+        await onAttendanceSaved();
       }
 
       onClose();
@@ -164,7 +159,7 @@ export default function AttendanceModal({
             ))}
 
             {students.length === 0 && (
-              <Text style={styles.empty}>No hay alumnos apuntados</Text>
+              <Text style={styles.empty}>No students enrolled</Text>
             )}
           </ScrollView>
         )}
@@ -176,7 +171,7 @@ export default function AttendanceModal({
           disabled={saving}
         >
           <Text style={styles.saveText}>
-            {saving ? "Guardando..." : "Guardar asistencia"}
+            {saving ? "Saving..." : "Save attendance"}
           </Text>
         </TouchableOpacity>
       </View>

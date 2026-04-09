@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   FlatList,
   Modal,
@@ -22,26 +22,19 @@ export default function ClassList({
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [selectedClass, setSelectedClass] = useState(null);
 
-  useEffect(() => {
-    console.log("🔹 [ClassList] classes prop changed:", classes);
-  }, [classes]);
-
   const confirmDelete = (item) => {
-    console.log("🔹 [ClassList] confirm delete:", item);
     setSelectedClass(item);
     setConfirmVisible(true);
   };
 
   const handleDelete = () => {
     if (!selectedClass) return;
-    console.log("🔹 [ClassList] deleting class:", selectedClass);
     onDeleteClass(selectedClass);
     setConfirmVisible(false);
     setSelectedClass(null);
   };
 
   const handleTakeAttendance = (item) => {
-    console.log("🔹 [ClassList] onTakeAttendance clicked for:", item);
     onTakeAttendance(item);
   };
 
@@ -51,8 +44,6 @@ export default function ClassList({
         data={classes}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => {
-          console.log("🔹 [ClassList] rendering class item:", item);
-
           return (
             <View style={styles.classCard}>
               <View style={styles.leftContainer}>
@@ -118,7 +109,7 @@ export default function ClassList({
           );
         }}
         ListEmptyComponent={
-          <Text style={styles.noClasses}>No hay clases programadas.</Text>
+          <Text style={styles.noClasses}>No classes scheduled.</Text>
         }
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -128,7 +119,7 @@ export default function ClassList({
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalText}>
-              ¿Eliminar la clase "{selectedClass?.lessonName}"?
+              Are you sure you want to delete the class "{selectedClass?.lessonName}"?
             </Text>
 
             <View style={styles.modalButtons}>

@@ -43,14 +43,12 @@ export default function HomeScreen() {
     setAttendanceVisible(true);
   };
 
-  // --- Helpers ---
   const formatTime = (time) => time.slice(0, 5);
   const toMinutes = (timeString) => {
     const [hours, minutes] = timeString.split(":").map(Number);
     return hours * 60 + minutes;
   };
 
-  // --- Mapeo y actualización de clases ---
   const isSameDay = (dateString, compareDate) => {
     const d1 = new Date(dateString);
     const d2 = new Date(compareDate);
@@ -120,7 +118,6 @@ export default function HomeScreen() {
     setRefreshing(false);
   };
 
-  // --- Enroll ---
   const handleEnroll = async (scheduleId, isException = false) => {
     try {
       if (isException) {
@@ -158,7 +155,7 @@ export default function HomeScreen() {
           startTime: cls.startTime,
           endTime: cls.endTime,
           lessonId: cls.lessonId ?? null,
-          description: cls.isException && !cls.lessonId ? cls.lessonName : null, // 👈 agregar descripción si no hay lesson
+          description: cls.isException && !cls.lessonId ? cls.lessonName : null, 
           date: selectedDay,
         });
       } else {
@@ -168,7 +165,7 @@ export default function HomeScreen() {
           endTime: cls.endTime,
           cancelled: true,
           date: selectedDay,
-          description: cls.isException && !cls.lessonId ? cls.lessonName : null, // 👈 mismo
+          description: cls.isException && !cls.lessonId ? cls.lessonName : null, 
         });
       }
 
@@ -202,7 +199,7 @@ export default function HomeScreen() {
 
   const handleCreateNewException = async () => {
     if (!newStartTime || !newEndTime || !newDescription) {
-      alert("Completa los campos obligatorios");
+      alert("Please fill in the required fields");
       return;
     }
 
@@ -252,7 +249,7 @@ export default function HomeScreen() {
         classData={selectedClass}
         selectedDay={selectedDay}
         onAttendanceSaved={async () => {
-          await fetchMyEnrollments(); // 🔹 actualiza enrollments
+          await fetchMyEnrollments(); 
           await fetchSchedulesByDay(selectedDay);
         }}
       />
@@ -272,7 +269,7 @@ export default function HomeScreen() {
           </View>
           <View>
             <Text style={styles.Content}>
-              Por favor, paga el mes correspondiente para acceder a esta clase.
+              Please pay the current month to access this class.
             </Text>
           </View>
         </View>
