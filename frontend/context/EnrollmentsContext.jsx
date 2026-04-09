@@ -27,6 +27,41 @@ export const EnrollmentsProvider = ({ children }) => {
     setEnrollments(data); // guardamos en el state
   };
 
+  // --- Traer todos los enrollments por clase ---
+  const fetchClassEnrollments = async ({
+  scheduleTemplateId = null,
+  scheduleExceptionId = null,
+  date,
+}) => {
+  if (!token) return [];
+
+  const params = new URLSearchParams({
+    date,
+  });
+
+  if (scheduleTemplateId) params.append("scheduleTemplateId", scheduleTemplateId);
+  if (scheduleExceptionId) params.append("scheduleExceptionId", scheduleExceptionId);
+
+  const res = await fetch(`${API_BASE_URL}/enrollments/class?${params}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    console.error("Error fetching class enrollments");
+    return [];
+  }
+
+  const data = await res.json();
+
+  return data.map((e) => ({
+    id: e.userId,
+    name: e.userName,
+    profileImageUrl: e.profileImageUrl || null,
+  }));
+};
+
   // --- Función genérica para enroll ---
   const enrollUser = async (scheduleTemplateId, date, exceptionId = null) => {
     if (!token) throw new Error("No user token found");
@@ -93,7 +128,7 @@ export const EnrollmentsProvider = ({ children }) => {
 
   return (
     <EnrollmentsContext.Provider
-      value={{ enrollments, fetchMyEnrollments, enrollUser, deleteEnrollment }}
+      value={{ enrollments, fetchMyEnrollments, enrollUser, deleteEnrollment, fetchClassEnrollments }}
     >
       {children}
     </EnrollmentsContext.Provider>

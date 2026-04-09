@@ -23,7 +23,8 @@ export default function HomeScreen() {
     createScheduleException,
     updateScheduleException,
   } = useSchedules();
-  const { enrollments, enrollUser, fetchMyEnrollments } = useEnrollments();
+  const { enrollments, enrollUser, fetchMyEnrollments, fetchClassEnrollments } =
+    useEnrollments();
   const { user } = useUser();
 
   const [refreshing, setRefreshing] = useState(false);
@@ -37,6 +38,7 @@ export default function HomeScreen() {
   const [newDescription, setNewDescription] = useState("");
   const [attendanceVisible, setAttendanceVisible] = useState(false);
   const [selectedClass, setSelectedClass] = useState(null);
+  const [classStudents, setClassStudents] = useState({});
 
   const handleTakeAttendance = (cls) => {
     setSelectedClass(cls);
@@ -60,6 +62,36 @@ export default function HomeScreen() {
   };
 
   useEffect(() => {
+    const loadStudents = async () => {
+      const result = {};
+
+      for (const cls of daySchedules) {
+        const date = selectedDay.toISOString().split("T")[0];
+
+        try {
+          const students = await fetchClassEnrollments({
+            scheduleTemplateId: cls.date ? null : cls.id,
+            scheduleExceptionId: cls.date ? cls.id : null,
+            date,
+          });
+          result[cls.id] = students || [];
+        } catch (err) {
+          console.error(
+            "Error fetching class enrollments for cls",
+            cls.id,
+            err,
+          );
+          result[cls.id] = [];
+        }
+      }
+
+      setClassStudents(result);
+    };
+
+    if (daySchedules.length > 0) loadStudents();
+  }, [daySchedules, selectedDay]);
+
+  useEffect(() => {
     const mapped = daySchedules
       .map((item) => {
         const start = formatTime(item.startTime);
@@ -70,22 +102,13 @@ export default function HomeScreen() {
         classDateTime.setHours(Math.floor(startMinutes / 60));
         classDateTime.setMinutes(startMinutes % 60);
 
-        const enrolled = enrollments.some((e) => {
-          if (!e) return false;
+        const students = (classStudents[item.id] || []).map((s) => ({
+          id: s.id,
+          name: s.name,
+          profileImageUrl: s.profileImageUrl || null, // o ruta de logo por defecto
+        }));
 
-          if (e.scheduleExceptionId) {
-            return (
-              e.scheduleExceptionId === item.id &&
-              isSameDay(e.date, selectedDay)
-            );
-          }
-          if (e.scheduleTemplateId) {
-            return (
-              e.scheduleTemplateId === item.id && isSameDay(e.date, selectedDay)
-            );
-          }
-          return false;
-        });
+        const enrolled = students.some((e) => e.id === user.id);
 
         return {
           id: String(item.id),
@@ -99,12 +122,17 @@ export default function HomeScreen() {
           startTime: start,
           endTime: end,
           isException: item.date !== null,
+          students,
         };
       })
       .sort((a, b) => a.startMinutes - b.startMinutes);
 
     setClasses(mapped);
-  }, [daySchedules, selectedDay, enrollments]);
+    console.log(
+      "DAY SCHEDULES WITH STUDENTS:",
+      JSON.stringify(mapped, null, 2),
+    );
+  }, [daySchedules, selectedDay, classStudents]);
 
   useFocusEffect(
     useCallback(() => {
@@ -155,7 +183,7 @@ export default function HomeScreen() {
           startTime: cls.startTime,
           endTime: cls.endTime,
           lessonId: cls.lessonId ?? null,
-          description: cls.isException && !cls.lessonId ? cls.lessonName : null, 
+          description: cls.isException && !cls.lessonId ? cls.lessonName : null,
           date: selectedDay,
         });
       } else {
@@ -165,7 +193,7 @@ export default function HomeScreen() {
           endTime: cls.endTime,
           cancelled: true,
           date: selectedDay,
-          description: cls.isException && !cls.lessonId ? cls.lessonName : null, 
+          description: cls.isException && !cls.lessonId ? cls.lessonName : null,
         });
       }
 
@@ -249,7 +277,7 @@ export default function HomeScreen() {
         classData={selectedClass}
         selectedDay={selectedDay}
         onAttendanceSaved={async () => {
-          await fetchMyEnrollments(); 
+          await fetchMyEnrollments();
           await fetchSchedulesByDay(selectedDay);
         }}
       />
@@ -259,18 +287,15 @@ export default function HomeScreen() {
       >
         <View style={styles.errorModal}>
           <View style={styles.modalHeader}>
-            <Text style={styles.Title}>{errorMessage}</Text>
+            <Text style={styles.Content}>
+              Please pay the current month to access this class.
+            </Text>
             <Ionicons
               name="close"
               size={28}
               style={styles.closenonpaidIcon}
               onPress={() => setErrorModalVisible(false)}
             />
-          </View>
-          <View>
-            <Text style={styles.Content}>
-              Please pay the current month to access this class.
-            </Text>
           </View>
         </View>
       </Modal>

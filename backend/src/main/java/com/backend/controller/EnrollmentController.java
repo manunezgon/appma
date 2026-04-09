@@ -72,7 +72,6 @@ public class EnrollmentController {
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/class")
     public ResponseEntity<?> getClassEnrollments(
             @RequestParam(required = false) Long scheduleTemplateId,
