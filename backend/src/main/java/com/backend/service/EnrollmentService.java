@@ -62,7 +62,8 @@ public class EnrollmentService {
                     professorName,
                     time,
                     e.getDate(),
-                    e.isAttended()
+                    e.isAttended(),
+                    e.getUser().getProfileImageUrl()
             );
 
         } else if (e.getScheduleException() != null) {
@@ -92,7 +93,8 @@ public class EnrollmentService {
                     professorName,
                     time,
                     e.getDate(),
-                    e.isAttended()
+                    e.isAttended(),
+                    e.getUser().getProfileImageUrl()
             );
 
         } else {
@@ -107,7 +109,8 @@ public class EnrollmentService {
                     "",
                     "",
                     e.getDate(),
-                    e.isAttended()
+                    e.isAttended(),
+                    e.getUser().getProfileImageUrl()
             );
         }
     }

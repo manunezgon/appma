@@ -12,5 +12,6 @@ public record EnrollmentResponseDTO(
         String professorName,
         String time,
         LocalDate date,
-        boolean attended
+        boolean attended,
+        String profileImageUrl
 ) {}

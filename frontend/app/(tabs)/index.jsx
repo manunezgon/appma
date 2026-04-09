@@ -70,7 +70,8 @@ export default function HomeScreen() {
         classDateTime.setHours(Math.floor(startMinutes / 60));
         classDateTime.setMinutes(startMinutes % 60);
 
-        const enrolled = enrollments.some((e) => {
+        // Filtrar enrollments solo una vez
+        const classEnrollments = enrollments.filter((e) => {
           if (!e) return false;
 
           if (e.scheduleExceptionId) {
@@ -79,13 +80,23 @@ export default function HomeScreen() {
               isSameDay(e.date, selectedDay)
             );
           }
+
           if (e.scheduleTemplateId) {
             return (
               e.scheduleTemplateId === item.id && isSameDay(e.date, selectedDay)
             );
           }
+
           return false;
         });
+
+        const enrolled = classEnrollments.length > 0;
+
+        const students = classEnrollments.map((e) => ({
+          id: e.userId,
+          name: e.userName,
+          profileImageUrl: e.profileImageUrl || null,
+        }));
 
         return {
           id: String(item.id),
@@ -99,13 +110,17 @@ export default function HomeScreen() {
           startTime: start,
           endTime: end,
           isException: item.date !== null,
+          students,
         };
       })
       .sort((a, b) => a.startMinutes - b.startMinutes);
 
     setClasses(mapped);
+    console.log(
+      "DAY SCHEDULES WITH STUDENTS:",
+      JSON.stringify(mapped, null, 2),
+    );
   }, [daySchedules, selectedDay, enrollments]);
-
   useFocusEffect(
     useCallback(() => {
       fetchSchedulesByDay(selectedDay);
@@ -155,7 +170,7 @@ export default function HomeScreen() {
           startTime: cls.startTime,
           endTime: cls.endTime,
           lessonId: cls.lessonId ?? null,
-          description: cls.isException && !cls.lessonId ? cls.lessonName : null, 
+          description: cls.isException && !cls.lessonId ? cls.lessonName : null,
           date: selectedDay,
         });
       } else {
@@ -165,7 +180,7 @@ export default function HomeScreen() {
           endTime: cls.endTime,
           cancelled: true,
           date: selectedDay,
-          description: cls.isException && !cls.lessonId ? cls.lessonName : null, 
+          description: cls.isException && !cls.lessonId ? cls.lessonName : null,
         });
       }
 
@@ -249,7 +264,7 @@ export default function HomeScreen() {
         classData={selectedClass}
         selectedDay={selectedDay}
         onAttendanceSaved={async () => {
-          await fetchMyEnrollments(); 
+          await fetchMyEnrollments();
           await fetchSchedulesByDay(selectedDay);
         }}
       />
