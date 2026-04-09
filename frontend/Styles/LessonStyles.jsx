@@ -90,8 +90,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderRadius: 10,
     backgroundColor: "#CCCCCC",
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: "column",
+    //alignItems: "center",
     justifyContent: "space-between",
   },
   leftContainer: {
@@ -260,6 +260,19 @@ const styles = StyleSheet.create({
   saveText: {
     color: "#fff",
     fontWeight: "bold",
+  },
+
+  studentRow: {
+    flexDirection: "row",
+    marginTop: 8,
+  },
+  studentAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    marginRight: 4,
+    borderWidth: 1,
+    borderColor: "#fff",
   },
 });
 
