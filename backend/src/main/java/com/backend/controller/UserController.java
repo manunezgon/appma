@@ -11,6 +11,7 @@ import com.backend.service.CloudinaryService;
 import com.backend.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,17 +51,30 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<UserResponseDTO> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         String token = authHeader.substring(7);
         String email = jwtUtil.extractEmail(token);
         User user = userService.getUserByEmail(email);
-        return ResponseEntity.ok(new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRole(), user.getPhone(), user.getProfileImageUrl()));
+        return ResponseEntity.ok(toDTO(user));
     }
 
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDTO> registerUser(@Valid @RequestBody UserRegisterDTO dto) {
+    public ResponseEntity<UserLoginResponseDTO> registerUser(@Valid @RequestBody UserRegisterDTO dto) {
+
         User user = userService.registerUser(dto);
-        return ResponseEntity.status(201).body(toDTO(user));
+
+        String token = userService.loginAndGetToken(dto.getEmail(), dto.getPassword());
+
+        return ResponseEntity.status(201).body(
+                new UserLoginResponseDTO(
+                        token,
+                        toDTO(user)
+                )
+        );
     }
 
     @PutMapping("/{id}")
@@ -89,11 +103,8 @@ public class UserController {
         User user = userService.getUserByEmail(dto.getEmail());
 
         UserLoginResponseDTO response = new UserLoginResponseDTO(
-                user.getId(),
-                user.getName(),
-                user.getEmail(),
-                user.getRole(),
-                token
+                token,
+                toDTO(user)
         );
 
         return ResponseEntity.ok(response);
