@@ -8,27 +8,38 @@ const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const token = await SecureStore.getItemAsync("userToken");
-        if (token) {
-          const res = await fetch(`${API_BASE_URL}/users/me`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (res.ok) {
-            const userData = await res.json();
-            setUser({ ...userData, token });
-          } else {
-            await SecureStore.deleteItemAsync("userToken");
-            setUser(null);
-          }
+        const storedToken = await SecureStore.getItemAsync("userToken");
+
+        if (!storedToken) {
+          setLoading(false);
+          return;
         }
+
+        const res = await fetch(`${API_BASE_URL}/users/me`, {
+          headers: { Authorization: `Bearer ${storedToken}` },
+        });
+
+        if (!res.ok) {
+          await SecureStore.deleteItemAsync("userToken");
+          setUser(null);
+          setToken(null);
+          return;
+        }
+
+        const userData = await res.json();
+
+        setUser(userData);
+        setToken(storedToken);
       } catch (err) {
         console.error("Error loading user:", err);
         setUser(null);
+        setToken(null);
       } finally {
         setLoading(false);
       }
@@ -37,18 +48,20 @@ export const UserProvider = ({ children }) => {
     loadUser();
   }, []);
 
-  const login = async (userData) => {
-    setUser(userData);
-    await SecureStore.setItemAsync("userToken", userData.token);
+  const login = async ({ user, token }) => {
+    await SecureStore.setItemAsync("userToken", token);
+    setUser(user);
+    setToken(token);
   };
 
   const logout = async () => {
     setUser(null);
+    setToken(null);
     await SecureStore.deleteItemAsync("userToken");
   };
 
   const updateProfileImage = async (file) => {
-    if (!user?.id || !user?.token) return;
+    if (!user?.id || !token) return;
 
     const formData = new FormData();
     formData.append("file", {
@@ -58,17 +71,14 @@ export const UserProvider = ({ children }) => {
     });
 
     try {
-      const res = await fetch(
-        `${API_BASE_URL}/users/${user.id}/upload-image`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-            "Content-Type": "multipart/form-data",
-          },
-          body: formData,
+      const res = await fetch(`${API_BASE_URL}/users/${user.id}/upload-image`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
         },
-      );
+        body: formData,
+      });
 
       if (!res.ok) {
         console.error("Error uploading profile image");
@@ -86,12 +96,11 @@ export const UserProvider = ({ children }) => {
     <UserContext.Provider
       value={{
         user,
-        token: user?.token || null,
+        token,
         login,
         logout,
         loading,
-        setUser,
-        updateProfileImage
+        updateProfileImage,
       }}
     >
       {children}
