@@ -7,7 +7,7 @@ import com.backend.model.PaymentType;
 import com.backend.model.User;
 import com.backend.repository.PaymentRepository;
 import com.backend.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -7,7 +7,7 @@ import com.backend.exception.UserNotFoundException;
 import com.backend.model.User;
 import com.backend.repository.UserRepository;
 import com.backend.security.JwtUtil;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;

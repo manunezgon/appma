@@ -3,7 +3,7 @@ package com.backend.service;
 import com.backend.exception.ResourceNotFoundException;
 import com.backend.model.Announcement;
 import com.backend.repository.AnnouncementRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

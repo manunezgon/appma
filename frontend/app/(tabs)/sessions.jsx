@@ -1,5 +1,4 @@
-import { useFocusEffect } from "@react-navigation/native";
-import { useCallback, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Modal,
   RefreshControl,
@@ -10,76 +9,62 @@ import {
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import ScheduleWizardModal from "../../components/ScheduleWizard/ScheduleWizardModal.jsx";
+import { useEnrollments } from "../../context/EnrollmentsContext";
 import { useUser } from "../../context/UserContext";
 import styles from "../../Styles/SessionStyle.jsx";
-import { API_BASE_URL } from "../config";
 
 export default function Sessions() {
   const { user } = useUser();
-  const [sections, setSections] = useState([]);
+  const { enrollments, deleteEnrollment, fetchMyEnrollments } =
+    useEnrollments();
+
   const [refreshing, setRefreshing] = useState(false);
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [selectedEnrollment, setSelectedEnrollment] = useState(null);
 
-  const fetchEnrollments = async () => {
-    if (!user || user.role !== "MEMBER") return;
-    try {
-      const response = await fetch(`${API_BASE_URL}/enrollments/me`, {
-        headers: { Authorization: `Bearer ${user?.token}` },
-      });
-      if (!response.ok) throw new Error(response.status);
-      const data = await response.json();
+  const sections = useMemo(() => {
+    if (!user || user.role !== "MEMBER") return [];
 
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-      const upcoming = data
-        .map((e) => {
-          const startHour = e.time.split(" - ")[0];
-          const classDateTime = new Date(`${e.date}T${startHour}`);
-          return { ...e, classDateTime };
-        })
-        .filter((e) => e.classDateTime >= today);
+    const upcoming = enrollments
+      .map((e) => {
+        const startHour = e.time.split(" - ")[0];
+        const classDateTime = new Date(`${e.date}T${startHour}`);
+        return { ...e, classDateTime };
+      })
+      .filter((e) => e.classDateTime >= today);
 
-      const todayClasses = upcoming
-        .filter((e) => {
-          const d = e.classDateTime;
-          return (
-            d.getFullYear() === today.getFullYear() &&
-            d.getMonth() === today.getMonth() &&
-            d.getDate() === today.getDate()
-          );
-        })
-        .sort((a, b) => a.classDateTime - b.classDateTime);
+    const todayClasses = upcoming
+      .filter((e) => {
+        const d = e.classDateTime;
+        return (
+          d.getFullYear() === today.getFullYear() &&
+          d.getMonth() === today.getMonth() &&
+          d.getDate() === today.getDate()
+        );
+      })
+      .sort((a, b) => a.classDateTime - b.classDateTime);
 
-      const nextClasses = upcoming
-        .filter(
-          (e) => !todayClasses.some((tc) => tc.enrollmentId === e.enrollmentId),
-        )
-        .sort((a, b) => a.classDateTime - b.classDateTime);
+    const nextClasses = upcoming
+      .filter(
+        (e) => !todayClasses.some((tc) => tc.enrollmentId === e.enrollmentId),
+      )
+      .sort((a, b) => a.classDateTime - b.classDateTime);
 
-      const sectionsData = [];
-      if (todayClasses.length)
-        sectionsData.push({ title: "Today", data: todayClasses });
-      if (nextClasses.length)
-        sectionsData.push({ title: "Upcoming classes", data: nextClasses });
+    const sectionsData = [];
+    if (todayClasses.length)
+      sectionsData.push({ title: "Today", data: todayClasses });
+    if (nextClasses.length)
+      sectionsData.push({ title: "Upcoming classes", data: nextClasses });
 
-      setSections(sectionsData);
-    } catch (error) {
-      console.error("Error fetching enrollments:", error);
-      setSections([]);
-    }
-  };
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchEnrollments();
-    }, [user]),
-  );
+    return sectionsData;
+  }, [user, enrollments]);
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchEnrollments();
+    await fetchMyEnrollments();
     setRefreshing(false);
   };
 
@@ -91,25 +76,7 @@ export default function Sessions() {
   const handleUnenroll = async () => {
     if (!selectedEnrollment) return;
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/enrollments/${selectedEnrollment}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${user?.token}` },
-        },
-      );
-      if (response.ok) {
-        setSections((prev) =>
-          prev
-            .map((section) => ({
-              ...section,
-              data: section.data.filter(
-                (e) => e.enrollmentId !== selectedEnrollment,
-              ),
-            }))
-            .filter((section) => section.data.length),
-        );
-      } else console.error("Error unenrolling:", response.status);
+      await deleteEnrollment(selectedEnrollment);
     } catch (error) {
       console.error(error);
     } finally {
