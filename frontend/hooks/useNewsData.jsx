@@ -1,10 +1,10 @@
-import { useCallback, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
+import { useCallback, useState } from "react";
 import { API_BASE_URL } from "../app/config";
 import { useUser } from "../context/UserContext";
 
 export function useNewsData() {
-  const { user } = useUser();
+  const { token } = useUser();
   const [announcements, setAnnouncements] = useState([]);
   const [carouselImages, setCarouselImages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -12,13 +12,13 @@ export function useNewsData() {
   const fetchJson = useCallback(
     async (url, options = {}) => {
       const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${user?.token}` },
+        headers: { Authorization: `Bearer ${token}` },
         ...options,
       });
       if (!res.ok) throw new Error(`Failed to fetch ${url}`);
       return res.json();
     },
-    [user]
+    [token],
   );
 
   const fetchAnnouncements = useCallback(async () => {
@@ -27,7 +27,7 @@ export function useNewsData() {
       setAnnouncements(
         Array.isArray(data)
           ? data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-          : []
+          : [],
       );
     } catch (err) {
       console.error(err);
@@ -51,14 +51,14 @@ export function useNewsData() {
       try {
         await fetchJson(
           `${API_BASE_URL}/announcements?message=${encodeURIComponent(message)}`,
-          { method: "POST" }
+          { method: "POST" },
         );
         await fetchAnnouncements();
       } catch (err) {
         console.error(err);
       }
     },
-    [fetchJson, fetchAnnouncements]
+    [fetchJson, fetchAnnouncements],
   );
 
   const addImage = useCallback(async () => {
@@ -80,7 +80,7 @@ export function useNewsData() {
         method: "POST",
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${user?.token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: formData,
       });
@@ -88,24 +88,22 @@ export function useNewsData() {
     } catch (err) {
       console.error(err);
     }
-  }, [user, fetchCarouselImages]);
+  }, [token, fetchCarouselImages]);
 
   const deleteImage = useCallback(
     async (imageId) => {
       try {
         await fetch(`${API_BASE_URL}/carousel/${imageId}`, {
           method: "DELETE",
-          headers: { Authorization: `Bearer ${user?.token}` },
+          headers: { Authorization: `Bearer ${token}` },
         });
-        setCarouselImages((prev) =>
-          prev.filter((img) => img.id !== imageId)
-        );
+        setCarouselImages((prev) => prev.filter((img) => img.id !== imageId));
       } catch (err) {
         console.error(err);
         await fetchCarouselImages();
       }
     },
-    [user, fetchCarouselImages]
+    [token, fetchCarouselImages],
   );
 
   const reorderImages = useCallback(
@@ -115,7 +113,7 @@ export function useNewsData() {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${user?.token}`,
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(orderedIds),
         });
@@ -124,7 +122,7 @@ export function useNewsData() {
         console.error("Error al reordenar:", err);
       }
     },
-    [user, fetchCarouselImages]
+    [token, fetchCarouselImages],
   );
 
   return {
