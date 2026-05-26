@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { API_BASE_URL } from "../app/config";
 import { useUser } from "./UserContext";
 
@@ -87,22 +93,24 @@ export const SchedulesProvider = ({ children }) => {
     await fetchSchedules();
   };
 
-  // --- Fetch schedules by day ---
-  const fetchSchedulesByDay = async (date) => {
-    if (!token) return;
-    try {
-      const dateStr = date.toISOString().split("T")[0]; 
-      const data = await authFetch(
-        `${API_BASE_URL}/scheduleTemplates/day?date=${dateStr}`,
-        {},
-        token,
-      );
-      setDaySchedules(data);
-    } catch (err) {
-      console.error("Error fetching schedules for the day:", err);
-      setDaySchedules([]);
-    }
-  };
+  const fetchSchedulesByDay = useCallback(
+    async (date) => {
+      if (!token) return;
+      try {
+        const dateStr = date.toISOString().split("T")[0];
+        const data = await authFetch(
+          `${API_BASE_URL}/scheduleTemplates/day?date=${dateStr}`,
+          {},
+          token,
+        );
+        setDaySchedules(data);
+      } catch (err) {
+        console.error("Error fetching schedules for the day:", err);
+        setDaySchedules([]);
+      }
+    },
+    [token],
+  );
 
   // --- Create schedule exception ---
   const createScheduleException = async ({

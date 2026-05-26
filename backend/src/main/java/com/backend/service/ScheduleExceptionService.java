@@ -11,7 +11,7 @@ import com.backend.repository.EnrollmentRepository;
 import com.backend.repository.LessonRepository;
 import com.backend.repository.ScheduleExceptionRepository;
 import com.backend.repository.ScheduleTemplateRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

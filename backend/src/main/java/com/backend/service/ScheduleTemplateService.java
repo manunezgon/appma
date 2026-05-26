@@ -8,7 +8,7 @@ import com.backend.exception.ResourceNotFoundException;
 import com.backend.model.ScheduleException;
 import com.backend.model.ScheduleTemplate;
 import com.backend.repository.*;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import Modal from "react-native-modal";
 import AdminCreateClassModal from "../../components/Lessons/AdminCreateClassModal";
@@ -23,8 +23,10 @@ export default function HomeScreen() {
     createScheduleException,
     updateScheduleException,
   } = useSchedules();
-  const { enrollments, enrollUser, fetchMyEnrollments, fetchClassEnrollments } =
-    useEnrollments();
+  const { enrollUser, fetchClassEnrollmentsByDay } = useEnrollments();
+
+  const lastHomeFocusRef = useRef({ dayKey: null, at: 0 });
+  const FOCUS_MIN_INTERVAL_MS = 45_000;
   const { user } = useUser();
 
   const [refreshing, setRefreshing] = useState(false);
@@ -63,33 +65,31 @@ export default function HomeScreen() {
 
   useEffect(() => {
     const loadStudents = async () => {
-      const result = {};
+      try {
+        const grouped = await fetchClassEnrollmentsByDay(selectedDay);
+        const byT = grouped.byTemplateId || {};
+        const byE = grouped.byExceptionId || {};
+        const result = {};
 
-      for (const cls of daySchedules) {
-        const date = selectedDay.toISOString().split("T")[0];
-
-        try {
-          const students = await fetchClassEnrollments({
-            scheduleTemplateId: cls.date ? null : cls.id,
-            scheduleExceptionId: cls.date ? cls.id : null,
-            date,
-          });
-          result[cls.id] = students || [];
-        } catch (err) {
-          console.error(
-            "Error fetching class enrollments for cls",
-            cls.id,
-            err,
-          );
-          result[cls.id] = [];
+        for (const cls of daySchedules) {
+          const list = cls.date
+            ? byE[cls.id] ?? byE[String(cls.id)] ?? []
+            : byT[cls.id] ?? byT[String(cls.id)] ?? [];
+          result[cls.id] = list.map((s) => ({
+            id: s.userId,
+            name: s.userName,
+            profileImageUrl: s.profileImageUrl || null,
+          }));
         }
+        setClassStudents(result);
+      } catch (err) {
+        console.error("Error fetching day class enrollments:", err);
+        setClassStudents({});
       }
-
-      setClassStudents(result);
     };
 
     if (daySchedules.length > 0) loadStudents();
-  }, [daySchedules, selectedDay]);
+  }, [daySchedules, selectedDay, fetchClassEnrollmentsByDay]);
 
   useEffect(() => {
     const mapped = daySchedules
@@ -128,16 +128,21 @@ export default function HomeScreen() {
       .sort((a, b) => a.startMinutes - b.startMinutes);
 
     setClasses(mapped);
-    console.log(
-      "DAY SCHEDULES WITH STUDENTS:",
-      JSON.stringify(mapped, null, 2),
-    );
-  }, [daySchedules, selectedDay, classStudents]);
+  }, [daySchedules, selectedDay, classStudents, user?.id]);
 
   useFocusEffect(
     useCallback(() => {
+      const dayKey = selectedDay.toISOString().split("T")[0];
+      const now = Date.now();
+      if (
+        lastHomeFocusRef.current.dayKey === dayKey &&
+        now - lastHomeFocusRef.current.at < FOCUS_MIN_INTERVAL_MS
+      ) {
+        return;
+      }
+      lastHomeFocusRef.current = { dayKey, at: now };
       fetchSchedulesByDay(selectedDay);
-    }, [selectedDay]),
+    }, [selectedDay, fetchSchedulesByDay]),
   );
 
   const onRefresh = async () => {
@@ -154,7 +159,6 @@ export default function HomeScreen() {
         await enrollUser(scheduleId, selectedDay);
       }
 
-      await fetchMyEnrollments();
       await fetchSchedulesByDay(selectedDay);
     } catch (err) {
       const message = err.message || "Error enrolling";
@@ -277,7 +281,6 @@ export default function HomeScreen() {
         classData={selectedClass}
         selectedDay={selectedDay}
         onAttendanceSaved={async () => {
-          await fetchMyEnrollments();
           await fetchSchedulesByDay(selectedDay);
         }}
       />
