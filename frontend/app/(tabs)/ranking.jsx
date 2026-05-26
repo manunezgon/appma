@@ -10,7 +10,7 @@ import styles from "../../Styles/RankingStyles";
 import { API_BASE_URL } from "../config";
 
 export default function Ranking() {
-  const { user } = useUser();
+  const { user, token } = useUser();
   const { lessons } = useLessons();
 
   const [ranking, setRanking] = useState([]);
@@ -52,7 +52,7 @@ export default function Ranking() {
         }
 
         const res = await fetch(url, {
-          headers: { Authorization: `Bearer ${user?.token}` },
+          headers: { Authorization: `Bearer ${token}` },
         });
 
         const data = await res.json();
@@ -65,7 +65,7 @@ export default function Ranking() {
     };
 
     fetchRanking();
-  }, [selectedType, selectedLesson, user?.token]);
+  }, [selectedType, selectedLesson, token]);
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
