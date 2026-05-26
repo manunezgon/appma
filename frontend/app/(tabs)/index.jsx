@@ -1,10 +1,24 @@
-import { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
+import { ActivityIndicator, TouchableOpacity, View } from "react-native";
+
+import AdminCreateClassModal from "../../components/Lessons/AdminCreateClassModal.jsx";
+import AttendanceModal from "../../components/Lessons/AttendanceModal";
 import ClassList from "../../components/Lessons/ClassList";
 import Calendar from "../../components/Lessons/WeekCalendar";
+
+import PaymentErrorModal from "../../components/Lessons/PaymentErrorModal.jsx";
+
+import useAdminClassActions from "../../hooks/useAdminClassActions.jsx";
+import useAdminClassModal from "../../hooks/useAdminClassModal.jsx";
+import useAttendance from "../../hooks/useAttendance.jsx";
+import useEnrollmentActions from "../../hooks/useEnrollmentsActions.jsx";
+import useHomeData from "../../hooks/useHomeData.jsx";
+
 import { useEnrollments } from "../../context/EnrollmentsContext";
-import { useSchedules } from "../../context/SchedulesContext";
+import { useLessons } from "../../context/LessonsContext";
 import { useUser } from "../../context/UserContext.jsx";
+
 import styles from "../../Styles/LessonStyles.jsx";
 
 export default function HomeScreen() {
@@ -12,104 +26,135 @@ export default function HomeScreen() {
 
   const { user } = useUser();
 
-  const { daySchedules, fetchSchedulesByDay, loadingSchedules } =
-    useSchedules();
+  const { lessons } = useLessons();
+
+  const { enrollUser } = useEnrollments();
+
+  // =========================
+  // HOME DATA
+  // =========================
 
   const {
-    classStudentsByDay,
-    loadingEnrollments,
-    loadDayEnrollments,
+    classes,
+    refreshing,
+    onRefresh,
+    loading,
+    daySchedules,
+    fetchDayData,
+  } = useHomeData(selectedDay);
+
+  // =========================
+  // ENROLLMENT ACTIONS
+  // =========================
+
+  const enrollmentActions = useEnrollmentActions({
     enrollUser,
-  } = useEnrollments();
+    selectedDay,
+    refreshDayData: fetchDayData,
+  });
 
-  const [refreshing, setRefreshing] = useState(false);
+  // =========================
+  // ATTENDANCE
+  // =========================
 
-  const isLoading = loadingSchedules || loadingEnrollments;
+  const { token } = useUser();
 
-  useEffect(() => {
-    fetchSchedulesByDay(selectedDay);
-    loadDayEnrollments(selectedDay);
-  }, [selectedDay]);
+  const attendance = useAttendance({
+    token,
+    onAttendanceSaved: fetchDayData,
+  });
 
-  const classes = useMemo(() => {
-    return daySchedules
-      .map((item) => {
-        const start = item.startTime.slice(0, 5);
-        const end = item.endTime.slice(0, 5);
+  // =========================
+  // ADMIN ACTIONS
+  // =========================
 
-        const students = classStudentsByDay[item.id] || [];
+  const adminActions = useAdminClassActions({
+    selectedDay,
+    daySchedules,
+  });
 
-        const enrolled = students.some((s) => s.id === user.id);
+  // =========================
+  // ADMIN MODAL
+  // =========================
 
-        const startMinutes =
-          Number(start.split(":")[0]) * 60 + Number(start.split(":")[1]);
-
-        const classDateTime = new Date(selectedDay);
-        classDateTime.setHours(Number(start.split(":")[0]));
-        classDateTime.setMinutes(Number(start.split(":")[1]));
-
-        return {
-          id: String(item.id),
-          lessonName: item.lessonName ?? item.description ?? "Class",
-          professorName: item.professorName ?? "",
-          time: `${start} - ${end}`,
-          startMinutes,
-          isEnrolled: enrolled,
-          isPast: classDateTime < new Date(),
-          lessonId: item.lessonId,
-          startTime: start,
-          endTime: end,
-          isException: item.date !== null,
-          students,
-        };
-      })
-      .sort((a, b) => a.startMinutes - b.startMinutes);
-  }, [daySchedules, classStudentsByDay, selectedDay, user.id]);
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-
-    await Promise.all([
-      fetchSchedulesByDay(selectedDay),
-      loadDayEnrollments(selectedDay),
-    ]);
-
-    setRefreshing(false);
-  };
-
-  const handleEnroll = async (scheduleId, isException = false) => {
-    await enrollUser(
-      isException ? null : scheduleId,
-      selectedDay,
-      isException ? scheduleId : null,
-    );
-
-    await Promise.all([
-      fetchSchedulesByDay(selectedDay),
-      loadDayEnrollments(selectedDay),
-    ]);
-  };
+  const adminModal = useAdminClassModal(adminActions);
 
   return (
     <View style={styles.container}>
+      {/* CALENDAR */}
+
       <Calendar selectedDay={selectedDay} setSelectedDay={setSelectedDay} />
 
-      {isLoading ? (
+      {/* ADMIN FAB */}
+
+      {user?.role === "ADMIN" && (
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={adminModal.openModal}
+        >
+          <Ionicons name="add" size={20} color="#fff" />
+        </TouchableOpacity>
+      )}
+
+      {/* LOADING */}
+
+      {loading ? (
         <ActivityIndicator size="large" color="#69188E" />
       ) : (
         <ClassList
           classes={classes}
           refreshing={refreshing}
           onRefresh={onRefresh}
-          onEnroll={handleEnroll}
+          onEnroll={enrollmentActions.handleEnroll}
           userRole={user?.role}
-          onDeleteClass={(cls) => {
-            // si quieres mantenerlo simple por ahora
-            // puedes mover esto luego al context de schedules
-            console.warn("delete not implemented here", cls);
-          }}
+          onDeleteClass={adminActions.deleteClass}
+          onTakeAttendance={(cls) =>
+            attendance.openAttendance(cls, selectedDay)
+          }
         />
       )}
+
+      {/* ATTENDANCE MODAL */}
+
+      <AttendanceModal
+        visible={attendance.attendanceVisible}
+        onClose={attendance.closeAttendance}
+        selectedClass={attendance.selectedClass}
+        selectedDay={selectedDay}
+        students={attendance.students}
+        loading={attendance.loading}
+        saving={attendance.saving}
+        onToggle={attendance.toggleAttendance}
+        onSave={attendance.saveAttendance}
+      />
+
+      {/* PAYMENT ERROR MODAL */}
+
+      <PaymentErrorModal
+        visible={enrollmentActions.errorModalVisible}
+        message={enrollmentActions.errorMessage}
+        onClose={enrollmentActions.closeErrorModal}
+      />
+
+      {/* ADMIN CREATE CLASS MODAL */}
+
+      <AdminCreateClassModal
+        visible={adminModal.visible}
+        onClose={adminModal.closeModal}
+        createMode={adminModal.createMode}
+        setCreateMode={adminModal.setCreateMode}
+        lessonsList={lessons}
+        selectedLessonId={adminModal.selectedLessonId}
+        setSelectedLessonId={adminModal.setSelectedLessonId}
+        newStartTime={adminModal.newStartTime}
+        setNewStartTime={adminModal.setNewStartTime}
+        newEndTime={adminModal.newEndTime}
+        setNewEndTime={adminModal.setNewEndTime}
+        newDescription={adminModal.newDescription}
+        setNewDescription={adminModal.setNewDescription}
+        onCreateExisting={adminModal.handleCreateExisting}
+        onCreateNew={adminModal.handleCreateNew}
+      />
     </View>
   );
 }

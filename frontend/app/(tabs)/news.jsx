@@ -20,12 +20,16 @@ export default function News() {
     fetchAnnouncements,
     deleteAnnouncement,
     fetchCarouselImages,
-    createAnnouncement,
     addImage,
     deleteImage,
     reorderImages,
+    createAnnouncement,
   } = useNewsData();
 
+  const handleSend = async (text) => {
+    await createAnnouncement(text);
+    setNewMessage("");
+  };
   const lastNewsFocusFetchAt = useRef(0);
   const NEWS_FOCUS_MIN_MS = 60_000;
 
@@ -81,7 +85,7 @@ export default function News() {
         <AdminInput
           value={newMessage}
           onChange={setNewMessage}
-          onSend={createAnnouncement}
+          onSend={handleSend}
         />
       )}
 
