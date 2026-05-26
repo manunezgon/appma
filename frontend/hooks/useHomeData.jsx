@@ -20,6 +20,8 @@ export default function useHomeData(selectedDay) {
     enrollUser,
   } = useEnrollments();
 
+  const [loadedDayKey, setLoadedDayKey] = useState(null);
+
   const [refreshing, setRefreshing] = useState(false);
 
   const lastHomeFocusRef = useRef({
@@ -28,11 +30,21 @@ export default function useHomeData(selectedDay) {
   });
 
   const fetchDayData = useCallback(async () => {
+    setLoadedDayKey(null);
+
+    const dayKey = selectedDay.toISOString().split("T")[0];
+
     await Promise.all([
       fetchSchedulesByDay(selectedDay),
       loadDayEnrollments(selectedDay),
     ]);
+
+    setLoadedDayKey(dayKey);
   }, [selectedDay, fetchSchedulesByDay, loadDayEnrollments]);
+
+  const currentDayKey = selectedDay.toISOString().split("T")[0];
+
+  const isCurrentDayLoaded = loadedDayKey === currentDayKey;
 
   useFocusEffect(
     useCallback(() => {
@@ -124,7 +136,7 @@ export default function useHomeData(selectedDay) {
   };
 
   return {
-    classes,
+    classes: isCurrentDayLoaded ? classes : [],
 
     refreshing,
 
@@ -134,7 +146,7 @@ export default function useHomeData(selectedDay) {
 
     fetchDayData,
 
-    loading: loadingSchedules || loadingEnrollments,
+    loading: !isCurrentDayLoaded || loadingSchedules || loadingEnrollments,
 
     daySchedules,
   };

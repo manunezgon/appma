@@ -101,7 +101,7 @@ export function useNewsData() {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [16, 9], // 👈 CLAVE (formato carousel)
+      aspect: [16, 9], 
       quality: 0.8,
     });
 
@@ -109,7 +109,6 @@ export function useNewsData() {
 
     const localUri = result.assets[0].uri;
 
-    // 1. UX OPTIMISTA (aparece al instante)
     const tempId = Date.now();
 
     setCarouselImages((prev) => [
@@ -129,7 +128,6 @@ export function useNewsData() {
     });
 
     try {
-      // 2. upload real
       await fetch(`${API_BASE_URL}/carousel/upload`, {
         method: "POST",
         headers: {
@@ -138,11 +136,10 @@ export function useNewsData() {
         body: formData,
       });
 
-      // 3. sincroniza con backend
       await fetchCarouselImages();
     } catch (err) {
       console.error(err);
-      await fetchCarouselImages(); // rollback seguro
+      await fetchCarouselImages(); 
     }
   }, [token, fetchCarouselImages]);
 

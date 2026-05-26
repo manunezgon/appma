@@ -106,4 +106,4 @@ function areEqual(prev, next) {
   );
 }
 
-export default memo(ClassItem, areEqual);
+export default memo(ClassItem);
