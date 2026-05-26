@@ -91,7 +91,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: "#CCCCCC",
     flexDirection: "column",
-    //alignItems: "center",
     justifyContent: "space-between",
   },
   leftContainer: {
@@ -261,10 +260,14 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
-
   studentRow: {
     flexDirection: "row",
     marginTop: 8,
+  },
+  rowBetween: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   studentAvatar: {
     width: 32,
