@@ -23,6 +23,15 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
+        name="news"
+        options={{
+          title: "Noticias",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="newspaper" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="index"
         options={{
           title: "Home",
@@ -46,15 +55,6 @@ export default function TabLayout() {
           title: "Ranking",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="podium" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="news"
-        options={{
-          title: "Noticias",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="newspaper" size={size} color={color} />
           ),
         }}
       />
