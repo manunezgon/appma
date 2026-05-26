@@ -1,6 +1,5 @@
 "use client";
 import { useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -16,7 +15,7 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useUser } from "../context/UserContext";
 import styles from "../Styles/GlobalStyles";
-import { API_BASE_URL } from "./config";
+import { API_BASE_URL } from "../config/api";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -55,9 +54,7 @@ export default function Register() {
         return;
       }
 
-      await SecureStore.setItemAsync("userToken", data.token);
-
-      login({
+      await login({
         token: data.token,
         user: data.user,
       });

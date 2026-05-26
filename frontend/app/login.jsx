@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -17,7 +16,7 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useUser } from "../context/UserContext";
 import styles from "../Styles/GlobalStyles";
-import { API_BASE_URL } from "./config";
+import { API_BASE_URL } from "../config/api";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -54,11 +53,9 @@ export default function Login() {
         return;
       }
 
-      await SecureStore.setItemAsync("userToken", data.token);
-
-      login({
+      await login({
+        user: data.user,
         token: data.token,
-        ...data.user,
       });
 
       router.replace("/(tabs)/news");
@@ -124,7 +121,7 @@ export default function Login() {
         )}
       </TouchableOpacity>
       <Text style={styles.linkText} onPress={goToRegister}>
-        Don't have an account? Sign up
+        Don&apos;t have an account? Sign up
       </Text>
     </KeyboardAwareScrollView>
   );
