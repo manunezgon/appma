@@ -3,7 +3,7 @@ export const colors = {
   surface: "#2A2A2A",
   surfaceAlt: "#3E3E3E",
   surfaceMuted: "#555555",
-  cardLight: "#CCCCCC",
+  cardLight: "#ababab",
   primary: "#69188E",
   success: "#00923A",
   danger: "#FF3B30",
