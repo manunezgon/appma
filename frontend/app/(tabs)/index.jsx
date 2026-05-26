@@ -30,10 +30,6 @@ export default function HomeScreen() {
 
   const { enrollUser } = useEnrollments();
 
-  // =========================
-  // HOME DATA
-  // =========================
-
   const {
     classes,
     refreshing,
@@ -43,19 +39,11 @@ export default function HomeScreen() {
     fetchDayData,
   } = useHomeData(selectedDay);
 
-  // =========================
-  // ENROLLMENT ACTIONS
-  // =========================
-
   const enrollmentActions = useEnrollmentActions({
     enrollUser,
     selectedDay,
     refreshDayData: fetchDayData,
   });
-
-  // =========================
-  // ATTENDANCE
-  // =========================
 
   const { token } = useUser();
 
@@ -64,18 +52,12 @@ export default function HomeScreen() {
     onAttendanceSaved: fetchDayData,
   });
 
-  // =========================
-  // ADMIN ACTIONS
-  // =========================
 
   const adminActions = useAdminClassActions({
     selectedDay,
     daySchedules,
   });
 
-  // =========================
-  // ADMIN MODAL
-  // =========================
 
   const adminModal = useAdminClassModal(adminActions);
 

@@ -41,7 +41,6 @@ export const SchedulesProvider = ({ children }) => {
   const [daySchedules, setDaySchedules] = useState([]);
   const [loadingSchedules, setLoadingSchedules] = useState(false);
 
-  // --- Fetch all schedules ---
   const fetchSchedules = async () => {
     if (!token) return;
     setLoadingSchedules(true);
@@ -65,7 +64,6 @@ export const SchedulesProvider = ({ children }) => {
     else setSchedules([]);
   }, [token]);
 
-  // --- CRUD for schedule templates ---
   const createSchedule = async (scheduleData) => {
     await authFetch(
       `${API_BASE_URL}/scheduleTemplates`,
@@ -112,7 +110,6 @@ export const SchedulesProvider = ({ children }) => {
     [token],
   );
 
-  // --- Create schedule exception ---
   const createScheduleException = async ({
     lessonId = null,
     startTime,
@@ -145,7 +142,6 @@ export const SchedulesProvider = ({ children }) => {
     }
   };
 
-  // --- Update schedule exception ---
   const updateScheduleException = async (id, dto) => {
     if (!token) return;
     try {

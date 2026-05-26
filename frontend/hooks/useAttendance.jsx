@@ -10,9 +10,7 @@ export default function useAttendance({ token, onAttendanceSaved }) {
   const [saving, setSaving] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
 
-  // =========================
-  // FETCH STUDENTS
-  // =========================
+
   const fetchStudents = useCallback(
     async (classData, day) => {
       if (!classData || !day) return;
@@ -36,8 +34,6 @@ export default function useAttendance({ token, onAttendanceSaved }) {
           },
         });
 
-        console.log("STATUS:", res.status);
-        console.log("RAW RESPONSE:", await res.clone().text());
         const data = await res.json();
 
         if (!res.ok || !Array.isArray(data)) {
@@ -62,21 +58,14 @@ export default function useAttendance({ token, onAttendanceSaved }) {
     [token],
   );
 
-  // =========================
-  // AUTO FETCH WHEN OPEN
-  // =========================
+ 
   useEffect(() => {
     if (!attendanceVisible || !selectedClass || !selectedDay) return;
 
     fetchStudents(selectedClass, selectedDay);
   }, [attendanceVisible, selectedClass, selectedDay, fetchStudents]);
 
-  // =========================
-  // OPEN / CLOSE
-  // =========================
   const openAttendance = (cls, day) => {
-    console.log("OPEN:", cls, day);
-
     setSelectedClass(cls);
     setSelectedDay(day);
     setAttendanceVisible(true);
@@ -89,18 +78,13 @@ export default function useAttendance({ token, onAttendanceSaved }) {
     setStudents([]);
   };
 
-  // =========================
-  // TOGGLE
-  // =========================
+
   const toggleAttendance = (id) => {
     setStudents((prev) =>
       prev.map((s) => (s.id === id ? { ...s, attended: !s.attended } : s)),
     );
   };
 
-  // =========================
-  // SAVE ATTENDANCE
-  // =========================
   const saveAttendance = async () => {
     if (!selectedClass || !selectedDay) return;
 
