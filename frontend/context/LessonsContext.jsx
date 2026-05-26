@@ -1,5 +1,5 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { API_BASE_URL } from "../app/config";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { API_BASE_URL } from "../config/api";
 import { useUser } from "./UserContext";
 
 const LessonsContext = createContext();
@@ -33,7 +33,7 @@ export const LessonsProvider = ({ children }) => {
   const [lessons, setLessons] = useState([]);
   const [loadingLessons, setLoadingLessons] = useState(false);
 
-  const fetchLessons = async () => {
+  const fetchLessons = useCallback(async () => {
     if (!token) return;
     setLoadingLessons(true);
     try {
@@ -45,14 +45,14 @@ export const LessonsProvider = ({ children }) => {
     } finally {
       setLoadingLessons(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     if (token) fetchLessons();
     else setLessons([]);
-  }, [token]);
+  }, [fetchLessons, token]);
 
-  const createLesson = async (lessonData) => {
+  const createLesson = useCallback(async (lessonData) => {
     const createdLesson = await authFetch(
       `${API_BASE_URL}/lessons/register`,
       {
@@ -63,9 +63,9 @@ export const LessonsProvider = ({ children }) => {
     );
     await fetchLessons();
     return createdLesson;
-  };
+  }, [fetchLessons, token]);
 
-  const updateLesson = async (id, lessonData) => {
+  const updateLesson = useCallback(async (id, lessonData) => {
     await authFetch(
       `${API_BASE_URL}/lessons/${id}`,
       {
@@ -75,28 +75,38 @@ export const LessonsProvider = ({ children }) => {
       token,
     );
     await fetchLessons();
-  };
+  }, [fetchLessons, token]);
 
-  const deleteLesson = async (id) => {
+  const deleteLesson = useCallback(async (id) => {
     await authFetch(
       `${API_BASE_URL}/lessons/${id}`,
       { method: "DELETE" },
       token,
     );
     await fetchLessons();
-  };
+  }, [fetchLessons, token]);
+
+  const value = useMemo(
+    () => ({
+      lessons,
+      loadingLessons,
+      fetchLessons,
+      createLesson,
+      updateLesson,
+      deleteLesson,
+    }),
+    [
+      createLesson,
+      deleteLesson,
+      fetchLessons,
+      lessons,
+      loadingLessons,
+      updateLesson,
+    ],
+  );
 
   return (
-    <LessonsContext.Provider
-      value={{
-        lessons,
-        loadingLessons,
-        fetchLessons,
-        createLesson,
-        updateLesson,
-        deleteLesson,
-      }}
-    >
+    <LessonsContext.Provider value={value}>
       {children}
     </LessonsContext.Provider>
   );

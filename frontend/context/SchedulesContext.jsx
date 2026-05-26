@@ -3,9 +3,10 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
-import { API_BASE_URL } from "../app/config";
+import { API_BASE_URL } from "../config/api";
 import { useUser } from "./UserContext";
 
 const SchedulesContext = createContext();
@@ -41,7 +42,7 @@ export const SchedulesProvider = ({ children }) => {
   const [daySchedules, setDaySchedules] = useState([]);
   const [loadingSchedules, setLoadingSchedules] = useState(false);
 
-  const fetchSchedules = async () => {
+  const fetchSchedules = useCallback(async () => {
     if (!token) return;
     setLoadingSchedules(true);
     try {
@@ -57,39 +58,39 @@ export const SchedulesProvider = ({ children }) => {
     } finally {
       setLoadingSchedules(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     if (token) fetchSchedules();
     else setSchedules([]);
-  }, [token]);
+  }, [fetchSchedules, token]);
 
-  const createSchedule = async (scheduleData) => {
+  const createSchedule = useCallback(async (scheduleData) => {
     await authFetch(
       `${API_BASE_URL}/scheduleTemplates`,
       { method: "POST", body: JSON.stringify(scheduleData) },
       token,
     );
     await fetchSchedules();
-  };
+  }, [fetchSchedules, token]);
 
-  const updateSchedule = async (id, scheduleData) => {
+  const updateSchedule = useCallback(async (id, scheduleData) => {
     await authFetch(
       `${API_BASE_URL}/scheduleTemplates/${id}`,
       { method: "PUT", body: JSON.stringify(scheduleData) },
       token,
     );
     await fetchSchedules();
-  };
+  }, [fetchSchedules, token]);
 
-  const deleteSchedule = async (id) => {
+  const deleteSchedule = useCallback(async (id) => {
     await authFetch(
       `${API_BASE_URL}/scheduleTemplates/${id}`,
       { method: "DELETE" },
       token,
     );
     await fetchSchedules();
-  };
+  }, [fetchSchedules, token]);
 
   const fetchSchedulesByDay = useCallback(
     async (date) => {
@@ -110,7 +111,7 @@ export const SchedulesProvider = ({ children }) => {
     [token],
   );
 
-  const createScheduleException = async ({
+  const createScheduleException = useCallback(async ({
     lessonId = null,
     startTime,
     endTime,
@@ -140,9 +141,9 @@ export const SchedulesProvider = ({ children }) => {
       console.error("Error creating schedule exception:", err);
       throw err;
     }
-  };
+  }, [token]);
 
-  const updateScheduleException = async (id, dto) => {
+  const updateScheduleException = useCallback(async (id, dto) => {
     if (!token) return;
     try {
       const dateStr = dto.date.toISOString().split("T")[0];
@@ -158,23 +159,37 @@ export const SchedulesProvider = ({ children }) => {
       console.error("Error updating schedule exception:", err);
       throw err;
     }
-  };
+  }, [token]);
+
+  const value = useMemo(
+    () => ({
+      schedules,
+      daySchedules,
+      fetchSchedules,
+      fetchSchedulesByDay,
+      createSchedule,
+      updateSchedule,
+      deleteSchedule,
+      createScheduleException,
+      loadingSchedules,
+      updateScheduleException,
+    }),
+    [
+      createSchedule,
+      createScheduleException,
+      daySchedules,
+      deleteSchedule,
+      fetchSchedules,
+      fetchSchedulesByDay,
+      loadingSchedules,
+      schedules,
+      updateSchedule,
+      updateScheduleException,
+    ],
+  );
 
   return (
-    <SchedulesContext.Provider
-      value={{
-        schedules,
-        daySchedules,
-        fetchSchedules,
-        fetchSchedulesByDay,
-        createSchedule,
-        updateSchedule,
-        deleteSchedule,
-        createScheduleException,
-        loadingSchedules,
-        updateScheduleException,
-      }}
-    >
+    <SchedulesContext.Provider value={value}>
       {children}
     </SchedulesContext.Provider>
   );
