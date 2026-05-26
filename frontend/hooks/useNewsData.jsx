@@ -38,7 +38,20 @@ export function useNewsData() {
   const fetchCarouselImages = useCallback(async () => {
     try {
       const data = await fetchJson(`${API_BASE_URL}/carousel`);
-      setCarouselImages(data.sort((a, b) => a.position - b.position));
+      setCarouselImages(
+        Array.isArray(data)
+          ? data
+              .map((img) => ({
+                id: img.id,
+                imageUrl:
+                  typeof img.imageUrl === "string"
+                    ? img.imageUrl
+                    : img.imageUrl?.uri,
+                position: img.position,
+              }))
+              .sort((a, b) => a.position - b.position)
+          : [],
+      );
     } catch (err) {
       console.error(err);
       setCarouselImages([]);
@@ -90,26 +103,45 @@ export function useNewsData() {
       allowsEditing: true,
       quality: 0.7,
     });
+
     if (result.canceled) return;
+
     const localUri = result.assets[0].uri;
+
+    // 1. UX OPTIMISTA (aparece al instante)
+    const tempId = Date.now();
+
+    setCarouselImages((prev) => [
+      ...prev,
+      {
+        id: tempId,
+        imageUrl: localUri,
+        uploading: true,
+      },
+    ]);
+
     const formData = new FormData();
     formData.append("file", {
       uri: localUri,
       type: "image/jpeg",
       name: "carousel.jpg",
     });
+
     try {
+      // 2. upload real
       await fetch(`${API_BASE_URL}/carousel/upload`, {
         method: "POST",
         headers: {
-          "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
         },
         body: formData,
       });
+
+      // 3. sincroniza con backend
       await fetchCarouselImages();
     } catch (err) {
       console.error(err);
+      await fetchCarouselImages(); // rollback seguro
     }
   }, [token, fetchCarouselImages]);
 

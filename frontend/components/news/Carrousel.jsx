@@ -31,6 +31,7 @@ export default function Carousel({ images, interval = 3000, onEdit, isAdmin }) {
       <View style={style.carruselContainer}>
         <PagerView
           ref={pagerRef}
+          key="carousel"
           style={style.pager}
           initialPage={0}
           onPageSelected={(e) => {
@@ -41,8 +42,8 @@ export default function Carousel({ images, interval = 3000, onEdit, isAdmin }) {
           {localImages.map((img, idx) => (
             <View key={idx} style={style.page}>
               <Image
-                source={{ uri: img.imageUrl || img }}
-                style={style.image}
+                source={{ uri: img.imageUrl }}
+                style={[style.image, { opacity: img.uploading ? 0.5 : 1 }]}
               />
             </View>
           ))}

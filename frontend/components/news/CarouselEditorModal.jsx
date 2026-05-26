@@ -21,8 +21,8 @@ export default function CarouselEditorModal({
   const [localImages, setLocalImages] = useState(images);
 
   useEffect(() => {
-    if (visible) setLocalImages(images);
-  }, [visible]);
+    setLocalImages(images ?? []);
+  }, [images]);
 
   const moveImage = (index, direction) => {
     const newIndex = index + direction;
@@ -36,23 +36,19 @@ export default function CarouselEditorModal({
   };
 
   const handleDelete = (index) => {
-    Alert.alert(
-      "Borrar imagen",
-      "¿Estás seguro de que quieres borrar esta imagen?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Borrar",
-          style: "destructive",
-          onPress: () => {
-            const newImages = [...localImages];
-            newImages.splice(index, 1);
-            setLocalImages(newImages);
-            onDelete(index);
-          },
+    Alert.alert("Delete Image", "Are you sure you want to delete this image?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => {
+          const newImages = [...localImages];
+          newImages.splice(index, 1);
+          setLocalImages(newImages);
+          onDelete(index);
         },
-      ],
-    );
+      },
+    ]);
   };
 
   return (
