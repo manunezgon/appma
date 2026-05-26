@@ -61,13 +61,36 @@ export function useNewsData() {
     [fetchJson, fetchAnnouncements],
   );
 
+  const deleteAnnouncement = useCallback(
+    async (id) => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/announcements/${id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text || "Error deleting announcement");
+        }
+
+        setAnnouncements((prev) => prev.filter((a) => a.id !== id));
+      } catch (err) {
+        console.error("deleteAnnouncement error:", err);
+      }
+    },
+    [token],
+  );
+
   const addImage = useCallback(async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       quality: 0.7,
     });
-    if (!result.canceled) return;
+    if (result.canceled) return;
     const localUri = result.assets[0].uri;
     const formData = new FormData();
     formData.append("file", {
@@ -130,6 +153,7 @@ export function useNewsData() {
     carouselImages,
     loading,
     fetchAnnouncements,
+    deleteAnnouncement,
     fetchCarouselImages,
     createAnnouncement,
     addImage,

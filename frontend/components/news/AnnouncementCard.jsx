@@ -1,27 +1,16 @@
 import { useState } from "react";
 import { Modal, Text, TouchableOpacity, View } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { API_BASE_URL } from "../../app/config";
 import { useUser } from "../../context/UserContext";
 import style from "../../Styles/NewsStyles";
 
-export default function AnnouncementCard({ announcement, onDeleted }) {
+export default function AnnouncementCard({
+  announcement,
+  onDeleted,
+  onDelete,
+}) {
   const { user } = useUser();
   const [confirmVisible, setConfirmVisible] = useState(false);
-
-  const handleDelete = async () => {
-    try {
-      await fetch(`${API_BASE_URL}/announcements/${announcement.id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${user?.token}` },
-      });
-      onDeleted?.();
-    } catch (err) {
-      console.error("Error deleting announcement:", err);
-    } finally {
-      setConfirmVisible(false);
-    }
-  };
 
   return (
     <View style={style.card}>
@@ -47,7 +36,7 @@ export default function AnnouncementCard({ announcement, onDeleted }) {
               <TouchableOpacity onPress={() => setConfirmVisible(false)}>
                 <Ionicons name="close" size={28} color="#69188E" />
               </TouchableOpacity>
-              <TouchableOpacity onPress={handleDelete}>
+              <TouchableOpacity onPress={onDelete}>
                 <Ionicons name="trash-outline" size={28} color="#FF3B30" />
               </TouchableOpacity>
             </View>

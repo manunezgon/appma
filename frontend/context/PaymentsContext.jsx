@@ -6,7 +6,7 @@ import { useUser } from "./UserContext";
 const PaymentsContext = createContext();
 
 export const PaymentsProvider = ({ children }) => {
-  const { user } = useUser();
+  const { user, token } = useUser();
 
   const [payments, setPayments] = useState([]);
   const [loadingPayments, setLoadingPayments] = useState(false);
@@ -17,7 +17,7 @@ export const PaymentsProvider = ({ children }) => {
       setLoadingPayments(true);
 
       const response = await fetch(`${API_BASE_URL}/payments/user/${userId}`, {
-        headers: { Authorization: `Bearer ${user.token}` },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!response.ok) throw new Error("Error cargando pagos");
@@ -35,7 +35,7 @@ export const PaymentsProvider = ({ children }) => {
     try {
       const response = await fetch(`${API_BASE_URL}/payments/${paymentId}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${user.token}` },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!response.ok) throw new Error("Error eliminando pago");
@@ -67,7 +67,7 @@ export const PaymentsProvider = ({ children }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       });

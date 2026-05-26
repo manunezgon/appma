@@ -13,11 +13,11 @@ export default function AdminInput({ value, onChange, onSend }) {
         onChangeText={onChange}
       />
       <TouchableOpacity
-        onPress={onSend}
+        onPress={() => onSend(value)}
         disabled={!value.trim()}
         style={{ opacity: value.trim() ? 1 : 0.4 }}
       >
-        <Ionicons name="megaphone-outline" size={28} color="#7c23b0ff" />
+        <Ionicons name="megaphone-outline" size={28} color="#69188E" />
       </TouchableOpacity>
     </View>
   );

@@ -5,9 +5,9 @@ import AdminInput from "../../components/news/AdminInput";
 import AnnouncementCard from "../../components/news/AnnouncementCard";
 import CarouselEditorModal from "../../components/news/CarouselEditorModal";
 import Carousel from "../../components/news/Carrousel";
-import style from "../../Styles/NewsStyles";
 import { useUser } from "../../context/UserContext";
 import { useNewsData } from "../../hooks/useNewsData";
+import style from "../../Styles/NewsStyles";
 
 export default function News() {
   const { user } = useUser();
@@ -18,6 +18,7 @@ export default function News() {
     announcements,
     carouselImages,
     fetchAnnouncements,
+    deleteAnnouncement,
     fetchCarouselImages,
     createAnnouncement,
     addImage,
@@ -45,10 +46,7 @@ export default function News() {
         <RefreshControl
           refreshing={false}
           onRefresh={async () => {
-            await Promise.all([
-              fetchAnnouncements(),
-              fetchCarouselImages(),
-            ]);
+            await Promise.all([fetchAnnouncements(), fetchCarouselImages()]);
           }}
         />
       }
@@ -96,6 +94,7 @@ export default function News() {
           <AnnouncementCard
             key={item.id}
             announcement={item}
+            onDelete={() => deleteAnnouncement(item.id)}
             onDeleted={fetchAnnouncements}
           />
         ))

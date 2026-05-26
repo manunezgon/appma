@@ -31,7 +31,7 @@ const generateMonths = () => {
 };
 
 export default function Payments() {
-  const { user } = useUser();
+  const { user, token } = useUser();
   const { lessons } = useLessons();
   const {
     payments,
@@ -58,7 +58,7 @@ export default function Payments() {
     try {
       setLoadingStudents(true);
       const response = await fetch(`${API_BASE_URL}/users`, {
-        headers: { Authorization: `Bearer ${user.token}` },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!response.ok) throw new Error("Error loading users");
@@ -83,8 +83,8 @@ export default function Payments() {
   };
 
   useEffect(() => {
-    if (user?.token) fetchStudents();
-  }, [user]);
+    if (token) fetchStudents();
+  }, [token]);
 
   const filteredStudents = students.filter((s) =>
     s.name.toLowerCase().includes(search.toLowerCase()),
