@@ -7,7 +7,7 @@ import RankingList from "../../components/Ranking/RankingList";
 import { useLessons } from "../../context/LessonsContext";
 import { useUser } from "../../context/UserContext";
 import styles from "../../Styles/RankingStyles";
-import { API_BASE_URL } from "../config";
+import { API_BASE_URL } from "../../config/api";
 
 export default function Ranking() {
   const { user, token } = useUser();
@@ -18,12 +18,11 @@ export default function Ranking() {
   const [selectedType, setSelectedType] = useState("month");
   const [loading, setLoading] = useState(false);
 
-  const { myIndex, myPosition, myClasses } = useMemo(() => {
+  const { myPosition, myClasses } = useMemo(() => {
     const index = ranking.findIndex(
       (r) => Number(r.userId) === Number(user?.id),
     );
     return {
-      myIndex: index,
       myPosition: index !== -1 ? index + 1 : null,
       myClasses: index !== -1 ? ranking[index].totalClasses : 0,
     };

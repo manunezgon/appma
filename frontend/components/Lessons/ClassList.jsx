@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { useCallback, useState } from "react";
 import {
   FlatList,
   Modal,
@@ -7,7 +8,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import styles from "../../Styles/LessonStyles.jsx";
 import ClassItem from "./ClassItem";
 
@@ -23,28 +23,36 @@ export default function ClassList({
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [selectedClass, setSelectedClass] = useState(null);
 
-  const confirmDelete = (item) => {
+  const confirmDelete = useCallback((item) => {
     setSelectedClass(item);
     setConfirmVisible(true);
-  };
+  }, []);
 
-  const handleDelete = async () => {
+  const handleDelete = useCallback(async () => {
     if (!selectedClass) return;
 
     await onDeleteClass(selectedClass);
 
     setConfirmVisible(false);
     setSelectedClass(null);
-  };
+  }, [onDeleteClass, selectedClass]);
 
-  const renderItem = ({ item }) => (
-    <ClassItem
-      item={item}
-      userRole={userRole}
-      onEnroll={onEnroll}
-      onDeleteClass={confirmDelete}
-      onTakeAttendance={onTakeAttendance}
-    />
+  const closeConfirm = useCallback(() => {
+    setConfirmVisible(false);
+    setSelectedClass(null);
+  }, []);
+
+  const renderItem = useCallback(
+    ({ item }) => (
+      <ClassItem
+        item={item}
+        userRole={userRole}
+        onEnroll={onEnroll}
+        onDeleteClass={confirmDelete}
+        onTakeAttendance={onTakeAttendance}
+      />
+    ),
+    [confirmDelete, onEnroll, onTakeAttendance, userRole],
   );
 
   return (
@@ -68,16 +76,12 @@ export default function ClassList({
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalText}>
-              Are you sure you want to delete the class "
-              {selectedClass?.lessonName}"?
+              {`Are you sure you want to delete the class "${selectedClass?.lessonName}"?`}
             </Text>
 
             <View style={styles.modalButtons}>
               <TouchableOpacity
-                onPress={() => {
-                  setConfirmVisible(false);
-                  setSelectedClass(null);
-                }}
+                onPress={closeConfirm}
               >
                 <Ionicons name="close" size={28} color="#69188E" />
               </TouchableOpacity>
