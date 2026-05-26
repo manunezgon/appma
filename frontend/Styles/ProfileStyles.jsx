@@ -1,24 +1,24 @@
 import { StyleSheet } from "react-native";
+import { colors, layout, radii, spacing, typography } from "./theme";
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "#1E1E1E",
+    ...layout.screen,
+    paddingTop: spacing.xl,
     alignItems: "center",
     justifyContent: "center",
   },
 
   title: {
     fontSize: 18,
-    color: "#CCCCCC",
+    color: colors.textMuted,
   },
 
   header: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 30,
-    gap: 10,
+    marginBottom: spacing.xxl,
+    gap: spacing.md,
   },
 
   profileImage: {
@@ -26,7 +26,16 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 50,
     borderWidth: 2,
-    borderColor: "#69188E",
+    borderColor: colors.primary,
+  },
+
+  profileImageBadge: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    backgroundColor: colors.primary,
+    borderRadius: radii.lg,
+    padding: spacing.xs,
   },
 
   headerText: {
@@ -34,106 +43,101 @@ const styles = StyleSheet.create({
   },
 
   name: {
-    fontSize: 16,
-    fontWeight: "bold",
+    ...typography.screenTitle,
     textTransform: "uppercase",
-    color: "#CCCCCC",
   },
 
   infoBox: {
     width: "80%",
-    borderRadius: 10,
-    backgroundColor: "#3E3E3E",
-    padding: 15,
-    marginBottom: 30,
+    borderRadius: radii.md,
+    backgroundColor: colors.surfaceAlt,
+    padding: spacing.lg,
+    marginBottom: spacing.xxl,
   },
 
   infoRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 8,
+    paddingVertical: spacing.sm,
   },
 
   label: {
     fontSize: 15,
-    color: "#AAAAAA",
+    color: colors.textSubtle,
   },
 
   value: {
     fontSize: 15,
-    color: "#CCCCCC",
+    color: colors.textMuted,
   },
 
   buttonContainer: {
     flexDirection: "row",
-    gap: 20,
+    gap: spacing.xl,
     width: "80%",
     marginBottom: 50,
   },
 
   button: {
     flex: 1,
-    padding: 10,
-    borderRadius: 10,
-    backgroundColor: "#69188E",
+    padding: spacing.md,
+    borderRadius: radii.md,
+    backgroundColor: colors.primary,
   },
 
   buttonText: {
     textAlign: "center",
-    color: "#cccccc",
-    paddingVertical: 4,
+    color: colors.textMuted,
+    paddingVertical: spacing.xs,
   },
 
   saveButton: {
-    backgroundColor: "#69188E",
+    backgroundColor: colors.primary,
   },
 
   cancelButton: {
-    backgroundColor: "#555555",
+    backgroundColor: colors.surfaceMuted,
   },
 
   logoutButton: {
-    backgroundColor: "#555555",
+    backgroundColor: colors.surfaceMuted,
   },
 
   modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.6)",
-    justifyContent: "center",
-    alignItems: "center",
+    ...layout.modalOverlay,
   },
 
   modalContent: {
     width: "90%",
     maxHeight: "85%",
-    backgroundColor: "#2E2E2E",
-    borderRadius: 10,
-    padding: 20,
+    backgroundColor: colors.surface,
+    borderRadius: radii.md,
+    padding: spacing.xl,
   },
 
   tabsContainer: {
     flexDirection: "row",
-    marginBottom: 20,
-    backgroundColor: "#3E3E3E",
-    borderRadius: 8,
+    marginBottom: spacing.xl,
+    backgroundColor: colors.surfaceAlt,
+    borderRadius: radii.sm,
     overflow: "hidden",
   },
 
   tabButton: {
     flex: 1,
-    paddingVertical: 10,
+    paddingVertical: spacing.md,
     alignItems: "center",
     justifyContent: "center",
   },
 
   tabActive: {
-    backgroundColor: "#69188E",
-    borderRadius: 8,
+    backgroundColor: colors.primary,
+    borderRadius: radii.sm,
   },
 
   tabText: {
     fontSize: 14,
-    color: "#cccccc",
+    color: colors.textMuted,
   },
 
   modalScroll: {
@@ -145,33 +149,33 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#CCCCCC",
-    marginBottom: 15,
+    color: colors.textMuted,
+    marginBottom: spacing.lg,
     textAlign: "center",
     textTransform: "uppercase",
   },
 
   input: {
     width: "100%",
-    backgroundColor: "#3E3E3E",
-    color: "#FFFFFF",
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 12,
+    backgroundColor: colors.surfaceAlt,
+    color: colors.white,
+    padding: spacing.md,
+    borderRadius: radii.sm,
+    marginBottom: spacing.md,
   },
 
   separator: {
     height: 1,
     width: "100%",
-    backgroundColor: "#555555",
-    marginVertical: 15,
+    backgroundColor: colors.surfaceMuted,
+    marginVertical: spacing.lg,
   },
 
   buttonRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 15,
-    gap: 20,
+    marginTop: spacing.lg,
+    gap: spacing.xl,
   },
 });
 

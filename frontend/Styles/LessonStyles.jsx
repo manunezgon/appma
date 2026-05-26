@@ -1,7 +1,12 @@
 import { StyleSheet } from "react-native";
+import { colors, layout, radii, spacing, typography } from "./theme";
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#1E1E1E", paddingTop: 50 },
+  container: {
+    ...layout.screen,
+    paddingTop: layout.screenHeaderTop,
+    paddingHorizontal: 0,
+  },
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -10,86 +15,86 @@ const styles = StyleSheet.create({
   },
 
   errorModal: {
-    backgroundColor: "#2a2a2a",
-    borderRadius: 12,
+    backgroundColor: colors.surface,
+    borderRadius: radii.lg,
   },
-  title: { color: "#fff", fontWeight: "bold", fontSize: 22 },
-  Content: { color: "#ccc", fontWeight: "bold", textAlign: "center" },
-  closenonpaidIcon: { color: "#69188E" },
+  title: { color: colors.text, fontWeight: "bold", fontSize: 22 },
+  Content: { color: colors.textMuted, fontWeight: "bold", textAlign: "center" },
+  closenonpaidIcon: { color: colors.primary },
   addButton: {
     width: 30,
     height: 30,
     borderRadius: 15,
-    backgroundColor: "#69188E",
+    backgroundColor: colors.primary,
     alignSelf: "center",
     justifyContent: "center",
     alignItems: "center",
-    marginVertical: 10,
+    marginVertical: spacing.md,
   },
 
   adminModal: {
-    backgroundColor: "#2a2a2a",
-    borderRadius: 12,
-    padding: 20,
+    backgroundColor: colors.surface,
+    borderRadius: radii.lg,
+    padding: spacing.xl,
   },
 
   titleCenter: {
-    color: "#fff",
+    color: colors.text,
     fontSize: 22,
     fontWeight: "bold",
-    marginBottom: 20,
+    marginBottom: spacing.xl,
     textAlign: "center",
   },
 
   modeButton: {
-    backgroundColor: "#3a3a3a",
+    backgroundColor: colors.surfaceAlt,
     paddingVertical: 14,
-    borderRadius: 8,
-    marginBottom: 12,
+    borderRadius: radii.sm,
+    marginBottom: spacing.md,
   },
 
   modeButtonText: {
-    color: "#fff",
+    color: colors.text,
     textAlign: "center",
     fontSize: 16,
     fontWeight: "600",
   },
 
   input: {
-    backgroundColor: "#1E1E1E",
-    color: "#fff",
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 12,
+    backgroundColor: colors.background,
+    color: colors.text,
+    padding: spacing.md,
+    borderRadius: radii.sm,
+    marginBottom: spacing.md,
     borderWidth: 1,
-    borderColor: "#444",
+    borderColor: colors.border,
   },
 
   picker: {
-    backgroundColor: "#1E1E1E",
-    color: "#fff",
-    borderRadius: 8,
-    marginBottom: 12,
+    backgroundColor: colors.background,
+    color: colors.text,
+    borderRadius: radii.sm,
+    marginBottom: spacing.md,
   },
 
   saveButton: {
-    backgroundColor: "#69188E",
+    backgroundColor: colors.primary,
     paddingVertical: 14,
-    borderRadius: 8,
+    borderRadius: radii.sm,
     alignItems: "center",
     marginTop: 10,
   },
 
   classContainer: {
     flex: 1,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
   classCard: {
-    padding: 15,
-    marginBottom: 10,
-    borderRadius: 10,
-    backgroundColor: "#CCCCCC",
+    padding: spacing.lg,
+    marginBottom: spacing.md,
+    borderRadius: radii.md,
+    backgroundColor: colors.cardLight,
     flexDirection: "column",
     justifyContent: "space-between",
   },
@@ -97,41 +102,41 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   centerContainer: {
-    marginLeft: 10,
-    marginRight: 10,
+    marginLeft: spacing.md,
+    marginRight: spacing.md,
   },
   rightContainer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: spacing.md,
   },
   adminButtons: {
     flexDirection: "row",
     justifyContent: "flex-end",
     marginTop: 10,
-    gap: 10,
+    gap: spacing.md,
   },
   editButton: {
     paddingHorizontal: 5,
   },
   editButtonText: {
-    color: "#fff",
+    color: colors.text,
     fontWeight: "600",
     textAlign: "center",
   },
   className: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#555555",
+    color: colors.textOnLight,
   },
   professorName: {
     fontSize: 14,
-    color: "#555555",
+    color: colors.textOnLight,
   },
   classTime: {
     fontSize: 14,
-    color: "#555555",
-    marginRight: 10,
+    color: colors.textOnLight,
+    marginRight: spacing.md,
   },
   enrollButton: {
     padding: 5,
@@ -140,22 +145,19 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
+    ...layout.modalOverlay,
   },
 
   modalContent: {
-    backgroundColor: "#CCCCCC",
-    padding: 20,
-    borderRadius: 10,
+    backgroundColor: colors.cardLight,
+    padding: spacing.xl,
+    borderRadius: radii.md,
     width: "80%",
   },
 
   modalText: {
     fontSize: 16,
-    marginBottom: 20,
+    marginBottom: spacing.xl,
     textAlign: "center",
   },
 
@@ -167,7 +169,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 20,
     fontSize: 16,
-    color: "#F5F5F5",
+    color: colors.text,
   },
 
   calendarContainer: {
@@ -183,17 +185,17 @@ const styles = StyleSheet.create({
   monthTitle: {
     fontSize: 15,
     fontWeight: "bold",
-    color: "#CCCCCC",
+    color: colors.textMuted,
     textTransform: "uppercase",
   },
   todayButton: {
-    backgroundColor: "#69188E",
+    backgroundColor: colors.primary,
     paddingVertical: 6,
     paddingHorizontal: 14,
-    borderRadius: 8,
+    borderRadius: radii.sm,
   },
   todayText: {
-    color: "#CCCCCC",
+    color: colors.textMuted,
     fontWeight: "600",
   },
   weekContainer: {
@@ -206,28 +208,28 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 10,
     borderRadius: 10,
-    backgroundColor: "#555555",
+    backgroundColor: colors.surfaceMuted,
     width: 45,
   },
   selectedBox: {
-    backgroundColor: "#69188E",
+    backgroundColor: colors.primary,
   },
   dayText: {
     fontSize: 14,
     fontWeight: "bold",
-    color: "#0A0A0A",
+    color: colors.black,
   },
   dateText: {
     fontSize: 16,
-    color: "#CCCCCC",
+    color: colors.textMuted,
   },
   activeText: {
-    color: "#CCCCCC",
+    color: colors.textMuted,
   },
   modalContainer: {
-    backgroundColor: "#2a2a2a",
-    borderRadius: 16,
-    padding: 16,
+    backgroundColor: colors.surface,
+    borderRadius: radii.xl,
+    padding: spacing.lg,
     maxHeight: "80%",
   },
   list: {
@@ -238,31 +240,36 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#444",
+    borderBottomColor: colors.border,
   },
   studentName: {
-    color: "#fff",
+    color: colors.text,
     fontSize: 16,
   },
   empty: {
-    color: "#aaa",
+    color: colors.textSubtle,
     textAlign: "center",
     marginTop: 20,
   },
   saveBtn: {
     marginTop: 12,
-    backgroundColor: "#69188E",
+    backgroundColor: colors.primary,
     padding: 14,
-    borderRadius: 10,
+    borderRadius: radii.md,
     alignItems: "center",
   },
   saveText: {
-    color: "#fff",
+    color: colors.text,
     fontWeight: "bold",
+  },
+  saveButtonText: {
+    color: colors.text,
+    fontWeight: "bold",
+    textAlign: "center",
   },
   studentRow: {
     flexDirection: "row",
-    marginTop: 8,
+    marginTop: spacing.sm,
   },
   rowBetween: {
     flexDirection: "row",
@@ -273,16 +280,16 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    marginRight: 4,
+    marginRight: spacing.xs,
   },
   moreStudents: {
-    backgroundColor: "#ccc",
+    backgroundColor: colors.cardLight,
     justifyContent: "center",
     alignItems: "center",
   },
   moreStudentsText: {
     fontSize: 12,
-    color: "#000",
+    color: colors.black,
     fontWeight: "bold",
   },
 });
