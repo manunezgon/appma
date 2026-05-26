@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { PaymentRow } from "./PaymentRow";
 import style from "../../Styles/PaymentStyle";
+import { colors } from "../../Styles/theme";
 
 export const StudentPaymentsModal = ({
   student,
@@ -47,7 +48,7 @@ export const StudentPaymentsModal = ({
         </TouchableOpacity>
 
         <TouchableOpacity style={style.closeButton} onPress={onClose}>
-          <Ionicons name="close" size={28} color="#69188E" />
+          <Ionicons name="close" size={28} color={colors.primary} />
         </TouchableOpacity>
       </View>
     </View>

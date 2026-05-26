@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Image, TouchableOpacity, View } from "react-native";
 import PagerView from "react-native-pager-view";
 import style from "../../Styles/NewsStyles";
+import { colors } from "../../Styles/theme";
 
 export default function Carousel({ images, interval = 3000, onEdit, isAdmin }) {
   const pagerRef = useRef(null);
@@ -52,7 +53,7 @@ export default function Carousel({ images, interval = 3000, onEdit, isAdmin }) {
 
       {isAdmin && onEdit && (
         <TouchableOpacity style={style.editButton} onPress={onEdit}>
-          <Ionicons name="albums-outline" size={25} color="#fff" />
+          <Ionicons name="albums-outline" size={25} color={colors.text} />
         </TouchableOpacity>
       )}
 

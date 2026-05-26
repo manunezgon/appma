@@ -9,6 +9,7 @@ import { PaymentModal } from "../../components/Payments/PaymentModal";
 import { StudentPaymentsModal } from "../../components/Payments/StudentPaymentsModal";
 import { StudentCard } from "../../components/Payments/StudentCard";
 import style from "../../Styles/PaymentStyle";
+import { colors } from "../../Styles/theme";
 
 const generateMonths = () => {
   const months = [];
@@ -145,7 +146,7 @@ export default function Payments() {
       <View style={style.searchBox}>
         <TextInput
           placeholder="Search students..."
-          placeholderTextColor="#888"
+          placeholderTextColor={colors.textSubtle}
           style={style.searchInput}
           value={search}
           onChangeText={setSearch}

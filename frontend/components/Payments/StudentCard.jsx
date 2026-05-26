@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { memo } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import style from "../../Styles/PaymentStyle";
+import { colors } from "../../Styles/theme";
 
 const StudentCardComponent = ({ student, onPress }) => {
   return (
@@ -17,7 +18,11 @@ const StudentCardComponent = ({ student, onPress }) => {
         />
         <Text style={style.name}>{student.name}</Text>
       </View>
-      <Ionicons name="chevron-forward-outline" size={28} color="#888" />
+      <Ionicons
+        name="chevron-forward-outline"
+        size={28}
+        color={colors.textSubtle}
+      />
     </TouchableOpacity>
   );
 };

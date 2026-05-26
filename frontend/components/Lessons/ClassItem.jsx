@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { memo, useCallback } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import styles from "../../Styles/LessonStyles.jsx";
+import { colors } from "../../Styles/theme";
 import defaultProfileImg from "../../app/assets/images/white_logo_circle.png";
 
 const ClassItem = ({
@@ -39,11 +40,19 @@ const ClassItem = ({
           {userRole === "ADMIN" ? (
             <View style={styles.iconRow}>
               <TouchableOpacity onPress={handleAttendance}>
-                <Ionicons name="clipboard-outline" size={28} color="#69188E" />
+                <Ionicons
+                  name="clipboard-outline"
+                  size={28}
+                  color={colors.primary}
+                />
               </TouchableOpacity>
 
               <TouchableOpacity onPress={handleDelete}>
-                <Ionicons name="trash-outline" size={28} color="#FF3B30" />
+                <Ionicons
+                  name="trash-outline"
+                  size={28}
+                  color={colors.danger}
+                />
               </TouchableOpacity>
             </View>
           ) : (
@@ -66,10 +75,10 @@ const ClassItem = ({
                 size={30}
                 color={
                   item.isEnrolled
-                    ? "#00923aff"
+                    ? colors.success
                     : item.isPast
-                      ? "#555555"
-                      : "#69188E"
+                      ? colors.surfaceMuted
+                      : colors.primary
                 }
               />
             </TouchableOpacity>

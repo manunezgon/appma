@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { memo, useCallback } from "react";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
 import style from "../../Styles/PaymentStyle";
+import { colors } from "../../Styles/theme";
 
 const PaymentRowComponent = ({ payment, onDelete }) => {
   const formatMonth = (monthString) => {
@@ -40,7 +41,7 @@ const PaymentRowComponent = ({ payment, onDelete }) => {
         </Text>
       </View>
       <TouchableOpacity onPress={confirmDelete}>
-        <Ionicons name="trash-outline" size={22} color="#ff4d4d" />
+        <Ionicons name="trash-outline" size={22} color={colors.danger} />
       </TouchableOpacity>
     </View>
   );

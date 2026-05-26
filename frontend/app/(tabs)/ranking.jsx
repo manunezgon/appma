@@ -7,6 +7,7 @@ import RankingList from "../../components/Ranking/RankingList";
 import { useLessons } from "../../context/LessonsContext";
 import { useUser } from "../../context/UserContext";
 import styles from "../../Styles/RankingStyles";
+import { colors } from "../../Styles/theme";
 import { API_BASE_URL } from "../../config/api";
 
 export default function Ranking() {
@@ -81,7 +82,7 @@ export default function Ranking() {
       />
 
       {loading ? (
-        <ActivityIndicator size="large" color="#69188E" />
+        <ActivityIndicator size="large" color={colors.primary} />
       ) : (
         <>
           <ProgressCard position={myPosition} classes={myClasses} />

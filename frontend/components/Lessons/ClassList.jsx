@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import styles from "../../Styles/LessonStyles.jsx";
+import { colors } from "../../Styles/theme";
 import ClassItem from "./ClassItem";
 
 export default function ClassList({
@@ -83,11 +84,11 @@ export default function ClassList({
               <TouchableOpacity
                 onPress={closeConfirm}
               >
-                <Ionicons name="close" size={28} color="#69188E" />
+                <Ionicons name="close" size={28} color={colors.primary} />
               </TouchableOpacity>
 
               <TouchableOpacity onPress={handleDelete}>
-                <Ionicons name="trash-outline" size={28} color="#FF3B30" />
+                <Ionicons name="trash-outline" size={28} color={colors.danger} />
               </TouchableOpacity>
             </View>
           </View>

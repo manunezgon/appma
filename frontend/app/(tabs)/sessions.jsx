@@ -12,6 +12,7 @@ import ScheduleWizardModal from "../../components/ScheduleWizard/ScheduleWizardM
 import { useEnrollments } from "../../context/EnrollmentsContext";
 import { useUser } from "../../context/UserContext";
 import styles from "../../Styles/SessionStyle.jsx";
+import { colors } from "../../Styles/theme";
 
 export default function Sessions() {
   const { user } = useUser();
@@ -94,7 +95,7 @@ export default function Sessions() {
         <Text style={styles.time}>{item.time}</Text>
       </View>
       <TouchableOpacity onPress={() => confirmUnenroll(item.enrollmentId)}>
-        <Ionicons name="log-out-outline" size={28} color="#FF3B30" />
+        <Ionicons name="log-out-outline" size={28} color={colors.danger} />
       </TouchableOpacity>
     </View>
   );
@@ -140,7 +141,7 @@ export default function Sessions() {
                     }}
                     style={styles.modalButton}
                   >
-                    <Ionicons name="close" size={28} color="#69188E" />
+                    <Ionicons name="close" size={28} color={colors.primary} />
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={handleUnenroll}
@@ -149,7 +150,7 @@ export default function Sessions() {
                     <Ionicons
                       name="log-out-outline"
                       size={28}
-                      color="#FF3B30"
+                      color={colors.danger}
                     />
                   </TouchableOpacity>
                 </View>

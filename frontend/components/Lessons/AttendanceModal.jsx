@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import Modal from "react-native-modal";
 import styles from "../../Styles/LessonStyles.jsx";
+import { colors } from "../../Styles/theme";
 
 export default function AttendanceModal({
   visible,
@@ -26,12 +27,17 @@ export default function AttendanceModal({
         {/* HEADER */}
         <View style={styles.modalHeader}>
           <Text style={styles.title}>{selectedClass?.lessonName}</Text>
-          <Ionicons name="close" size={26} color="#fff" onPress={onClose} />
+          <Ionicons
+            name="close"
+            size={26}
+            color={colors.text}
+            onPress={onClose}
+          />
         </View>
 
         {/* CONTENT */}
         {loading ? (
-          <ActivityIndicator size="large" color="purple" />
+          <ActivityIndicator size="large" color={colors.primary} />
         ) : (
           <ScrollView style={styles.list}>
             {(students ?? []).map((student) => (
@@ -45,7 +51,7 @@ export default function AttendanceModal({
                 <Ionicons
                   name={student.attended ? "checkbox" : "square-outline"}
                   size={26}
-                  color={student.attended ? "limegreen" : "#ccc"}
+                  color={student.attended ? colors.success : colors.textMuted}
                 />
               </TouchableOpacity>
             ))}

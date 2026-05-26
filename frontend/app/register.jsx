@@ -15,6 +15,7 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useUser } from "../context/UserContext";
 import styles from "../Styles/GlobalStyles";
+import { colors } from "../Styles/theme";
 import { API_BASE_URL } from "../config/api";
 
 export default function Register() {
@@ -78,7 +79,7 @@ export default function Register() {
 
   return (
     <KeyboardAwareScrollView
-      style={{ flex: 1, backgroundColor: "#1E1E1E" }}
+      style={styles.screen}
       contentContainerStyle={styles.container}
       enableOnAndroid={true}
       extraHeight={Platform.OS === "android" ? 80 : 0}
@@ -125,7 +126,7 @@ export default function Register() {
         disabled={loading || !name || !email || !password}
       >
         {loading ? (
-          <ActivityIndicator color="#fff" />
+          <ActivityIndicator color={colors.text} />
         ) : (
           <Text style={styles.buttonText}>REGISTER</Text>
         )}

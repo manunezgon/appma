@@ -13,6 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import EditProfileModal from "../../components/Profile/EditProfileModal.jsx";
 import { useUser } from "../../context/UserContext";
 import styles from "../../Styles/ProfileStyles.jsx";
+import { colors } from "../../Styles/theme";
 import profilePic from "../assets/images/white_logo_circle.png";
 import { API_BASE_URL } from "../../config/api";
 
@@ -167,16 +168,9 @@ export default function Profile() {
                 style={styles.profileImage}
               />
               <View
-                style={{
-                  position: "absolute",
-                  bottom: 0,
-                  right: 0,
-                  backgroundColor: "#69188E",
-                  borderRadius: 12,
-                  padding: 4,
-                }}
+                style={styles.profileImageBadge}
               >
-                <Ionicons name="add" size={16} color="#fff" />
+                <Ionicons name="add" size={16} color={colors.text} />
               </View>
             </View>
           </TouchableOpacity>

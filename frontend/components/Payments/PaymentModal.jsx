@@ -3,6 +3,7 @@ import { Picker } from "@react-native-picker/picker";
 import { useEffect, useState } from "react";
 import { Modal, Switch, Text, TouchableOpacity, View } from "react-native";
 import style from "../../Styles/PaymentStyle";
+import { colors } from "../../Styles/theme";
 
 export const PaymentModal = ({
   visible,
@@ -111,7 +112,7 @@ export const PaymentModal = ({
           </TouchableOpacity>
 
           <TouchableOpacity style={style.closeButton} onPress={onClose}>
-            <Ionicons name="close" size={28} color="#69188E" />
+            <Ionicons name="close" size={28} color={colors.primary} />
           </TouchableOpacity>
         </View>
       </View>

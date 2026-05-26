@@ -2,6 +2,7 @@ import { Picker } from "@react-native-picker/picker";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import Modal from "react-native-modal";
 import styles from "../../Styles/LessonStyles.jsx";
+import { colors } from "../../Styles/theme";
 
 export default function AdminCreateClassModal({
   visible,
@@ -54,7 +55,7 @@ export default function AdminCreateClassModal({
           <>
             <TextInput
               placeholder="Description"
-              placeholderTextColor="#888"
+              placeholderTextColor={colors.textSubtle}
               value={newDescription}
               onChangeText={setNewDescription}
               style={styles.input}
@@ -62,7 +63,7 @@ export default function AdminCreateClassModal({
 
             <TextInput
               placeholder="Start time (HH:MM)"
-              placeholderTextColor="#888"
+              placeholderTextColor={colors.textSubtle}
               value={newStartTime}
               onChangeText={setNewStartTime}
               style={styles.input}
@@ -70,16 +71,14 @@ export default function AdminCreateClassModal({
 
             <TextInput
               placeholder="End time (HH:MM)"
-              placeholderTextColor="#888"
+              placeholderTextColor={colors.textSubtle}
               value={newEndTime}
               onChangeText={setNewEndTime}
               style={styles.input}
             />
 
             <TouchableOpacity style={styles.saveButton} onPress={onCreateNew}>
-              <Text style={{ color: "white", fontWeight: "bold" }}>
-                Save
-              </Text>
+              <Text style={styles.saveButtonText}>Save</Text>
             </TouchableOpacity>
           </>
         )}
@@ -105,7 +104,7 @@ export default function AdminCreateClassModal({
 
             <TextInput
               placeholder="Hora inicio (HH:MM)"
-              placeholderTextColor="#888"
+              placeholderTextColor={colors.textSubtle}
               value={newStartTime}
               onChangeText={setNewStartTime}
               style={styles.input}
@@ -113,7 +112,7 @@ export default function AdminCreateClassModal({
 
             <TextInput
               placeholder="Hora fin (HH:MM)"
-              placeholderTextColor="#888"
+              placeholderTextColor={colors.textSubtle}
               value={newEndTime}
               onChangeText={setNewEndTime}
               style={styles.input}
@@ -123,9 +122,7 @@ export default function AdminCreateClassModal({
               style={styles.saveButton}
               onPress={onCreateExisting}
             >
-              <Text style={{ color: "white", fontWeight: "bold" }}>
-                Guardar
-              </Text>
+              <Text style={styles.saveButtonText}>Guardar</Text>
             </TouchableOpacity>
           </>
         )}

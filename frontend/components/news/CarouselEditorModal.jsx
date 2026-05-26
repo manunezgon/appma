@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import style from "../../Styles/NewsStyles";
+import { colors } from "../../Styles/theme";
 
 export default function CarouselEditorModal({
   visible,
@@ -61,7 +62,7 @@ export default function CarouselEditorModal({
       <View style={style.modalOverlay}>
         <View style={style.editModalContent}>
           <TouchableOpacity onPress={onClose} style={style.closeModalButton}>
-            <Ionicons name="close" size={30} color="#69188E" />
+            <Ionicons name="close" size={30} color={colors.primary} />
           </TouchableOpacity>
 
           <View style={style.imagesContainer}>
@@ -77,7 +78,11 @@ export default function CarouselEditorModal({
                     style={style.reorderButton}
                     onPress={() => moveImage(idx, -1)}
                   >
-                    <Ionicons name="arrow-up-outline" size={16} color="#fff" />
+                    <Ionicons
+                      name="arrow-up-outline"
+                      size={16}
+                      color={colors.text}
+                    />
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={style.reorderButton}
@@ -86,7 +91,7 @@ export default function CarouselEditorModal({
                     <Ionicons
                       name="arrow-down-outline"
                       size={16}
-                      color="#fff"
+                      color={colors.text}
                     />
                   </TouchableOpacity>
                 </View>
@@ -95,13 +100,17 @@ export default function CarouselEditorModal({
                   style={style.deleteImageButton}
                   onPress={() => handleDelete(idx)}
                 >
-                  <Ionicons name="trash-outline" size={16} color="#fff" />
+                  <Ionicons
+                    name="trash-outline"
+                    size={16}
+                    color={colors.text}
+                  />
                 </TouchableOpacity>
               </View>
             ))}
 
             <TouchableOpacity style={style.addImageButton} onPress={onAdd}>
-              <Ionicons name="add-outline" size={30} color="#fff" />
+              <Ionicons name="add-outline" size={30} color={colors.text} />
             </TouchableOpacity>
           </View>
           <TouchableOpacity

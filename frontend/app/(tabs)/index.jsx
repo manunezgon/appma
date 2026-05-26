@@ -20,6 +20,7 @@ import { useLessons } from "../../context/LessonsContext";
 import { useUser } from "../../context/UserContext.jsx";
 
 import styles from "../../Styles/LessonStyles.jsx";
+import { colors } from "../../Styles/theme";
 
 export default function HomeScreen() {
   const [selectedDay, setSelectedDay] = useState(new Date());
@@ -71,14 +72,14 @@ export default function HomeScreen() {
           style={styles.addButton}
           onPress={adminModal.openModal}
         >
-          <Ionicons name="add" size={20} color="#fff" />
+          <Ionicons name="add" size={20} color={colors.text} />
         </TouchableOpacity>
       )}
 
       {/* LOADING */}
 
       {loading ? (
-        <ActivityIndicator size="large" color="#69188E" />
+        <ActivityIndicator size="large" color={colors.primary} />
       ) : (
         <ClassList
           classes={classes}
