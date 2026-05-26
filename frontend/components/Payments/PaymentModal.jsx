@@ -1,7 +1,7 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { useEffect, useState } from "react";
 import { Modal, Switch, Text, TouchableOpacity, View } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import style from "../../Styles/PaymentStyle";
 
 export const PaymentModal = ({
@@ -26,7 +26,7 @@ export const PaymentModal = ({
       setSelectedLessonId(null);
       setSelectedMonth("");
     }
-  }, [visible]);
+  }, [visible, setSelectedLessonId, setSelectedMonth]);
 
   const handleConfirm = () => {
     onConfirm({

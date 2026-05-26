@@ -1,6 +1,6 @@
+import { Ionicons } from "@expo/vector-icons";
 import { memo, useCallback } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import styles from "../../Styles/LessonStyles.jsx";
 import defaultProfileImg from "../../app/assets/images/white_logo_circle.png";
 
@@ -106,4 +106,4 @@ function areEqual(prev, next) {
   );
 }
 
-export default memo(ClassItem);
+export default memo(ClassItem, areEqual);

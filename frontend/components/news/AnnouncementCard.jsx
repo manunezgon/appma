@@ -1,6 +1,6 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { Modal, Text, TouchableOpacity, View } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import { useUser } from "../../context/UserContext";
 import style from "../../Styles/NewsStyles";
 

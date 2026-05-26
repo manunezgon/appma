@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { API_BASE_URL } from "../app/config";
+import { API_BASE_URL } from "../config/api";
 
 export default function useAttendance({ token, onAttendanceSaved }) {
   const [attendanceVisible, setAttendanceVisible] = useState(false);

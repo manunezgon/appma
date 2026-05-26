@@ -1,5 +1,5 @@
+import { Ionicons } from "@expo/vector-icons";
 import { TextInput, TouchableOpacity, View } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import style from "../../Styles/NewsStyles";
 
 export default function AdminInput({ value, onChange, onSend }) {

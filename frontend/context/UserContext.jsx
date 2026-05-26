@@ -2,7 +2,7 @@
 
 import * as SecureStore from "expo-secure-store";
 import { createContext, useContext, useEffect, useState } from "react";
-import { API_BASE_URL } from "../app/config";
+import { API_BASE_URL } from "../config/api";
 
 const UserContext = createContext();
 
@@ -96,6 +96,7 @@ export const UserProvider = ({ children }) => {
     <UserContext.Provider
       value={{
         user,
+        setUser,
         token,
         login,
         logout,

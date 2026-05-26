@@ -5,7 +5,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { API_BASE_URL, enrollmentsByDayUrl } from "../app/config";
+import { API_BASE_URL, enrollmentsByDayUrl } from "../config/api";
 import { useUser } from "./UserContext";
 
 const EnrollmentsContext = createContext();

@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import {
   FlatList,
   Modal,
@@ -5,9 +6,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import { PaymentRow } from "./PaymentRow";
-import style from "../../Styles/PaymentStyle"
+import style from "../../Styles/PaymentStyle";
 
 export const StudentPaymentsModal = ({
   student,

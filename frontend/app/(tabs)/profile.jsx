@@ -9,12 +9,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
+import { Ionicons } from "@expo/vector-icons";
 import EditProfileModal from "../../components/Profile/EditProfileModal.jsx";
 import { useUser } from "../../context/UserContext";
 import styles from "../../Styles/ProfileStyles.jsx";
 import profilePic from "../assets/images/white_logo_circle.png";
-import { API_BASE_URL } from "../config.jsx";
+import { API_BASE_URL } from "../../config/api";
 
 export default function Profile() {
   const { user, setUser, logout, token, updateProfileImage } = useUser();

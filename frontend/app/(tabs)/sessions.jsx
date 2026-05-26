@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
 import {
   Modal,
   RefreshControl,
@@ -7,7 +8,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import ScheduleWizardModal from "../../components/ScheduleWizard/ScheduleWizardModal.jsx";
 import { useEnrollments } from "../../context/EnrollmentsContext";
 import { useUser } from "../../context/UserContext";

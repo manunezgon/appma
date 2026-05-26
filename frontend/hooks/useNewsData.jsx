@@ -1,6 +1,6 @@
 import * as ImagePicker from "expo-image-picker";
 import { useCallback, useState } from "react";
-import { API_BASE_URL } from "../app/config";
+import { API_BASE_URL } from "../config/api";
 import { useUser } from "../context/UserContext";
 
 export function useNewsData() {
