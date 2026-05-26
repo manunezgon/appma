@@ -1,10 +1,6 @@
 import { useState } from "react";
 
-export default function useEnrollmentActions({
-  enrollUser,
-  selectedDay,
-  refreshDayData,
-}) {
+export default function useEnrollmentActions({ enrollUser, selectedDay }) {
   const [errorModalVisible, setErrorModalVisible] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState("");
@@ -21,8 +17,6 @@ export default function useEnrollmentActions({
         selectedDay,
         isException ? scheduleId : null,
       );
-
-      await refreshDayData();
     } catch (err) {
       const message = err?.message || "Error enrolling";
 
@@ -40,6 +34,7 @@ export default function useEnrollmentActions({
     handleEnroll,
 
     errorModalVisible,
+
     errorMessage,
 
     closeErrorModal,

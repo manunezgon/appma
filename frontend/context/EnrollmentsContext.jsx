@@ -11,7 +11,7 @@ import { useUser } from "./UserContext";
 const EnrollmentsContext = createContext();
 
 export const EnrollmentsProvider = ({ children }) => {
-  const { token } = useUser();
+  const { user, token } = useUser();
 
   const [enrollments, setEnrollments] = useState([]);
   const [classStudentsByDay, setClassStudentsByDay] = useState({});
@@ -89,42 +89,75 @@ export const EnrollmentsProvider = ({ children }) => {
   const enrollUser = async (scheduleTemplateId, date, exceptionId = null) => {
     if (!token) throw new Error("No user token found");
 
-    const url = exceptionId
-      ? `${API_BASE_URL}/enrollments/exception/${exceptionId}`
-      : `${API_BASE_URL}/enrollments`;
+    const classKey = exceptionId || scheduleTemplateId;
 
-    const body = exceptionId
-      ? {}
-      : {
-          scheduleTemplateId,
-          date: date.toISOString().split("T")[0],
-        };
+    const optimisticStudent = {
+      id: user.id,
+      name: user.name,
+      profileImageUrl: user.profileImageUrl || null,
+    };
 
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(body),
+    setClassStudentsByDay((prev) => {
+      const currentStudents = prev[classKey] || [];
+
+      const alreadyExists = currentStudents.some((s) => s.id === user.id);
+
+      if (alreadyExists) return prev;
+
+      return {
+        ...prev,
+        [classKey]: [...currentStudents, optimisticStudent],
+      };
     });
 
-    if (!res.ok) {
-      let errorText;
-      try {
-        const data = await res.json();
-        errorText = data?.error;
-      } catch {
-        errorText = await res.text();
+    try {
+      const url = exceptionId
+        ? `${API_BASE_URL}/enrollments/exception/${exceptionId}`
+        : `${API_BASE_URL}/enrollments`;
+
+      const body = exceptionId
+        ? {}
+        : {
+            scheduleTemplateId,
+            date: date.toISOString().split("T")[0],
+          };
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) {
+        let errorText;
+
+        try {
+          const data = await res.json();
+          errorText = data?.error;
+        } catch {
+          errorText = await res.text();
+        }
+
+        throw new Error(errorText || "Error al inscribirse");
       }
-      throw new Error(errorText || "Error al inscribirse");
+
+      const enrollment = await res.json();
+
+      setEnrollments((prev) => [...prev, enrollment]);
+
+      return enrollment;
+    } catch (err) {
+      // rollback
+      setClassStudentsByDay((prev) => ({
+        ...prev,
+        [classKey]: (prev[classKey] || []).filter((s) => s.id !== user.id),
+      }));
+
+      throw err;
     }
-
-    const enrollment = await res.json();
-
-    setEnrollments((prev) => [...prev, enrollment]);
-
-    return enrollment;
   };
 
   const deleteEnrollment = async (enrollmentId) => {

@@ -42,7 +42,6 @@ export default function HomeScreen() {
   const enrollmentActions = useEnrollmentActions({
     enrollUser,
     selectedDay,
-    refreshDayData: fetchDayData,
   });
 
   const { token } = useUser();
@@ -52,12 +51,10 @@ export default function HomeScreen() {
     onAttendanceSaved: fetchDayData,
   });
 
-
   const adminActions = useAdminClassActions({
     selectedDay,
     daySchedules,
   });
-
 
   const adminModal = useAdminClassModal(adminActions);
 

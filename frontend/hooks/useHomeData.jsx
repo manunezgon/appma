@@ -131,8 +131,6 @@ export default function useHomeData(selectedDay) {
       selectedDay,
       isException ? scheduleId : null,
     );
-
-    await fetchDayData();
   };
 
   return {
