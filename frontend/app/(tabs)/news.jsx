@@ -1,5 +1,5 @@
 import { useFocusEffect } from "@react-navigation/native";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Image, RefreshControl, ScrollView, Text, View } from "react-native";
 import AdminInput from "../../components/news/AdminInput";
 import AnnouncementCard from "../../components/news/AnnouncementCard";
@@ -25,10 +25,15 @@ export default function News() {
     reorderImages,
   } = useNewsData();
 
+  const lastNewsFocusFetchAt = useRef(0);
+  const NEWS_FOCUS_MIN_MS = 60_000;
+
   useFocusEffect(
     useCallback(() => {
-      fetchAnnouncements();
-      fetchCarouselImages();
+      const now = Date.now();
+      if (now - lastNewsFocusFetchAt.current < NEWS_FOCUS_MIN_MS) return;
+      lastNewsFocusFetchAt.current = now;
+      void Promise.all([fetchAnnouncements(), fetchCarouselImages()]);
     }, [fetchAnnouncements, fetchCarouselImages]),
   );
 
@@ -40,7 +45,10 @@ export default function News() {
         <RefreshControl
           refreshing={false}
           onRefresh={async () => {
-            await fetchAnnouncements();
+            await Promise.all([
+              fetchAnnouncements(),
+              fetchCarouselImages(),
+            ]);
           }}
         />
       }

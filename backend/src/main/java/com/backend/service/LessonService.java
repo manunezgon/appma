@@ -3,7 +3,7 @@ package com.backend.service;
 import com.backend.dto.LessonRequestDTO;
 import com.backend.model.Lesson;
 import com.backend.repository.LessonRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

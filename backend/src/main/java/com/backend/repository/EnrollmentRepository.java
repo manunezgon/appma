@@ -23,7 +23,16 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
     List<Enrollment> findByScheduleExceptionAndDate(ScheduleException scheduleException, LocalDate date);
 
-    List<Enrollment>findByScheduleExceptionId(Long exceptionId);
+    List<Enrollment> findByScheduleExceptionId(Long exceptionId);
+
+    @Query("""
+            SELECT e FROM Enrollment e
+            JOIN FETCH e.user
+            LEFT JOIN FETCH e.scheduleTemplate
+            LEFT JOIN FETCH e.scheduleException
+            WHERE e.date = :date
+            """)
+    List<Enrollment> findAllByDateWithAssociations(@Param("date") LocalDate date);
 
     boolean existsByUserAndScheduleException(User user, ScheduleException exception);
 

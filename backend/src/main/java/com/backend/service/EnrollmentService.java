@@ -1,21 +1,26 @@
 package com.backend.service;
 
 import com.backend.dto.AttendanceDTO;
+import com.backend.dto.ClassAttendeeDTO;
+import com.backend.dto.DayEnrollmentsGroupedDTO;
 import com.backend.dto.EnrollmentRequestDTO;
 import com.backend.dto.EnrollmentResponseDTO;
 import com.backend.exception.ResourceNotFoundException;
 import com.backend.model.*;
 import com.backend.repository.*;
 import com.backend.security.JwtUtil;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -275,5 +280,30 @@ public class EnrollmentService {
         LocalDate classDate = LocalDate.parse(date);
 
         return enrollmentRepository.findByScheduleExceptionAndDate(exception, classDate);
+    }
+
+    @Transactional(readOnly = true)
+    public DayEnrollmentsGroupedDTO getEnrollmentsGroupedByDay(LocalDate date) {
+        List<Enrollment> rows = enrollmentRepository.findAllByDateWithAssociations(date);
+        Map<Long, List<ClassAttendeeDTO>> byTemplateId = new HashMap<>();
+        Map<Long, List<ClassAttendeeDTO>> byExceptionId = new HashMap<>();
+
+        for (Enrollment e : rows) {
+            User u = e.getUser();
+            ClassAttendeeDTO att = new ClassAttendeeDTO(
+                    u.getId(),
+                    u.getName(),
+                    u.getProfileImageUrl()
+            );
+            if (e.getScheduleTemplate() != null) {
+                Long tid = e.getScheduleTemplate().getId();
+                byTemplateId.computeIfAbsent(tid, k -> new ArrayList<>()).add(att);
+            } else if (e.getScheduleException() != null) {
+                Long eid = e.getScheduleException().getId();
+                byExceptionId.computeIfAbsent(eid, k -> new ArrayList<>()).add(att);
+            }
+        }
+
+        return new DayEnrollmentsGroupedDTO(byTemplateId, byExceptionId);
     }
 }

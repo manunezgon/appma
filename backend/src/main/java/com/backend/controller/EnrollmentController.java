@@ -1,17 +1,23 @@
 package com.backend.controller;
 
 import com.backend.dto.AttendanceDTO;
+import com.backend.dto.DayEnrollmentsGroupedDTO;
 import com.backend.dto.EnrollmentRequestDTO;
 import com.backend.dto.EnrollmentResponseDTO;
 import com.backend.service.EnrollmentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+@Tag(name = "Enrollments")
 @RestController
 @RequestMapping("/enrollments")
 @RequiredArgsConstructor
@@ -36,6 +42,16 @@ public class EnrollmentController {
             @RequestHeader("Authorization") String authHeader) {
         List<EnrollmentResponseDTO> dtos = enrollmentService.getMyEnrollmentsDTO(authHeader);
         return ResponseEntity.ok(dtos); // ya viene listo del service
+    }
+
+    @Operation(
+            summary = "Enrollments per day",
+            description = "Devuelve mapas byTemplateId y byExceptionId con asistentes para la fecha dada (sustituye múltiples GET /enrollments/class). Requiere JWT."
+    )
+    @GetMapping("/by-day")
+    public ResponseEntity<DayEnrollmentsGroupedDTO> getEnrollmentsByDay(
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return ResponseEntity.ok(enrollmentService.getEnrollmentsGroupedByDay(date));
     }
 
     @PostMapping

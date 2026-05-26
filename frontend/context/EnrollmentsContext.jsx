@@ -1,5 +1,11 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import { API_BASE_URL } from "../app/config";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { API_BASE_URL, enrollmentsByDayUrl } from "../app/config";
 import { useUser } from "./UserContext";
 
 const EnrollmentsContext = createContext();
@@ -8,8 +14,7 @@ export const EnrollmentsProvider = ({ children }) => {
   const { token } = useUser();
   const [enrollments, setEnrollments] = useState([]); // 🟢 guardamos enrollments del usuario
 
-  // --- Traer enrollments del usuario ---
-  const fetchMyEnrollments = async () => {
+  const fetchMyEnrollments = useCallback(async () => {
     if (!token) return;
 
     const res = await fetch(`${API_BASE_URL}/enrollments/me`, {
@@ -24,43 +29,58 @@ export const EnrollmentsProvider = ({ children }) => {
     }
 
     const data = await res.json();
-    setEnrollments(data); // guardamos en el state
-  };
+    setEnrollments(data);
+  }, [token]);
 
-  // --- Traer todos los enrollments por clase ---
-  const fetchClassEnrollments = async ({
-  scheduleTemplateId = null,
-  scheduleExceptionId = null,
-  date,
-}) => {
-  if (!token) return [];
-
-  const params = new URLSearchParams({
-    date,
-  });
-
-  if (scheduleTemplateId) params.append("scheduleTemplateId", scheduleTemplateId);
-  if (scheduleExceptionId) params.append("scheduleExceptionId", scheduleExceptionId);
-
-  const res = await fetch(`${API_BASE_URL}/enrollments/class?${params}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
+  const fetchClassEnrollmentsByDay = useCallback(
+    async (date) => {
+      if (!token) return { byTemplateId: {}, byExceptionId: {} };
+      const dateStr = date.toISOString().split("T")[0];
+      const res = await fetch(enrollmentsByDayUrl(dateStr), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        console.error("Error fetching day enrollments");
+        return { byTemplateId: {}, byExceptionId: {} };
+      }
+      return res.json();
     },
-  });
+    [token],
+  );
 
-  if (!res.ok) {
-    console.error("Error fetching class enrollments");
-    return [];
-  }
+  const fetchClassEnrollments = useCallback(
+    async ({
+      scheduleTemplateId = null,
+      scheduleExceptionId = null,
+      date,
+    }) => {
+      if (!token) return [];
 
-  const data = await res.json();
+      const params = new URLSearchParams({ date });
+      if (scheduleTemplateId)
+        params.append("scheduleTemplateId", scheduleTemplateId);
+      if (scheduleExceptionId)
+        params.append("scheduleExceptionId", scheduleExceptionId);
 
-  return data.map((e) => ({
-    id: e.userId,
-    name: e.userName,
-    profileImageUrl: e.profileImageUrl || null,
-  }));
-};
+      const res = await fetch(`${API_BASE_URL}/enrollments/class?${params}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) {
+        console.error("Error fetching class enrollments");
+        return [];
+      }
+
+      const data = await res.json();
+
+      return data.map((e) => ({
+        id: e.userId,
+        name: e.userName,
+        profileImageUrl: e.profileImageUrl || null,
+      }));
+    },
+    [token],
+  );
 
   // --- Función genérica para enroll ---
   const enrollUser = async (scheduleTemplateId, date, exceptionId = null) => {
@@ -115,20 +135,29 @@ export const EnrollmentsProvider = ({ children }) => {
 
     if (!res.ok) throw new Error("Error deleting enrollment");
 
-    // 🔹 actualizar state
     setEnrollments((prev) =>
-      prev.filter((e) => e.id !== enrollmentId)
+      prev.filter(
+        (e) =>
+          e.enrollmentId !== enrollmentId &&
+          e.id !== enrollmentId,
+      ),
     );
   };
 
-  // 🔹 Traer enrollments al cargar el contexto
   useEffect(() => {
     fetchMyEnrollments();
-  }, [token]);
+  }, [token, fetchMyEnrollments]);
 
   return (
     <EnrollmentsContext.Provider
-      value={{ enrollments, fetchMyEnrollments, enrollUser, deleteEnrollment, fetchClassEnrollments }}
+      value={{
+        enrollments,
+        fetchMyEnrollments,
+        enrollUser,
+        deleteEnrollment,
+        fetchClassEnrollments,
+        fetchClassEnrollmentsByDay,
+      }}
     >
       {children}
     </EnrollmentsContext.Provider>
