@@ -57,10 +57,9 @@ export default function News() {
     >
       <View style={style.header}>
         <Image
-          source={require("../assets/images/white_logo_nw.png")}
+          source={require("../assets/images/white_logo.png")}
           style={style.logo}
         />
-        <Text style={style.title}>La Forja</Text>
       </View>
 
       <Carousel

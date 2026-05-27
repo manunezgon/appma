@@ -40,18 +40,18 @@ export const radii = {
 
 export const typography = {
   screenTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
     color: colors.textMuted,
     textTransform: "uppercase",
     textAlign: "center",
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "600",
   },
   body: {
-    fontSize: 14,
+    fontSize: 16,
   },
 };
 

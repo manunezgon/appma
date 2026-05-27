@@ -13,8 +13,8 @@ const style = StyleSheet.create({
     marginBottom: spacing.md,
   },
   logo: {
-    width: 60,
-    height: 60,
+    height: 200,
+    width: "100%",
     resizeMode: "contain",
   },
   title: {
@@ -24,6 +24,7 @@ const style = StyleSheet.create({
   subtitle: {
     ...typography.screenTitle,
     margin: spacing.lg,
+    paddingBottom: spacing.sm,
   },
   newsContainer: {
     flex: 1,
@@ -36,6 +37,7 @@ const style = StyleSheet.create({
   },
   carruselWrapper: {
     position: "relative",
+    marginTop: spacing.xl,
     marginBottom: spacing.xl,
   },
   carruselContainer: {
