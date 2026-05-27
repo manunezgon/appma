@@ -1,7 +1,15 @@
 import * as ImagePicker from "expo-image-picker";
 import { useCallback, useState } from "react";
-import { API_BASE_URL } from "../config/api";
 import { useUser } from "../context/UserContext";
+import {
+  createAnnouncementRequest,
+  deleteAnnouncementRequest,
+  deleteCarouselImageRequest,
+  getAnnouncements,
+  getCarouselImages,
+  reorderCarouselImagesRequest,
+  uploadCarouselImageRequest,
+} from "../services/newsApi";
 
 export function useNewsData() {
   const { token } = useUser();
@@ -9,21 +17,9 @@ export function useNewsData() {
   const [carouselImages, setCarouselImages] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchJson = useCallback(
-    async (url, options = {}) => {
-      const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}` },
-        ...options,
-      });
-      if (!res.ok) throw new Error(`Failed to fetch ${url}`);
-      return res.json();
-    },
-    [token],
-  );
-
   const fetchAnnouncements = useCallback(async () => {
     try {
-      const data = await fetchJson(`${API_BASE_URL}/announcements`);
+      const data = await getAnnouncements(token);
       setAnnouncements(
         Array.isArray(data)
           ? data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
@@ -33,11 +29,11 @@ export function useNewsData() {
       console.error(err);
       setAnnouncements([]);
     }
-  }, [fetchJson]);
+  }, [token]);
 
   const fetchCarouselImages = useCallback(async () => {
     try {
-      const data = await fetchJson(`${API_BASE_URL}/carousel`);
+      const data = await getCarouselImages(token);
       setCarouselImages(
         Array.isArray(data)
           ? data
@@ -56,39 +52,25 @@ export function useNewsData() {
       console.error(err);
       setCarouselImages([]);
     }
-  }, [fetchJson]);
+  }, [token]);
 
   const createAnnouncement = useCallback(
     async (message) => {
       if (!message.trim()) return;
       try {
-        await fetchJson(
-          `${API_BASE_URL}/announcements?message=${encodeURIComponent(message)}`,
-          { method: "POST" },
-        );
+        await createAnnouncementRequest(message, token);
         await fetchAnnouncements();
       } catch (err) {
         console.error(err);
       }
     },
-    [fetchJson, fetchAnnouncements],
+    [fetchAnnouncements, token],
   );
 
   const deleteAnnouncement = useCallback(
     async (id) => {
       try {
-        const res = await fetch(`${API_BASE_URL}/announcements/${id}`, {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!res.ok) {
-          const text = await res.text();
-          throw new Error(text || "Error deleting announcement");
-        }
-
+        await deleteAnnouncementRequest(id, token);
         setAnnouncements((prev) => prev.filter((a) => a.id !== id));
       } catch (err) {
         console.error("deleteAnnouncement error:", err);
@@ -120,22 +102,8 @@ export function useNewsData() {
       },
     ]);
 
-    const formData = new FormData();
-    formData.append("file", {
-      uri: localUri,
-      type: "image/jpeg",
-      name: "carousel.jpg",
-    });
-
     try {
-      await fetch(`${API_BASE_URL}/carousel/upload`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
+      await uploadCarouselImageRequest(localUri, token);
       await fetchCarouselImages();
     } catch (err) {
       console.error(err);
@@ -146,10 +114,7 @@ export function useNewsData() {
   const deleteImage = useCallback(
     async (imageId) => {
       try {
-        await fetch(`${API_BASE_URL}/carousel/${imageId}`, {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        await deleteCarouselImageRequest(imageId, token);
         setCarouselImages((prev) => prev.filter((img) => img.id !== imageId));
       } catch (err) {
         console.error(err);
@@ -162,14 +127,7 @@ export function useNewsData() {
   const reorderImages = useCallback(
     async (orderedIds) => {
       try {
-        await fetch(`${API_BASE_URL}/carousel/reorder`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(orderedIds),
-        });
+        await reorderCarouselImagesRequest(orderedIds, token);
         await fetchCarouselImages();
       } catch (err) {
         console.error("Error al reordenar:", err);

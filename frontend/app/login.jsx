@@ -17,7 +17,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { useUser } from "../context/UserContext";
 import styles from "../Styles/GlobalStyles";
 import { colors } from "../Styles/theme";
-import { API_BASE_URL } from "../config/api";
+import { loginRequest } from "../services/usersApi";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -40,19 +40,7 @@ export default function Login() {
     setLoggingIn(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/users/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        Alert.alert("Error", data.message || "Invalid credentials");
-        setPassword("");
-        return;
-      }
+      const data = await loginRequest({ email, password });
 
       await login({
         user: data.user,
@@ -63,7 +51,7 @@ export default function Login() {
     } catch (error) {
       console.error(error);
       setPassword("");
-      Alert.alert("Error", "Unable to connect to the server");
+      Alert.alert("Error", error?.message || "Unable to connect to the server");
     } finally {
       setLoggingIn(false);
     }

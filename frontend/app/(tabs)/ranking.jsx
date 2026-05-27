@@ -8,7 +8,7 @@ import { useLessons } from "../../context/LessonsContext";
 import { useUser } from "../../context/UserContext";
 import styles from "../../Styles/RankingStyles";
 import { colors } from "../../Styles/theme";
-import { API_BASE_URL } from "../../config/api";
+import { getRanking } from "../../services/metricsApi";
 
 export default function Ranking() {
   const { user, token } = useUser();
@@ -45,17 +45,7 @@ export default function Ranking() {
     const fetchRanking = async () => {
       setLoading(true);
       try {
-        let url = `${API_BASE_URL}/metrics/${selectedType}`;
-
-        if (selectedLesson) {
-          url += `?lessonId=${selectedLesson}`;
-        }
-
-        const res = await fetch(url, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        const data = await res.json();
+        const data = await getRanking({ selectedType, selectedLesson }, token);
         setRanking(data);
       } catch (err) {
         console.error(err);

@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import { API_BASE_URL } from "../config/api";
+import {
+  getClassEnrollments,
+  saveAttendanceRequest,
+} from "../services/enrollmentsApi";
 
 export default function useAttendance({ token, onAttendanceSaved }) {
   const [attendanceVisible, setAttendanceVisible] = useState(false);
@@ -18,25 +21,9 @@ export default function useAttendance({ token, onAttendanceSaved }) {
       setLoading(true);
 
       try {
-        const dateStr = day.toISOString().split("T")[0];
+        const data = await getClassEnrollments(classData, day, token);
 
-        let url = `${API_BASE_URL}/enrollments/class?date=${dateStr}`;
-
-        if (classData.isException) {
-          url += `&scheduleExceptionId=${classData.id}`;
-        } else {
-          url += `&scheduleTemplateId=${classData.id}`;
-        }
-
-        const res = await fetch(url, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        const data = await res.json();
-
-        if (!res.ok || !Array.isArray(data)) {
+        if (!Array.isArray(data)) {
           setStudents([]);
           return;
         }
@@ -91,35 +78,18 @@ export default function useAttendance({ token, onAttendanceSaved }) {
     setSaving(true);
 
     try {
-      const dateStr = selectedDay.toISOString().split("T")[0];
-
       const presentUserIds = students
         .filter((s) => s.attended)
         .map((s) => s.id);
 
-      const body = {
-        date: dateStr,
-        presentUserIds,
-        scheduleTemplateId: selectedClass.isException ? null : selectedClass.id,
-        scheduleExceptionId: selectedClass.isException
-          ? selectedClass.id
-          : null,
-      };
-
-      const res = await fetch(`${API_BASE_URL}/enrollments/attendance`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      await saveAttendanceRequest(
+        {
+          selectedClass,
+          selectedDay,
+          presentUserIds,
         },
-        body: JSON.stringify(body),
-      });
-
-      if (!res.ok) {
-        const err = await res.json();
-        console.error("saveAttendance error:", err);
-        return;
-      }
+        token,
+      );
 
       await onAttendanceSaved?.();
       closeAttendance();

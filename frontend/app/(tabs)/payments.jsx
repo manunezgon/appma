@@ -3,7 +3,7 @@ import { FlatList, Text, TextInput, View } from "react-native";
 import { useLessons } from "../../context/LessonsContext";
 import { usePayments } from "../../context/PaymentsContext";
 import { useUser } from "../../context/UserContext";
-import { API_BASE_URL } from "../../config/api";
+import { getUsers } from "../../services/usersApi";
 
 import { PaymentModal } from "../../components/Payments/PaymentModal";
 import { StudentPaymentsModal } from "../../components/Payments/StudentPaymentsModal";
@@ -60,12 +60,7 @@ export default function Payments() {
 
     try {
       setLoadingStudents(true);
-      const response = await fetch(`${API_BASE_URL}/users`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!response.ok) throw new Error("Error loading users");
-      const data = await response.json();
+      const data = await getUsers(token);
 
       const studentsOnly = data
         .filter((u) => u.role === "MEMBER")

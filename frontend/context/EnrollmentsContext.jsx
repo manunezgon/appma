@@ -5,7 +5,13 @@ import {
   useEffect,
   useState,
 } from "react";
-import { API_BASE_URL, enrollmentsByDayUrl } from "../config/api";
+import {
+  createEnrollmentRequest,
+  createExceptionEnrollmentRequest,
+  deleteEnrollmentRequest,
+  getDayEnrollments,
+  getMyEnrollments,
+} from "../services/enrollmentsApi";
 import { useUser } from "./UserContext";
 
 const EnrollmentsContext = createContext();
@@ -21,18 +27,7 @@ export const EnrollmentsProvider = ({ children }) => {
     if (!token) return;
 
     try {
-      const res = await fetch(`${API_BASE_URL}/enrollments/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!res.ok) {
-        console.error("Error fetching enrollments");
-        return;
-      }
-
-      const data = await res.json();
+      const data = await getMyEnrollments(token);
       setEnrollments(data);
     } catch (err) {
       console.error(err);
@@ -65,15 +60,7 @@ export const EnrollmentsProvider = ({ children }) => {
       setLoadingEnrollments(true);
 
       try {
-        const dateStr = date.toISOString().split("T")[0];
-
-        const res = await fetch(enrollmentsByDayUrl(dateStr), {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (!res.ok) throw new Error("Error fetching enrollments");
-
-        const grouped = await res.json();
+        const grouped = await getDayEnrollments(date, token);
 
         setClassStudentsByDay(normalizeEnrollments(grouped));
       } catch (err) {
@@ -111,40 +98,9 @@ export const EnrollmentsProvider = ({ children }) => {
     });
 
     try {
-      const url = exceptionId
-        ? `${API_BASE_URL}/enrollments/exception/${exceptionId}`
-        : `${API_BASE_URL}/enrollments`;
-
-      const body = exceptionId
-        ? {}
-        : {
-            scheduleTemplateId,
-            date: date.toISOString().split("T")[0],
-          };
-
-      const res = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(body),
-      });
-
-      if (!res.ok) {
-        let errorText;
-
-        try {
-          const data = await res.json();
-          errorText = data?.error;
-        } catch {
-          errorText = await res.text();
-        }
-
-        throw new Error(errorText || "Error al inscribirse");
-      }
-
-      const enrollment = await res.json();
+      const enrollment = exceptionId
+        ? await createExceptionEnrollmentRequest(exceptionId, token)
+        : await createEnrollmentRequest(scheduleTemplateId, date, token);
 
       setEnrollments((prev) => [...prev, enrollment]);
 
@@ -163,14 +119,7 @@ export const EnrollmentsProvider = ({ children }) => {
   const deleteEnrollment = async (enrollmentId) => {
     if (!token) return;
 
-    const res = await fetch(`${API_BASE_URL}/enrollments/${enrollmentId}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!res.ok) throw new Error("Error deleting enrollment");
+    await deleteEnrollmentRequest(enrollmentId, token);
 
     setEnrollments((prev) =>
       prev.filter(

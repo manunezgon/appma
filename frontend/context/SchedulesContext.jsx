@@ -6,35 +6,18 @@ import {
   useMemo,
   useState,
 } from "react";
-import { API_BASE_URL } from "../config/api";
+import {
+  createScheduleExceptionRequest,
+  createScheduleRequest,
+  deleteScheduleRequest,
+  getSchedules,
+  getSchedulesByDay,
+  updateScheduleExceptionRequest,
+  updateScheduleRequest,
+} from "../services/schedulesApi";
 import { useUser } from "./UserContext";
 
 const SchedulesContext = createContext();
-
-const authFetch = async (url, options = {}, token) => {
-  const res = await fetch(url, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      ...options.headers,
-    },
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    console.error("Backend error text:", text);
-    throw new Error(text || "Request failed");
-  }
-
-  const text = await res.text();
-  try {
-    return text ? JSON.parse(text) : null;
-  } catch (err) {
-    console.warn("Failed to parse JSON:", err);
-    return null;
-  }
-};
 
 export const SchedulesProvider = ({ children }) => {
   const { token } = useUser();
@@ -46,11 +29,7 @@ export const SchedulesProvider = ({ children }) => {
     if (!token) return;
     setLoadingSchedules(true);
     try {
-      const data = await authFetch(
-        `${API_BASE_URL}/scheduleTemplates`,
-        {},
-        token,
-      );
+      const data = await getSchedules(token);
       setSchedules(data);
     } catch (err) {
       console.error("Error fetching schedules:", err);
@@ -66,29 +45,17 @@ export const SchedulesProvider = ({ children }) => {
   }, [fetchSchedules, token]);
 
   const createSchedule = useCallback(async (scheduleData) => {
-    await authFetch(
-      `${API_BASE_URL}/scheduleTemplates`,
-      { method: "POST", body: JSON.stringify(scheduleData) },
-      token,
-    );
+    await createScheduleRequest(scheduleData, token);
     await fetchSchedules();
   }, [fetchSchedules, token]);
 
   const updateSchedule = useCallback(async (id, scheduleData) => {
-    await authFetch(
-      `${API_BASE_URL}/scheduleTemplates/${id}`,
-      { method: "PUT", body: JSON.stringify(scheduleData) },
-      token,
-    );
+    await updateScheduleRequest(id, scheduleData, token);
     await fetchSchedules();
   }, [fetchSchedules, token]);
 
   const deleteSchedule = useCallback(async (id) => {
-    await authFetch(
-      `${API_BASE_URL}/scheduleTemplates/${id}`,
-      { method: "DELETE" },
-      token,
-    );
+    await deleteScheduleRequest(id, token);
     await fetchSchedules();
   }, [fetchSchedules, token]);
 
@@ -96,12 +63,7 @@ export const SchedulesProvider = ({ children }) => {
     async (date) => {
       if (!token) return;
       try {
-        const dateStr = date.toISOString().split("T")[0];
-        const data = await authFetch(
-          `${API_BASE_URL}/scheduleTemplates/day?date=${dateStr}`,
-          {},
-          token,
-        );
+        const data = await getSchedulesByDay(date, token);
         setDaySchedules(data);
       } catch (err) {
         console.error("Error fetching schedules for the day:", err);
@@ -121,20 +83,8 @@ export const SchedulesProvider = ({ children }) => {
   }) => {
     if (!token) return;
     try {
-      const dateStr = date.toISOString().split("T")[0];
-      await authFetch(
-        `${API_BASE_URL}/scheduleExceptions`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            lessonId,
-            startTime,
-            endTime,
-            cancelled,
-            date: dateStr,
-            description,
-          }),
-        },
+      await createScheduleExceptionRequest(
+        { lessonId, startTime, endTime, cancelled, date, description },
         token,
       );
     } catch (err) {
@@ -146,15 +96,7 @@ export const SchedulesProvider = ({ children }) => {
   const updateScheduleException = useCallback(async (id, dto) => {
     if (!token) return;
     try {
-      const dateStr = dto.date.toISOString().split("T")[0];
-      await authFetch(
-        `${API_BASE_URL}/scheduleExceptions/${id}`,
-        {
-          method: "PUT",
-          body: JSON.stringify({ ...dto, date: dateStr }),
-        },
-        token,
-      );
+      await updateScheduleExceptionRequest(id, dto, token);
     } catch (err) {
       console.error("Error updating schedule exception:", err);
       throw err;

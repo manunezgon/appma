@@ -1,32 +1,13 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { API_BASE_URL } from "../config/api";
+import {
+  createLessonRequest,
+  deleteLessonRequest,
+  getLessons,
+  updateLessonRequest,
+} from "../services/lessonsApi";
 import { useUser } from "./UserContext";
 
 const LessonsContext = createContext();
-
-const authFetch = async (url, options = {}, token) => {
-  const res = await fetch(url, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      ...options.headers,
-    },
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || "Request failed");
-  }
-
-  const text = await res.text();
-  try {
-    return text ? JSON.parse(text) : null;
-  } catch (err) {
-    console.warn("Failed to parse JSON:", err);
-    return null;
-  }
-};
 
 export const LessonsProvider = ({ children }) => {
   const { token } = useUser();
@@ -37,7 +18,7 @@ export const LessonsProvider = ({ children }) => {
     if (!token) return;
     setLoadingLessons(true);
     try {
-      const data = await authFetch(`${API_BASE_URL}/lessons`, {}, token);
+      const data = await getLessons(token);
       setLessons(data);
     } catch (err) {
       console.error("Error fetching lessons:", err);
@@ -53,36 +34,18 @@ export const LessonsProvider = ({ children }) => {
   }, [fetchLessons, token]);
 
   const createLesson = useCallback(async (lessonData) => {
-    const createdLesson = await authFetch(
-      `${API_BASE_URL}/lessons/register`,
-      {
-        method: "POST",
-        body: JSON.stringify(lessonData),
-      },
-      token,
-    );
+    const createdLesson = await createLessonRequest(lessonData, token);
     await fetchLessons();
     return createdLesson;
   }, [fetchLessons, token]);
 
   const updateLesson = useCallback(async (id, lessonData) => {
-    await authFetch(
-      `${API_BASE_URL}/lessons/${id}`,
-      {
-        method: "PUT",
-        body: JSON.stringify(lessonData),
-      },
-      token,
-    );
+    await updateLessonRequest(id, lessonData, token);
     await fetchLessons();
   }, [fetchLessons, token]);
 
   const deleteLesson = useCallback(async (id) => {
-    await authFetch(
-      `${API_BASE_URL}/lessons/${id}`,
-      { method: "DELETE" },
-      token,
-    );
+    await deleteLessonRequest(id, token);
     await fetchLessons();
   }, [fetchLessons, token]);
 
