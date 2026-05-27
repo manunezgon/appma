@@ -183,8 +183,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   monthTitle: {
-    fontSize: 15,
-    fontWeight: "bold",
+    ...typography.screenTitle,
     color: colors.textMuted,
     textTransform: "uppercase",
   },

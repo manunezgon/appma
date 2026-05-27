@@ -18,6 +18,34 @@ const styles = StyleSheet.create({
     borderRadius: radii.md,
     backgroundColor: colors.cardLight,
   },
+
+  infoContainer: {
+    flex: 1,
+  },
+
+  rightContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+  },
+
+  dateTimeContainer: {
+    alignItems: "flex-end",
+  },
+
+  upcomingCard: {
+    backgroundColor: colors.surfaceMuted,
+    opacity: 0.9,
+  },
+
+  upcomingText: {
+    color: colors.textMuted,
+  },
+
+  upcomingSubText: {
+    color: colors.textMuted,
+  },
+
   className: { ...typography.cardTitle, color: colors.textOnLight },
   professorName: { ...typography.body, color: colors.textOnLight },
   date: { ...typography.body, color: colors.textOnLight },
@@ -28,6 +56,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.textMuted,
   },
+
   modalOverlay: {
     ...layout.modalOverlay,
   },

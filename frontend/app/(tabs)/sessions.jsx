@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { useMemo, useState } from "react";
 import {
   Modal,
   RefreshControl,
@@ -86,19 +86,45 @@ export default function Sessions() {
     }
   };
 
-  const renderItem = ({ item }) => (
-    <View style={styles.classCard}>
-      <View>
-        <Text style={styles.className}>{item.lessonName}</Text>
-        <Text style={styles.professorName}>{item.professorName}</Text>
-        <Text style={styles.date}>{item.date}</Text>
-        <Text style={styles.time}>{item.time}</Text>
+  const renderItem = ({ item, section }) => {
+    const isUpcoming = section.title === "Upcoming classes";
+
+    return (
+      <View style={[styles.classCard, isUpcoming && styles.upcomingCard]}>
+        <View style={styles.infoContainer}>
+          <Text style={[styles.className, isUpcoming && styles.upcomingText]}>
+            {item.lessonName}
+          </Text>
+
+          <Text
+            style={[styles.professorName, isUpcoming && styles.upcomingSubText]}
+          >
+            {item.professorName}
+          </Text>
+        </View>
+
+        <View style={styles.rightContainer}>
+          <View style={styles.dateTimeContainer}>
+            <Text style={[styles.date, isUpcoming && styles.upcomingSubText]}>
+              {item.date}
+            </Text>
+
+            <Text style={[styles.time, isUpcoming && styles.upcomingText]}>
+              {item.time}
+            </Text>
+          </View>
+
+          <TouchableOpacity onPress={() => confirmUnenroll(item.enrollmentId)}>
+            <Ionicons
+              name="log-out-outline"
+              size={26}
+              color={isUpcoming ? colors.textMuted : colors.danger}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
-      <TouchableOpacity onPress={() => confirmUnenroll(item.enrollmentId)}>
-        <Ionicons name="log-out-outline" size={28} color={colors.danger} />
-      </TouchableOpacity>
-    </View>
-  );
+    );
+  };
 
   const renderSectionHeader = ({ section }) => (
     <View style={styles.sectionHeaderContainer}>
