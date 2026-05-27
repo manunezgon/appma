@@ -1,14 +1,15 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FlatList, Text, TextInput, View } from "react-native";
 import { useLessons } from "../../context/LessonsContext";
 import { usePayments } from "../../context/PaymentsContext";
 import { useUser } from "../../context/UserContext";
-import { API_BASE_URL } from "../config";
+import { getUsers } from "../../services/usersApi";
 
 import { PaymentModal } from "../../components/Payments/PaymentModal";
 import { StudentPaymentsModal } from "../../components/Payments/StudentPaymentsModal";
 import { StudentCard } from "../../components/Payments/StudentCard";
-import style from "../../Styles/PaymentStyle"
+import style from "../../Styles/PaymentStyle";
+import { colors } from "../../Styles/theme";
 
 const generateMonths = () => {
   const months = [];
@@ -31,7 +32,7 @@ const generateMonths = () => {
 };
 
 export default function Payments() {
-  const { user } = useUser();
+  const { token } = useUser();
   const { lessons } = useLessons();
   const {
     payments,
@@ -54,15 +55,12 @@ export default function Payments() {
 
   const [months] = useState(generateMonths());
 
-  const fetchStudents = async () => {
+  const fetchStudents = useCallback(async () => {
+    if (!token) return;
+
     try {
       setLoadingStudents(true);
-      const response = await fetch(`${API_BASE_URL}/users`, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
-
-      if (!response.ok) throw new Error("Error loading users");
-      const data = await response.json();
+      const data = await getUsers(token);
 
       const studentsOnly = data
         .filter((u) => u.role === "MEMBER")
@@ -80,25 +78,70 @@ export default function Payments() {
     } finally {
       setLoadingStudents(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
-    if (user?.token) fetchStudents();
-  }, [user]);
+    fetchStudents();
+  }, [fetchStudents]);
 
-  const filteredStudents = students.filter((s) =>
-    s.name.toLowerCase().includes(search.toLowerCase()),
+  const filteredStudents = useMemo(() => {
+    const normalizedSearch = search.toLowerCase();
+
+    return students.filter((s) =>
+      s.name.toLowerCase().includes(normalizedSearch),
+    );
+  }, [search, students]);
+
+  const paidMonths = useMemo(
+    () => payments.map((payment) => payment.monthPaid),
+    [payments],
+  );
+
+  const handleStudentPress = useCallback(
+    (student) => {
+      setSelectedStudent(student);
+      fetchPaymentsByUser(student.id);
+    },
+    [fetchPaymentsByUser],
+  );
+
+  const handleDeletePayment = useCallback(
+    (paymentId) => {
+      if (!selectedStudent) return;
+      deletePayment(paymentId, selectedStudent.id);
+    },
+    [deletePayment, selectedStudent],
+  );
+
+  const handleConfirmPayment = useCallback(
+    async (data) => {
+      if (!selectedStudent) return;
+
+      await registerPayment({
+        userId: selectedStudent.id,
+        ...data,
+      });
+
+      setShowPaymentModal(false);
+      setSelectedMonth("");
+      setSelectedLessonId(null);
+    },
+    [registerPayment, selectedStudent],
+  );
+
+  const renderStudent = useCallback(
+    ({ item }) => <StudentCard student={item} onPress={handleStudentPress} />,
+    [handleStudentPress],
   );
 
   return (
     <View style={style.container}>
-
       <Text style={style.title}>Students</Text>
 
       <View style={style.searchBox}>
         <TextInput
           placeholder="Search students..."
-          placeholderTextColor="#888"
+          placeholderTextColor={colors.textSubtle}
           style={style.searchInput}
           value={search}
           onChangeText={setSearch}
@@ -111,15 +154,7 @@ export default function Payments() {
         <FlatList
           data={filteredStudents}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <StudentCard
-              student={item}
-              onPress={(student) => {
-                setSelectedStudent(student);
-                fetchPaymentsByUser(student.id);
-              }}
-            />
-          )}
+          renderItem={renderStudent}
           ListEmptyComponent={<Text style={style.empty}>No students</Text>}
         />
       )}
@@ -127,7 +162,7 @@ export default function Payments() {
       <StudentPaymentsModal
         student={selectedStudent}
         payments={payments}
-        onDelete={(paymentId) => deletePayment(paymentId, selectedStudent.id)}
+        onDelete={handleDeletePayment}
         onRegister={() => setShowPaymentModal(true)}
         onClose={() => {
           setSelectedStudent(null);
@@ -140,21 +175,12 @@ export default function Payments() {
         student={selectedStudent}
         lessons={lessons}
         months={months}
-        paidMonths={payments.map((p) => p.monthPaid)}
+        paidMonths={paidMonths}
         selectedLessonId={selectedLessonId}
         setSelectedLessonId={setSelectedLessonId}
         selectedMonth={selectedMonth}
         setSelectedMonth={setSelectedMonth}
-        onConfirm={async (data) => {
-          await registerPayment({
-            userId: selectedStudent.id,
-            ...data,
-          });
-
-          setShowPaymentModal(false);
-          setSelectedMonth("");
-          setSelectedLessonId(null);
-        }}
+        onConfirm={handleConfirmPayment}
         registering={registeringPayment}
         onClose={() => setShowPaymentModal(false)}
       />

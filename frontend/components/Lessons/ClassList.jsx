@@ -1,17 +1,16 @@
-import { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { useCallback, useState } from "react";
 import {
   FlatList,
-  Image,
   Modal,
   RefreshControl,
-  ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import styles from "../../Styles/LessonStyles.jsx";
-import defaultProfileImg from "../../app/assets/images/white_logo_circle.png";
+import { colors } from "../../Styles/theme";
+import ClassItem from "./ClassItem";
 
 export default function ClassList({
   classes,
@@ -25,119 +24,47 @@ export default function ClassList({
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [selectedClass, setSelectedClass] = useState(null);
 
-  const confirmDelete = (item) => {
+  const confirmDelete = useCallback((item) => {
     setSelectedClass(item);
     setConfirmVisible(true);
-  };
+  }, []);
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(async () => {
     if (!selectedClass) return;
-    onDeleteClass(selectedClass);
+
+    await onDeleteClass(selectedClass);
+
     setConfirmVisible(false);
     setSelectedClass(null);
-  };
+  }, [onDeleteClass, selectedClass]);
 
-  const handleTakeAttendance = (item) => {
-    onTakeAttendance(item);
-  };
+  const closeConfirm = useCallback(() => {
+    setConfirmVisible(false);
+    setSelectedClass(null);
+  }, []);
+
+  const renderItem = useCallback(
+    ({ item }) => (
+      <ClassItem
+        item={item}
+        userRole={userRole}
+        onEnroll={onEnroll}
+        onDeleteClass={confirmDelete}
+        onTakeAttendance={onTakeAttendance}
+      />
+    ),
+    [confirmDelete, onEnroll, onTakeAttendance, userRole],
+  );
 
   return (
     <View style={styles.classContainer}>
       <FlatList
         data={classes}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => {
-          return (
-            <View style={styles.classCard}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <View style={styles.leftContainer}>
-                  <Text style={styles.className}>{item.lessonName}</Text>
-                  <Text style={styles.professorName}>{item.professorName}</Text>
-                </View>
-
-                <View style={styles.centerContainer}>
-                  <Text style={styles.classTime}>{item.time}</Text>
-                </View>
-
-                <View style={styles.rightContainer}>
-                  {userRole === "ADMIN" ? (
-                    <View style={{ flexDirection: "row", gap: 12 }}>
-                      <TouchableOpacity
-                        onPress={() => handleTakeAttendance(item)}
-                      >
-                        <Ionicons
-                          name="clipboard-outline"
-                          size={28}
-                          color="#7c23b0ff"
-                        />
-                      </TouchableOpacity>
-
-                      <TouchableOpacity onPress={() => confirmDelete(item)}>
-                        <Ionicons
-                          name="trash-outline"
-                          size={28}
-                          color="#FF3B30"
-                        />
-                      </TouchableOpacity>
-                    </View>
-                  ) : (
-                    <TouchableOpacity
-                      style={[
-                        styles.enrollButton,
-                        item.isEnrolled && styles.enrollButtonDisabled,
-                      ]}
-                      disabled={item.isEnrolled || item.isPast}
-                      onPress={() => onEnroll(item.id, item.isException)}
-                    >
-                      <Ionicons
-                        name={
-                          item.isEnrolled
-                            ? "checkmark-circle"
-                            : item.isPast
-                              ? "time-outline"
-                              : "add-circle"
-                        }
-                        size={30}
-                        color={
-                          item.isEnrolled
-                            ? "#00923aff"
-                            : item.isPast
-                              ? "#555555"
-                              : "#7c23b0ff"
-                        }
-                      />
-                    </TouchableOpacity>
-                  )}
-                </View>
-              </View>
-              {item.students?.length > 0 && (
-                <ScrollView
-                  style={styles.studentRow}
-                  horizontal
-                  showsHorizontalScrollIndicator={false} // ⬅️ opcional, oculta la barra de scroll
-                >
-                  {item.students.map((s) => (
-                    <Image
-                      key={s.id}
-                      source={
-                        s.profileImageUrl
-                          ? { uri: s.profileImageUrl }
-                          : defaultProfileImg
-                      }
-                      style={styles.studentAvatar}
-                    />
-                  ))}
-                </ScrollView>
-              )}
-            </View>
-          );
-        }}
+        renderItem={renderItem}
+        keyExtractor={(item) => String(item.id)}
+        removeClippedSubviews
+        initialNumToRender={8}
+        windowSize={7}
         ListEmptyComponent={
           <Text style={styles.noClasses}>No classes scheduled.</Text>
         }
@@ -145,26 +72,23 @@ export default function ClassList({
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       />
+
       <Modal visible={confirmVisible} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalText}>
-              Are you sure you want to delete the class "
-              {selectedClass?.lessonName}"?
+              {`Are you sure you want to delete the class "${selectedClass?.lessonName}"?`}
             </Text>
 
             <View style={styles.modalButtons}>
               <TouchableOpacity
-                onPress={() => {
-                  setConfirmVisible(false);
-                  setSelectedClass(null);
-                }}
+                onPress={closeConfirm}
               >
-                <Ionicons name="close" size={28} color="#7c23b0ff" />
+                <Ionicons name="close" size={28} color={colors.primary} />
               </TouchableOpacity>
 
               <TouchableOpacity onPress={handleDelete}>
-                <Ionicons name="trash-outline" size={28} color="#FF3B30" />
+                <Ionicons name="trash-outline" size={28} color={colors.danger} />
               </TouchableOpacity>
             </View>
           </View>

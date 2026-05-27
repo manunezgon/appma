@@ -1,56 +1,75 @@
 import { StyleSheet } from "react-native";
+import { colors, layout, radii, spacing, typography } from "./theme";
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#1E1E1E",
-    paddingTop: 50,
-    paddingHorizontal: 20,
+    ...layout.screen,
   },
-  sectionHeaderContainer: { paddingTop: 20, paddingBottom: 10 },
+  sectionHeaderContainer: { paddingTop: spacing.xl, paddingBottom: spacing.md },
   sectionHeader: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#CCCCCC",
-    textTransform: "uppercase",
-    justifyContent: "center",
-    textAlign: "center",
+    ...typography.screenTitle,
   },
   classCard: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 15,
-    marginBottom: 10,
-    borderRadius: 10,
-    backgroundColor: "#CCCCCC",
+    padding: spacing.lg,
+    marginBottom: spacing.md,
+    borderRadius: radii.md,
+    backgroundColor: colors.cardLight,
   },
-  className: { fontSize: 16, fontWeight: "600" },
-  professorName: { fontSize: 14, color: "#555" },
-  date: { fontSize: 14, color: "#555" },
-  time: { fontSize: 14, color: "#555" },
+
+  infoContainer: {
+    flex: 1,
+  },
+
+  rightContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+  },
+
+  dateTimeContainer: {
+    alignItems: "flex-end",
+  },
+
+  upcomingCard: {
+    backgroundColor: colors.surfaceMuted,
+    opacity: 0.9,
+  },
+
+  upcomingText: {
+    color: colors.textMuted,
+  },
+
+  upcomingSubText: {
+    color: colors.textMuted,
+  },
+
+  className: { ...typography.cardTitle, color: colors.textOnLight },
+  professorName: { ...typography.body, color: colors.textOnLight },
+  date: { ...typography.body, color: colors.textOnLight },
+  time: { ...typography.body, color: colors.textOnLight },
   noClasses: {
     textAlign: "center",
-    marginTop: 20,
+    marginTop: spacing.xl,
     fontSize: 16,
-    color: "#555",
+    color: colors.textMuted,
   },
+
   modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
+    ...layout.modalOverlay,
   },
   modalContent: {
-    backgroundColor: "#CCCCCC",
-    padding: 20,
-    borderRadius: 10,
+    backgroundColor: colors.cardLight,
+    padding: spacing.xl,
+    borderRadius: radii.md,
     width: "80%",
   },
-  modalText: { fontSize: 16, marginBottom: 20, textAlign: "center" },
+  modalText: { fontSize: 16, marginBottom: spacing.xl, textAlign: "center" },
   modalButtons: { flexDirection: "row", justifyContent: "space-between" },
-  modalButton: { padding: 5 },
-  loading: { textAlign: "center", marginTop: 50 }
+  modalButton: { padding: spacing.xs },
+  loading: { textAlign: "center", marginTop: 50, color: colors.textMuted },
 });
 
 export default styles;

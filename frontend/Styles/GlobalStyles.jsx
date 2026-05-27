@@ -1,15 +1,20 @@
 import { StyleSheet } from "react-native";
+import { colors, radii, spacing } from "./theme";
 
 const styles = StyleSheet.create({
-    container: {
+  container: {
     flexGrow: 1,
     alignItems: "center",
     justifyContent: "center",
   },
+  screen: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
   loader: {
-    flex: 1, 
-    justifyContent: 'center', 
-    alignItems: 'center'
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   logo: {
     width: 200,
@@ -17,29 +22,32 @@ const styles = StyleSheet.create({
     marginBottom: 25,
   },
   input: {
-    width: "90%", 
+    width: "90%",
     borderWidth: 1,
-    borderColor: "#F5F5F5",
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 10,
-    backgroundColor: "#F5F5F5", 
-    color: "#000000ff", 
+    borderColor: colors.text,
+    borderRadius: radii.sm,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    backgroundColor: colors.text,
+    color: colors.black,
   },
   button: {
-    backgroundColor: "#7c23b0ff", 
-    padding: 12,
-    borderRadius: 8,
+    backgroundColor: colors.primary,
+    padding: spacing.md,
+    borderRadius: radii.sm,
     alignItems: "center",
   },
   buttonText: {
-    color: "#F5F5F5",
+    color: colors.text,
     fontSize: 16,
   },
   linkText: {
-    color: "#F5F5F5", 
-    marginTop: 30,
+    color: colors.text,
+    marginTop: spacing.xxl,
   },
- });
+  activityIndicator: {
+    color: colors.text,
+  },
+});
 
 export default styles;

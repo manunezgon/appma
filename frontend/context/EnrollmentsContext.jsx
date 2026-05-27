@@ -5,141 +5,125 @@ import {
   useEffect,
   useState,
 } from "react";
-import { API_BASE_URL, enrollmentsByDayUrl } from "../app/config";
+import {
+  createEnrollmentRequest,
+  createExceptionEnrollmentRequest,
+  deleteEnrollmentRequest,
+  getDayEnrollments,
+  getMyEnrollments,
+} from "../services/enrollmentsApi";
 import { useUser } from "./UserContext";
 
 const EnrollmentsContext = createContext();
 
 export const EnrollmentsProvider = ({ children }) => {
-  const { token } = useUser();
-  const [enrollments, setEnrollments] = useState([]); // 🟢 guardamos enrollments del usuario
+  const { user, token } = useUser();
+
+  const [enrollments, setEnrollments] = useState([]);
+  const [classStudentsByDay, setClassStudentsByDay] = useState({});
+  const [loadingEnrollments, setLoadingEnrollments] = useState(false);
 
   const fetchMyEnrollments = useCallback(async () => {
     if (!token) return;
 
-    const res = await fetch(`${API_BASE_URL}/enrollments/me`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!res.ok) {
-      console.error("Error fetching enrollments");
-      return;
+    try {
+      const data = await getMyEnrollments(token);
+      setEnrollments(data);
+    } catch (err) {
+      console.error(err);
     }
-
-    const data = await res.json();
-    setEnrollments(data);
   }, [token]);
 
-  const fetchClassEnrollmentsByDay = useCallback(
-    async (date) => {
-      if (!token) return { byTemplateId: {}, byExceptionId: {} };
-      const dateStr = date.toISOString().split("T")[0];
-      const res = await fetch(enrollmentsByDayUrl(dateStr), {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) {
-        console.error("Error fetching day enrollments");
-        return { byTemplateId: {}, byExceptionId: {} };
-      }
-      return res.json();
-    },
-    [token],
-  );
+  const normalizeEnrollments = (grouped) => {
+    const byT = grouped.byTemplateId || {};
+    const byE = grouped.byExceptionId || {};
 
-  const fetchClassEnrollments = useCallback(
-    async ({
-      scheduleTemplateId = null,
-      scheduleExceptionId = null,
-      date,
-    }) => {
-      if (!token) return [];
+    const result = {};
 
-      const params = new URLSearchParams({ date });
-      if (scheduleTemplateId)
-        params.append("scheduleTemplateId", scheduleTemplateId);
-      if (scheduleExceptionId)
-        params.append("scheduleExceptionId", scheduleExceptionId);
+    Object.keys({ ...byT, ...byE }).forEach((key) => {
+      const list = byT[key] || byE[key] || [];
 
-      const res = await fetch(`${API_BASE_URL}/enrollments/class?${params}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!res.ok) {
-        console.error("Error fetching class enrollments");
-        return [];
-      }
-
-      const data = await res.json();
-
-      return data.map((e) => ({
-        id: e.userId,
-        name: e.userName,
-        profileImageUrl: e.profileImageUrl || null,
+      result[key] = list.map((s) => ({
+        id: s.userId,
+        name: s.userName,
+        profileImageUrl: s.profileImageUrl || null,
       }));
+    });
+
+    return result;
+  };
+
+  const loadDayEnrollments = useCallback(
+    async (date) => {
+      if (!token) return;
+
+      setLoadingEnrollments(true);
+
+      try {
+        const grouped = await getDayEnrollments(date, token);
+
+        setClassStudentsByDay(normalizeEnrollments(grouped));
+      } catch (err) {
+        console.error(err);
+        setClassStudentsByDay({});
+      } finally {
+        setLoadingEnrollments(false);
+      }
     },
     [token],
   );
 
-  // --- Función genérica para enroll ---
   const enrollUser = async (scheduleTemplateId, date, exceptionId = null) => {
     if (!token) throw new Error("No user token found");
 
-    let url = exceptionId
-      ? `${API_BASE_URL}/enrollments/exception/${exceptionId}`
-      : `${API_BASE_URL}/enrollments`;
+    const classKey = exceptionId || scheduleTemplateId;
 
-    let body = exceptionId
-      ? {}
-      : { scheduleTemplateId, date: date.toISOString().split("T")[0] };
+    const optimisticStudent = {
+      id: user.id,
+      name: user.name,
+      profileImageUrl: user.profileImageUrl || null,
+    };
 
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(body),
+    setClassStudentsByDay((prev) => {
+      const currentStudents = prev[classKey] || [];
+
+      const alreadyExists = currentStudents.some((s) => s.id === user.id);
+
+      if (alreadyExists) return prev;
+
+      return {
+        ...prev,
+        [classKey]: [...currentStudents, optimisticStudent],
+      };
     });
 
-    if (!res.ok) {
-      let errorText;
-      try {
-        const data = await res.json();
-        errorText = data?.error;
-      } catch {
-        errorText = await res.text();
-      }
-      throw new Error(errorText || "Error al inscribirse");
+    try {
+      const enrollment = exceptionId
+        ? await createExceptionEnrollmentRequest(exceptionId, token)
+        : await createEnrollmentRequest(scheduleTemplateId, date, token);
+
+      setEnrollments((prev) => [...prev, enrollment]);
+
+      return enrollment;
+    } catch (err) {
+      // rollback
+      setClassStudentsByDay((prev) => ({
+        ...prev,
+        [classKey]: (prev[classKey] || []).filter((s) => s.id !== user.id),
+      }));
+
+      throw err;
     }
-
-    const enrollment = await res.json();
-
-    // 🔹 actualizar el state después de enroll
-    setEnrollments((prev) => [...prev, enrollment]);
-
-    return enrollment;
   };
 
-  // --- Opcional: eliminar enrollment ---
   const deleteEnrollment = async (enrollmentId) => {
     if (!token) return;
 
-    const res = await fetch(`${API_BASE_URL}/enrollments/${enrollmentId}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!res.ok) throw new Error("Error deleting enrollment");
+    await deleteEnrollmentRequest(enrollmentId, token);
 
     setEnrollments((prev) =>
       prev.filter(
-        (e) =>
-          e.enrollmentId !== enrollmentId &&
-          e.id !== enrollmentId,
+        (e) => e.enrollmentId !== enrollmentId && e.id !== enrollmentId,
       ),
     );
   };
@@ -153,10 +137,13 @@ export const EnrollmentsProvider = ({ children }) => {
       value={{
         enrollments,
         fetchMyEnrollments,
+
+        classStudentsByDay,
+        loadingEnrollments,
+        loadDayEnrollments,
+
         enrollUser,
         deleteEnrollment,
-        fetchClassEnrollments,
-        fetchClassEnrollmentsByDay,
       }}
     >
       {children}

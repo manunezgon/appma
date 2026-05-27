@@ -22,7 +22,7 @@ function RootGuard({ children }) {
     if (mounted && !user && pathname !== "/login" && pathname !== "/register") {
       router.replace("/login");
     }
-  }, [mounted, user, pathname]);
+  }, [mounted, user, pathname, router]);
 
   if (!mounted) return <Text>Cargando...</Text>;
 

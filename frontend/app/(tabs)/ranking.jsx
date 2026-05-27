@@ -7,7 +7,8 @@ import RankingList from "../../components/Ranking/RankingList";
 import { useLessons } from "../../context/LessonsContext";
 import { useUser } from "../../context/UserContext";
 import styles from "../../Styles/RankingStyles";
-import { API_BASE_URL } from "../config";
+import { colors } from "../../Styles/theme";
+import { getRanking } from "../../services/metricsApi";
 
 export default function Ranking() {
   const { user, token } = useUser();
@@ -18,12 +19,11 @@ export default function Ranking() {
   const [selectedType, setSelectedType] = useState("month");
   const [loading, setLoading] = useState(false);
 
-  const { myIndex, myPosition, myClasses } = useMemo(() => {
+  const { myPosition, myClasses } = useMemo(() => {
     const index = ranking.findIndex(
       (r) => Number(r.userId) === Number(user?.id),
     );
     return {
-      myIndex: index,
       myPosition: index !== -1 ? index + 1 : null,
       myClasses: index !== -1 ? ranking[index].totalClasses : 0,
     };
@@ -45,17 +45,7 @@ export default function Ranking() {
     const fetchRanking = async () => {
       setLoading(true);
       try {
-        let url = `${API_BASE_URL}/metrics/${selectedType}`;
-
-        if (selectedLesson) {
-          url += `?lessonId=${selectedLesson}`;
-        }
-
-        const res = await fetch(url, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        const data = await res.json();
+        const data = await getRanking({ selectedType, selectedLesson }, token);
         setRanking(data);
       } catch (err) {
         console.error(err);
@@ -82,7 +72,7 @@ export default function Ranking() {
       />
 
       {loading ? (
-        <ActivityIndicator size="large" color="#69188E" />
+        <ActivityIndicator size="large" color={colors.primary} />
       ) : (
         <>
           <ProgressCard position={myPosition} classes={myClasses} />

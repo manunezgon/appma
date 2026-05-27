@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import style from "../../Styles/NewsStyles";
+import { colors } from "../../Styles/theme";
 
 export default function CarouselEditorModal({
   visible,
@@ -21,8 +22,8 @@ export default function CarouselEditorModal({
   const [localImages, setLocalImages] = useState(images);
 
   useEffect(() => {
-    if (visible) setLocalImages(images);
-  }, [visible]);
+    setLocalImages(images ?? []);
+  }, [images]);
 
   const moveImage = (index, direction) => {
     const newIndex = index + direction;
@@ -36,23 +37,19 @@ export default function CarouselEditorModal({
   };
 
   const handleDelete = (index) => {
-    Alert.alert(
-      "Borrar imagen",
-      "¿Estás seguro de que quieres borrar esta imagen?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Borrar",
-          style: "destructive",
-          onPress: () => {
-            const newImages = [...localImages];
-            newImages.splice(index, 1);
-            setLocalImages(newImages);
-            onDelete(index);
-          },
+    Alert.alert("Delete Image", "Are you sure you want to delete this image?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => {
+          const newImages = [...localImages];
+          newImages.splice(index, 1);
+          setLocalImages(newImages);
+          onDelete(index);
         },
-      ],
-    );
+      },
+    ]);
   };
 
   return (
@@ -65,7 +62,7 @@ export default function CarouselEditorModal({
       <View style={style.modalOverlay}>
         <View style={style.editModalContent}>
           <TouchableOpacity onPress={onClose} style={style.closeModalButton}>
-            <Ionicons name="close" size={30} color="#69188E" />
+            <Ionicons name="close" size={30} color={colors.primary} />
           </TouchableOpacity>
 
           <View style={style.imagesContainer}>
@@ -81,7 +78,11 @@ export default function CarouselEditorModal({
                     style={style.reorderButton}
                     onPress={() => moveImage(idx, -1)}
                   >
-                    <Ionicons name="arrow-up-outline" size={16} color="#fff" />
+                    <Ionicons
+                      name="arrow-up-outline"
+                      size={16}
+                      color={colors.text}
+                    />
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={style.reorderButton}
@@ -90,7 +91,7 @@ export default function CarouselEditorModal({
                     <Ionicons
                       name="arrow-down-outline"
                       size={16}
-                      color="#fff"
+                      color={colors.text}
                     />
                   </TouchableOpacity>
                 </View>
@@ -99,13 +100,17 @@ export default function CarouselEditorModal({
                   style={style.deleteImageButton}
                   onPress={() => handleDelete(idx)}
                 >
-                  <Ionicons name="trash-outline" size={16} color="#fff" />
+                  <Ionicons
+                    name="trash-outline"
+                    size={16}
+                    color={colors.text}
+                  />
                 </TouchableOpacity>
               </View>
             ))}
 
             <TouchableOpacity style={style.addImageButton} onPress={onAdd}>
-              <Ionicons name="add-outline" size={30} color="#fff" />
+              <Ionicons name="add-outline" size={30} color={colors.text} />
             </TouchableOpacity>
           </View>
           <TouchableOpacity

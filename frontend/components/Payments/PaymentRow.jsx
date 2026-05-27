@@ -1,8 +1,10 @@
+import { Ionicons } from "@expo/vector-icons";
+import { memo, useCallback } from "react";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import style from "../../Styles/PaymentStyle";
+import { colors } from "../../Styles/theme";
 
-export const PaymentRow = ({ payment, onDelete }) => {
+const PaymentRowComponent = ({ payment, onDelete }) => {
   const formatMonth = (monthString) => {
     const [year, month] = monthString.split("-");
     const date = new Date(year, month - 1);
@@ -12,6 +14,21 @@ export const PaymentRow = ({ payment, onDelete }) => {
       year: "numeric",
     });
   };
+
+  const confirmDelete = useCallback(() => {
+    Alert.alert(
+      "Delete payment",
+      "Are you sure you want to delete this payment?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => onDelete(payment.id),
+        },
+      ],
+    );
+  }, [onDelete, payment.id]);
 
   return (
     <View style={style.paymentRow}>
@@ -23,24 +40,11 @@ export const PaymentRow = ({ payment, onDelete }) => {
           Lesson: {payment.lessonName} ({payment.professorName})
         </Text>
       </View>
-      <TouchableOpacity
-        onPress={() =>
-          Alert.alert(
-            "Delete payment",
-            "Are you sure you want to delete this payment?",
-            [
-              { text: "Cancel", style: "cancel" },
-              {
-                text: "Delete",
-                style: "destructive",
-                onPress: () => onDelete(payment.id),
-              },
-            ],
-          )
-        }
-      >
-        <Ionicons name="trash-outline" size={22} color="#ff4d4d" />
+      <TouchableOpacity onPress={confirmDelete}>
+        <Ionicons name="trash-outline" size={22} color={colors.danger} />
       </TouchableOpacity>
     </View>
   );
 };
+
+export const PaymentRow = memo(PaymentRowComponent);

@@ -1,6 +1,5 @@
 "use client";
 import { useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -16,7 +15,8 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useUser } from "../context/UserContext";
 import styles from "../Styles/GlobalStyles";
-import { API_BASE_URL } from "./config";
+import { colors } from "../Styles/theme";
+import { registerRequest } from "../services/usersApi";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -41,29 +41,15 @@ export default function Register() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/users/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, phone }),
-      });
+      const data = await registerRequest({ name, email, password, phone });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        Alert.alert("Error", data.message || "Unable to register");
-        setLoading(false);
-        return;
-      }
-
-      await SecureStore.setItemAsync("userToken", data.token);
-
-      login({
+      await login({
         token: data.token,
         user: data.user,
       });
     } catch (error) {
       console.error(error);
-      Alert.alert("Error", "Unable to connect to the server");
+      Alert.alert("Error", error?.message || "Unable to connect to the server");
     } finally {
       setLoading(false);
     }
@@ -81,7 +67,7 @@ export default function Register() {
 
   return (
     <KeyboardAwareScrollView
-      style={{ flex: 1, backgroundColor: "#1E1E1E" }}
+      style={styles.screen}
       contentContainerStyle={styles.container}
       enableOnAndroid={true}
       extraHeight={Platform.OS === "android" ? 80 : 0}
@@ -128,7 +114,7 @@ export default function Register() {
         disabled={loading || !name || !email || !password}
       >
         {loading ? (
-          <ActivityIndicator color="#fff" />
+          <ActivityIndicator color={colors.text} />
         ) : (
           <Text style={styles.buttonText}>REGISTER</Text>
         )}

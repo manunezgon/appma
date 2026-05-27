@@ -1,8 +1,9 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { useEffect, useState } from "react";
 import { Modal, Switch, Text, TouchableOpacity, View } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import style from "../../Styles/PaymentStyle";
+import { colors } from "../../Styles/theme";
 
 export const PaymentModal = ({
   visible,
@@ -26,7 +27,7 @@ export const PaymentModal = ({
       setSelectedLessonId(null);
       setSelectedMonth("");
     }
-  }, [visible]);
+  }, [visible, setSelectedLessonId, setSelectedMonth]);
 
   const handleConfirm = () => {
     onConfirm({
@@ -111,7 +112,7 @@ export const PaymentModal = ({
           </TouchableOpacity>
 
           <TouchableOpacity style={style.closeButton} onPress={onClose}>
-            <Ionicons name="close" size={28} color="#69188E" />
+            <Ionicons name="close" size={28} color={colors.primary} />
           </TouchableOpacity>
         </View>
       </View>

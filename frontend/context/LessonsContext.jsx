@@ -1,43 +1,24 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { API_BASE_URL } from "../app/config";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createLessonRequest,
+  deleteLessonRequest,
+  getLessons,
+  updateLessonRequest,
+} from "../services/lessonsApi";
 import { useUser } from "./UserContext";
 
 const LessonsContext = createContext();
-
-const authFetch = async (url, options = {}, token) => {
-  const res = await fetch(url, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      ...options.headers,
-    },
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || "Request failed");
-  }
-
-  const text = await res.text();
-  try {
-    return text ? JSON.parse(text) : null;
-  } catch (err) {
-    console.warn("Failed to parse JSON:", err);
-    return null;
-  }
-};
 
 export const LessonsProvider = ({ children }) => {
   const { token } = useUser();
   const [lessons, setLessons] = useState([]);
   const [loadingLessons, setLoadingLessons] = useState(false);
 
-  const fetchLessons = async () => {
+  const fetchLessons = useCallback(async () => {
     if (!token) return;
     setLoadingLessons(true);
     try {
-      const data = await authFetch(`${API_BASE_URL}/lessons`, {}, token);
+      const data = await getLessons(token);
       setLessons(data);
     } catch (err) {
       console.error("Error fetching lessons:", err);
@@ -45,58 +26,50 @@ export const LessonsProvider = ({ children }) => {
     } finally {
       setLoadingLessons(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     if (token) fetchLessons();
     else setLessons([]);
-  }, [token]);
+  }, [fetchLessons, token]);
 
-  const createLesson = async (lessonData) => {
-    const createdLesson = await authFetch(
-      `${API_BASE_URL}/lessons/register`,
-      {
-        method: "POST",
-        body: JSON.stringify(lessonData),
-      },
-      token,
-    );
+  const createLesson = useCallback(async (lessonData) => {
+    const createdLesson = await createLessonRequest(lessonData, token);
     await fetchLessons();
     return createdLesson;
-  };
+  }, [fetchLessons, token]);
 
-  const updateLesson = async (id, lessonData) => {
-    await authFetch(
-      `${API_BASE_URL}/lessons/${id}`,
-      {
-        method: "PUT",
-        body: JSON.stringify(lessonData),
-      },
-      token,
-    );
+  const updateLesson = useCallback(async (id, lessonData) => {
+    await updateLessonRequest(id, lessonData, token);
     await fetchLessons();
-  };
+  }, [fetchLessons, token]);
 
-  const deleteLesson = async (id) => {
-    await authFetch(
-      `${API_BASE_URL}/lessons/${id}`,
-      { method: "DELETE" },
-      token,
-    );
+  const deleteLesson = useCallback(async (id) => {
+    await deleteLessonRequest(id, token);
     await fetchLessons();
-  };
+  }, [fetchLessons, token]);
+
+  const value = useMemo(
+    () => ({
+      lessons,
+      loadingLessons,
+      fetchLessons,
+      createLesson,
+      updateLesson,
+      deleteLesson,
+    }),
+    [
+      createLesson,
+      deleteLesson,
+      fetchLessons,
+      lessons,
+      loadingLessons,
+      updateLesson,
+    ],
+  );
 
   return (
-    <LessonsContext.Provider
-      value={{
-        lessons,
-        loadingLessons,
-        fetchLessons,
-        createLesson,
-        updateLesson,
-        deleteLesson,
-      }}
-    >
+    <LessonsContext.Provider value={value}>
       {children}
     </LessonsContext.Provider>
   );

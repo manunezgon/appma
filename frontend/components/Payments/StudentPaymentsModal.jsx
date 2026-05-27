@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import {
   FlatList,
   Modal,
@@ -5,9 +6,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import { PaymentRow } from "./PaymentRow";
-import style from "../../Styles/PaymentStyle"
+import style from "../../Styles/PaymentStyle";
+import { colors } from "../../Styles/theme";
 
 export const StudentPaymentsModal = ({
   student,
@@ -47,7 +48,7 @@ export const StudentPaymentsModal = ({
         </TouchableOpacity>
 
         <TouchableOpacity style={style.closeButton} onPress={onClose}>
-          <Ionicons name="close" size={28} color="#69188E" />
+          <Ionicons name="close" size={28} color={colors.primary} />
         </TouchableOpacity>
       </View>
     </View>

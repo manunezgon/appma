@@ -2,7 +2,10 @@
 
 import * as SecureStore from "expo-secure-store";
 import { createContext, useContext, useEffect, useState } from "react";
-import { API_BASE_URL } from "../app/config";
+import {
+  getCurrentUser,
+  uploadProfileImageRequest,
+} from "../services/usersApi";
 
 const UserContext = createContext();
 
@@ -21,21 +24,15 @@ export const UserProvider = ({ children }) => {
           return;
         }
 
-        const res = await fetch(`${API_BASE_URL}/users/me`, {
-          headers: { Authorization: `Bearer ${storedToken}` },
-        });
-
-        if (!res.ok) {
+        try {
+          const userData = await getCurrentUser(storedToken);
+          setUser(userData);
+          setToken(storedToken);
+        } catch {
           await SecureStore.deleteItemAsync("userToken");
           setUser(null);
           setToken(null);
-          return;
         }
-
-        const userData = await res.json();
-
-        setUser(userData);
-        setToken(storedToken);
       } catch (err) {
         console.error("Error loading user:", err);
         setUser(null);
@@ -63,29 +60,8 @@ export const UserProvider = ({ children }) => {
   const updateProfileImage = async (file) => {
     if (!user?.id || !token) return;
 
-    const formData = new FormData();
-    formData.append("file", {
-      uri: file.uri,
-      name: "profile.jpg",
-      type: "image/jpeg",
-    });
-
     try {
-      const res = await fetch(`${API_BASE_URL}/users/${user.id}/upload-image`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-        body: formData,
-      });
-
-      if (!res.ok) {
-        console.error("Error uploading profile image");
-        return;
-      }
-
-      const data = await res.json();
+      const data = await uploadProfileImageRequest(user.id, file, token);
       setUser((prev) => ({ ...prev, profileImageUrl: data.url }));
     } catch (err) {
       console.error("Error uploading profile image:", err);
@@ -96,6 +72,7 @@ export const UserProvider = ({ children }) => {
     <UserContext.Provider
       value={{
         user,
+        setUser,
         token,
         login,
         logout,

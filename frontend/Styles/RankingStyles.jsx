@@ -1,98 +1,92 @@
 import { StyleSheet } from "react-native";
+import { colors, layout, radii, spacing, typography } from "./theme";
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    ...layout.screen,
     paddingTop: 20,
-    paddingHorizontal: 20,
-    backgroundColor: "#1E1E1E",
   },
   content: { padding: 16, paddingTop: 50 },
 
   title: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#CCCCCC",
-    textTransform: "uppercase",
-    justifyContent: "center",
-    textAlign: "center",
-    paddingBottom: 30,
+    ...typography.screenTitle,
+    paddingBottom: spacing.xxl,
   },
 
   segmentedControl: {
     flexDirection: "row",
-    backgroundColor: "#555555",
-    borderRadius: 8,
-    marginBottom: 15,
+    backgroundColor: colors.surfaceMuted,
+    borderRadius: radii.sm,
+    marginBottom: spacing.lg,
   },
 
   segmentButton: {
     flex: 1,
-    paddingVertical: 10,
+    paddingVertical: spacing.md,
     alignItems: "center",
-    borderRadius: 8,
+    borderRadius: radii.sm,
   },
 
   segmentActive: {
-    backgroundColor: "#69188E",
+    backgroundColor: colors.primary,
   },
 
   segmentText: {
-    color: "#CCCCCC",
+    color: colors.textMuted,
   },
 
   segmentTextActive: {
-    color: "#CCCCCC",
+    color: colors.textMuted,
     fontWeight: "600",
   },
 
   pickerContainer: {
-    backgroundColor: "#555555",
-    borderRadius: 10,
-    marginBottom: 15,
+    backgroundColor: colors.surfaceMuted,
+    borderRadius: radii.md,
+    marginBottom: spacing.lg,
   },
 
-myProgressCard: {
-    backgroundColor: "#2a2a2a",
-    borderRadius: 10,
-    padding: 16,
-    marginBottom: 15,
+  picker: {
+    color: colors.textMuted,
+  },
+
+  myProgressCard: {
+    backgroundColor: colors.surface,
+    borderRadius: radii.md,
+    padding: spacing.lg,
+    marginBottom: spacing.lg,
   },
 
   myProgressTitle: {
-    color: "#cccccc",
-    fontWeight: "bold",
-    fontSize: 16,
-    textAlign: "center",
-    textTransform: "uppercase",
-    marginBottom: 10,
+    ...typography.screenTitle,
+    marginBottom: spacing.md,
   },
 
   myProgressRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 5,
+    gap: spacing.xs,
     justifyContent: "center", 
-    paddingVertical: 4,
+    paddingVertical: spacing.xs,
   },
 
   myProgressValue: {
-    color: "#69188E",
+    color: colors.primary,
     fontSize: 22,
     fontWeight: "bold",
   },
 
-  myProgressLabel: { color: "#ccc" },
+  myProgressLabel: { color: colors.textMuted },
 
   podiumContainer: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "flex-end",
-    marginBottom: 20,
+    marginBottom: spacing.xl,
     gap: 80,
   },
 
-podiumFirst: {
+  podiumFirst: {
     alignItems: "center",
   },
 
@@ -110,11 +104,11 @@ podiumFirst: {
 
   podiumPlace: {
     fontSize: 30,
-    marginBottom: 5,
+    marginBottom: spacing.xs,
   },
 
   podiumName: {
-    color: "#cccccc",
+    color: colors.textMuted,
     fontWeight: "bold",
     textTransform: "uppercase",
     fontSize: 14,
@@ -122,31 +116,31 @@ podiumFirst: {
   },
 
   podiumClasses: {
-    color: "#555555",
+    color: colors.surfaceMuted,
     fontWeight: "bold",
   },
 
   rankingCard: {
-    backgroundColor: "#2a2a2a",
-    borderRadius: 10,
+    backgroundColor: colors.surface,
+    borderRadius: radii.md,
     paddingVertical: 10,
     paddingHorizontal: 12,
   },
 
-    rankingRow: {
+  rankingRow: {
     flexDirection: "row",
-    paddingVertical: 10,
+    paddingVertical: spacing.md,
     borderBottomWidth: 0.5,
-    borderBottomColor: "#555555",
+    borderBottomColor: colors.surfaceMuted,
   },
 
-position: { width: 30, color: "#ccc", fontWeight: "bold" },
+  position: { width: 30, color: colors.textMuted, fontWeight: "bold" },
 
-  userName: { flex: 1, color: "#ccc", fontWeight: "600" },
+  userName: { flex: 1, color: colors.textMuted, fontWeight: "600" },
 
-  classes: { color: "#ccc" },
+  classes: { color: colors.textMuted },
 
-  diffText: { color: "#555555", fontSize: 11 },
+  diffText: { color: colors.surfaceMuted, fontSize: 11 },
 });
 
 export default styles;

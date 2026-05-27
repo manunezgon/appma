@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -17,7 +16,8 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useUser } from "../context/UserContext";
 import styles from "../Styles/GlobalStyles";
-import { API_BASE_URL } from "./config";
+import { colors } from "../Styles/theme";
+import { loginRequest } from "../services/usersApi";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -40,32 +40,18 @@ export default function Login() {
     setLoggingIn(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/users/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      const data = await loginRequest({ email, password });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        Alert.alert("Error", data.message || "Invalid credentials");
-        setPassword("");
-        return;
-      }
-
-      await SecureStore.setItemAsync("userToken", data.token);
-
-      login({
+      await login({
+        user: data.user,
         token: data.token,
-        ...data.user,
       });
 
       router.replace("/(tabs)/news");
     } catch (error) {
       console.error(error);
       setPassword("");
-      Alert.alert("Error", "Unable to connect to the server");
+      Alert.alert("Error", error?.message || "Unable to connect to the server");
     } finally {
       setLoggingIn(false);
     }
@@ -83,7 +69,7 @@ export default function Login() {
 
   return (
     <KeyboardAwareScrollView
-      style={{ flex: 1, backgroundColor: "#1E1E1E" }}
+      style={styles.screen}
       contentContainerStyle={styles.container}
       enableOnAndroid={true}
       extraHeight={Platform.OS === "android" ? 80 : 0}
@@ -118,13 +104,13 @@ export default function Login() {
         disabled={loggingIn || !email || !password}
       >
         {loggingIn ? (
-          <ActivityIndicator color="#fff" />
+          <ActivityIndicator color={colors.text} />
         ) : (
           <Text style={styles.buttonText}>LOG IN</Text>
         )}
       </TouchableOpacity>
       <Text style={styles.linkText} onPress={goToRegister}>
-        Don't have an account? Sign up
+        Don&apos;t have an account? Sign up
       </Text>
     </KeyboardAwareScrollView>
   );

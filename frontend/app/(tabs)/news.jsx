@@ -5,9 +5,9 @@ import AdminInput from "../../components/news/AdminInput";
 import AnnouncementCard from "../../components/news/AnnouncementCard";
 import CarouselEditorModal from "../../components/news/CarouselEditorModal";
 import Carousel from "../../components/news/Carrousel";
-import style from "../../Styles/NewsStyles";
 import { useUser } from "../../context/UserContext";
 import { useNewsData } from "../../hooks/useNewsData";
+import style from "../../Styles/NewsStyles";
 
 export default function News() {
   const { user } = useUser();
@@ -18,13 +18,18 @@ export default function News() {
     announcements,
     carouselImages,
     fetchAnnouncements,
+    deleteAnnouncement,
     fetchCarouselImages,
-    createAnnouncement,
     addImage,
     deleteImage,
     reorderImages,
+    createAnnouncement,
   } = useNewsData();
 
+  const handleSend = async (text) => {
+    await createAnnouncement(text);
+    setNewMessage("");
+  };
   const lastNewsFocusFetchAt = useRef(0);
   const NEWS_FOCUS_MIN_MS = 60_000;
 
@@ -45,20 +50,16 @@ export default function News() {
         <RefreshControl
           refreshing={false}
           onRefresh={async () => {
-            await Promise.all([
-              fetchAnnouncements(),
-              fetchCarouselImages(),
-            ]);
+            await Promise.all([fetchAnnouncements(), fetchCarouselImages()]);
           }}
         />
       }
     >
       <View style={style.header}>
         <Image
-          source={require("../assets/images/white_logo_nw.png")}
+          source={require("../assets/images/white_logo.png")}
           style={style.logo}
         />
-        <Text style={style.title}>La Forja</Text>
       </View>
 
       <Carousel
@@ -83,7 +84,7 @@ export default function News() {
         <AdminInput
           value={newMessage}
           onChange={setNewMessage}
-          onSend={createAnnouncement}
+          onSend={handleSend}
         />
       )}
 
@@ -96,6 +97,7 @@ export default function News() {
           <AnnouncementCard
             key={item.id}
             announcement={item}
+            onDelete={() => deleteAnnouncement(item.id)}
             onDeleted={fetchAnnouncements}
           />
         ))

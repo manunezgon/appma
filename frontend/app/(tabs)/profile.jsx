@@ -9,12 +9,17 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
+import { Ionicons } from "@expo/vector-icons";
 import EditProfileModal from "../../components/Profile/EditProfileModal.jsx";
 import { useUser } from "../../context/UserContext";
 import styles from "../../Styles/ProfileStyles.jsx";
+import { colors } from "../../Styles/theme";
 import profilePic from "../assets/images/white_logo_circle.png";
-import { API_BASE_URL } from "../config.jsx";
+import {
+  getCurrentUser,
+  updatePasswordRequest,
+  updateUserRequest,
+} from "../../services/usersApi";
 
 export default function Profile() {
   const { user, setUser, logout, token, updateProfileImage } = useUser();
@@ -45,13 +50,8 @@ export default function Profile() {
 
   const refreshUser = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/users/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setUser((prev) => ({ ...prev, ...data }));
-      }
+      const data = await getCurrentUser(token);
+      setUser((prev) => ({ ...prev, ...data }));
     } catch (err) {
       console.error("Error refrescando usuario:", err);
     }
@@ -66,29 +66,19 @@ export default function Profile() {
     }
 
     try {
-      const res = await fetch(`${API_BASE_URL}/users/${user.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
+      await updateUserRequest(
+        user.id,
+        {
           name: editName,
           email: editEmail,
           phone: editPhone.length >= 9 ? editPhone : undefined,
           password: currentPassword,
-        }),
-      });
-
-      if (res.ok) {
-        await refreshUser();
-        setCurrentPassword("");
-        setModalVisible(false);
-      } else {
-        const text = await res.text();
-        console.error("Error backend:", text);
-        Alert.alert("Error updating profile");
-      }
+        },
+        token,
+      );
+      await refreshUser();
+      setCurrentPassword("");
+      setModalVisible(false);
     } catch (error) {
       console.error(error);
       Alert.alert("Error updating profile");
@@ -104,28 +94,11 @@ export default function Profile() {
     }
 
     try {
-      const res = await fetch(
-        `${API_BASE_URL}/users/${user.id}/update-password`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ oldPassword, newPassword }),
-        },
-      );
-
-      if (res.ok) {
-        Alert.alert("Password updated");
-        setOldPassword("");
-        setNewPassword("");
-        setModalVisible(false);
-      } else {
-        const text = await res.text();
-        console.error("Error backend:", text);
-        Alert.alert("Error updating password");
-      }
+      await updatePasswordRequest(user.id, { oldPassword, newPassword }, token);
+      Alert.alert("Password updated");
+      setOldPassword("");
+      setNewPassword("");
+      setModalVisible(false);
     } catch (error) {
       console.error(error);
       Alert.alert("Error updating password");
@@ -167,16 +140,9 @@ export default function Profile() {
                 style={styles.profileImage}
               />
               <View
-                style={{
-                  position: "absolute",
-                  bottom: 0,
-                  right: 0,
-                  backgroundColor: "#69188E",
-                  borderRadius: 12,
-                  padding: 4,
-                }}
+                style={styles.profileImageBadge}
               >
-                <Ionicons name="add" size={16} color="#fff" />
+                <Ionicons name="add" size={16} color={colors.text} />
               </View>
             </View>
           </TouchableOpacity>
