@@ -1,28 +1,36 @@
 {
   "expo": {
-    "name": "frontend",
-    "slug": "frontend",
+    "name": "LaForjaApp",
+    "slug": "LaForjaApp",
     "version": "1.0.0",
     "orientation": "portrait",
+
     "icon": "./app/assets/images/black_logo.png",
-    "scheme": "frontend",
+
+    "scheme": "LaForjaApp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.jabega.laforjaapp"
     },
+
     "android": {
+      "package": "com.jabega.laforjaapp",
       "adaptiveIcon": {
         "foregroundImage": "./app/assets/images/black_logo.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true
     },
+
     "web": {
       "bundler": "metro",
       "output": "static",
       "favicon": "./app/assets/images/black_logo.png"
     },
+
     "plugins": [
       "expo-router",
       [
@@ -38,8 +46,16 @@
       "expo-font",
       "expo-web-browser"
     ],
+
     "experiments": {
       "typedRoutes": true
+    },
+
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "6a799ddc-2c51-4185-8401-633d5bae7247"
+      }
     }
   }
 }
