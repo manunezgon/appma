@@ -47,7 +47,14 @@ const styles = StyleSheet.create({
   },
 
   picker: {
+    backgroundColor: colors.surfaceMuted,
     color: colors.textMuted,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    width: "100%",
   },
 
   myProgressCard: {

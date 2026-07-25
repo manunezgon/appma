@@ -1,4 +1,6 @@
-import { Picker } from "@react-native-picker/picker";
+import RNPickerSelect from "react-native-picker-select";
+import { Ionicons } from "@expo/vector-icons";
+import { colors } from "../../Styles/theme";
 import { Text, TouchableOpacity, View } from "react-native";
 import styles from "../../Styles/RankingStyles";
 
@@ -48,21 +50,39 @@ export default function RankingFilters({
       </View>
 
       <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={selectedLesson}
-          dropdownIconColor="white"
-          onValueChange={(itemValue) => setSelectedLesson(itemValue)}
-          style={styles.picker}
-        >
-          <Picker.Item label="All lessons" value={null} />
-          {lessons.map((lesson) => (
-            <Picker.Item
-              key={lesson.id}
-              label={lesson.lessonName}
-              value={lesson.id}
+        <RNPickerSelect
+          value={selectedLesson}
+          itemKey={selectedLesson}
+          onValueChange={setSelectedLesson}
+          items={lessons.map((lesson) => ({
+            label: lesson.lessonName,
+            value: lesson.id,
+          }))}
+          placeholder={{
+            label: "All lessons",
+            value: null,
+            color: colors.textSubtle,
+          }}
+          useNativeAndroidPickerStyle={false}
+          Icon={() => (
+            <Ionicons
+              name="chevron-down"
+              size={20}
+              color={colors.text}
             />
-          ))}
-        </Picker>
+          )}
+          style={{
+            inputIOS: styles.picker,
+            inputAndroid: styles.picker,
+            placeholder: {
+              color: colors.textSubtle,
+            },
+            iconContainer: {
+              top: 14,
+              right: 12,
+            },
+          }}
+        />
       </View>
     </>
   );
