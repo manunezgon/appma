@@ -81,12 +81,14 @@ export default function Register() {
 
       <TextInput
         placeholder="Name"
+        placeholderTextColor={colors.textSubtle}
         value={name}
         onChangeText={setName}
         style={styles.input}
       />
       <TextInput
         placeholder="Email"
+        placeholderTextColor={colors.textSubtle}
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
@@ -96,6 +98,7 @@ export default function Register() {
       />
       <TextInput
         placeholder="Password"
+        placeholderTextColor={colors.textSubtle}
         value={password}
         onChangeText={setPassword}
         secureTextEntry
@@ -103,6 +106,7 @@ export default function Register() {
       />
       <TextInput
         placeholder="Phone"
+        placeholderTextColor={colors.textSubtle}
         value={phone}
         onChangeText={setPhone}
         style={styles.input}

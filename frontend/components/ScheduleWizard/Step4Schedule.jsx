@@ -37,6 +37,7 @@ export default function Step4Schedule({
         value={startTime}
         onChangeText={setStartTime}
         placeholder="e.g. 18:00"
+        placeholderTextColor={colors.textOnLite}
         style={style.inputField}
       />
 
@@ -45,6 +46,7 @@ export default function Step4Schedule({
         value={endTime}
         onChangeText={setEndTime}
         placeholder="e.g. 19:00"
+        placeholderTextColor={colors.textOnLite}
         style={style.inputField}
       />
 

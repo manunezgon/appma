@@ -96,6 +96,7 @@ export default function Step3Lesson({
             value={newLessonName}
             onChangeText={setNewLessonName}
             placeholder="e.g. Advanced Yoga"
+            placeholderTextColor={colors.textOnLite}
             style={style.inputField}
           />
 
@@ -104,6 +105,7 @@ export default function Step3Lesson({
             value={newProfessorName}
             onChangeText={setNewProfessorName}
             placeholder="Instructor name"
+            placeholderTextColor={colors.textOnLite}
             style={style.inputField}
           />
 
@@ -112,6 +114,7 @@ export default function Step3Lesson({
             value={newAmountMonthly}
             onChangeText={setNewAmountMonthly}
             placeholder="e.g. 35"
+            placeholderTextColor={colors.textOnLite}
             keyboardType="numeric"
             style={style.inputField}
           />

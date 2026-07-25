@@ -70,6 +70,7 @@ export default function EditProfileModal({
                 <TextInput
                   style={styles.input}
                   placeholder="Name"
+                  placeholderTextColor={colors.textSubtle}
                   value={editName}
                   onChangeText={setEditName}
                   autoCapitalize="words"
@@ -79,6 +80,7 @@ export default function EditProfileModal({
                 <TextInput
                   style={styles.input}
                   placeholder="Email"
+                  placeholderTextColor={colors.textSubtle}
                   value={editEmail}
                   keyboardType="email-address"
                   autoCapitalize="none"
@@ -91,6 +93,7 @@ export default function EditProfileModal({
                 <TextInput
                   style={styles.input}
                   placeholder="Phone"
+                  placeholderTextColor={colors.textSubtle}
                   value={editPhone}
                   onChangeText={setEditPhone}
                   keyboardType="phone-pad"
@@ -100,6 +103,7 @@ export default function EditProfileModal({
                 <TextInput
                   style={styles.input}
                   placeholder="Current Password"
+                  placeholderTextColor={colors.textSubtle}
                   value={currentPassword}
                   onChangeText={setCurrentPassword}
                   secureTextEntry
@@ -130,6 +134,7 @@ export default function EditProfileModal({
                 <TextInput
                   style={styles.input}
                   placeholder="Current Password"
+                  placeholderTextColor={colors.textSubtle}
                   value={oldPassword}
                   onChangeText={setOldPassword}
                   secureTextEntry
@@ -139,6 +144,7 @@ export default function EditProfileModal({
                 <TextInput
                   style={styles.input}
                   placeholder="New Password"
+                  placeholderTextColor={colors.textSubtle}
                   value={newPassword}
                   onChangeText={setNewPassword}
                   secureTextEntry
