@@ -1,20 +1,23 @@
 {
   "expo": {
     "name": "LaForjaApp",
-    "slug": "LaForjaApp",
+    "slug": "frontend",
     "version": "1.0.0",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+
     "orientation": "portrait",
-
     "icon": "./app/assets/images/black_logo.png",
+    "scheme": "laforjaapp",
 
-    "scheme": "LaForjaApp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
 
     "ios": {
-      "supportsTablet": true,
       "bundleIdentifier": "com.jabega.laforjaapp",
       "buildNumber": "1",
+      "supportsTablet": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -22,17 +25,12 @@
 
     "android": {
       "package": "com.jabega.laforjaapp",
+      "versionCode": 1,
+      "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
         "foregroundImage": "./app/assets/images/black_logo.png",
         "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true
-    },
-
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./app/assets/images/black_logo.png"
+      }
     },
 
     "plugins": [
@@ -50,10 +48,6 @@
       "expo-font",
       "expo-web-browser"
     ],
-
-    "experiments": {
-      "typedRoutes": true
-    },
 
     "extra": {
       "router": {},
