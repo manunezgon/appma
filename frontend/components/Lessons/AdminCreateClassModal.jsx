@@ -1,5 +1,6 @@
-import { Picker } from "@react-native-picker/picker";
+import RNPickerSelect from "react-native-picker-select";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import Modal from "react-native-modal";
 import styles from "../../Styles/LessonStyles.jsx";
 import { colors } from "../../Styles/theme";
@@ -86,21 +87,39 @@ export default function AdminCreateClassModal({
         {/* Usar lesson existente */}
         {createMode === "existing" && (
           <>
-            <Picker
-              selectedValue={selectedLessonId}
-              onValueChange={(value) => setSelectedLessonId(value)}
-              style={styles.picker}
-            >
-              <Picker.Item label="Select a class" value={null} />
-
-              {lessonsList.map((lesson) => (
-                <Picker.Item
-                  key={lesson.id}
-                  label={`${lesson.lessonName} - ${lesson.professorName}`}
-                  value={lesson.id}
+            <RNPickerSelect
+              value={selectedLessonId}
+              itemKey={selectedLessonId}
+              onValueChange={setSelectedLessonId}
+              items={lessonsList.map((lesson) => ({
+                label: `${lesson.lessonName} - ${lesson.professorName}`,
+                value: lesson.id,
+              }))}
+              placeholder={{
+                label: "Select a class",
+                value: null,
+                color: colors.textSubtle,
+              }}
+              useNativeAndroidPickerStyle={false}
+              Icon={() => (
+                <Ionicons
+                  name="chevron-down"
+                  size={20}
+                  color={colors.text}
                 />
-              ))}
-            </Picker>
+              )}
+              style={{
+                inputIOS: styles.picker,
+                inputAndroid: styles.picker,
+                placeholder: {
+                  color: colors.textSubtle,
+                },
+                iconContainer: {
+                  top: 14,
+                  right: 12,
+                },
+              }}
+            />
 
             <TextInput
               placeholder="Hora inicio (HH:MM)"
