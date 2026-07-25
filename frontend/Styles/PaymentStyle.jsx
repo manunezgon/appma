@@ -63,7 +63,14 @@ const style = StyleSheet.create({
     marginBottom: spacing.md,
   },
   picker: {
+    backgroundColor: colors.background,
     color: colors.text,
+    borderRadius: radii.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    marginBottom: spacing.md,
     width: "100%",
   },
   registerButton: {

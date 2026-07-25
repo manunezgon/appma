@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Picker } from "@react-native-picker/picker";
+import RNPickerSelect from "react-native-picker-select";
 import { useEffect, useState } from "react";
 import { Modal, Switch, Text, TouchableOpacity, View } from "react-native";
 import style from "../../Styles/PaymentStyle";
@@ -58,45 +58,81 @@ export const PaymentModal = ({
             <>
               <Text style={style.modalSubtitle}>Select lesson</Text>
               <View style={style.pickerContainer}>
-                <Picker
-                  selectedValue={selectedLessonId}
+                <RNPickerSelect
+                  value={selectedLessonId}
+                  itemKey={selectedLessonId}
                   onValueChange={setSelectedLessonId}
-                  style={style.picker}
-                >
-                  <Picker.Item label="Select a lesson..." value={null} />
-                  {lessons.map((lesson) => (
-                    <Picker.Item
-                      key={lesson.id}
-                      label={`${lesson.lessonName} (${lesson.professorName})`}
-                      value={lesson.id}
+                  items={lessons.map((lesson) => ({
+                    label: `${lesson.lessonName} (${lesson.professorName})`,
+                    value: lesson.id,
+                  }))}
+                  placeholder={{
+                    label: "Select a lesson...",
+                    value: null,
+                    color: colors.textSubtle,
+                  }}
+                  useNativeAndroidPickerStyle={false}
+                  Icon={() => (
+                    <Ionicons
+                      name="chevron-down"
+                      size={20}
+                      color={colors.text}
                     />
-                  ))}
-                </Picker>
+                  )}
+                  style={{
+                    inputIOS: style.picker,
+                    inputAndroid: style.picker,
+                    placeholder: {
+                      color: colors.textSubtle,
+                    },
+                    iconContainer: {
+                      top: 14,
+                      right: 12,
+                    },
+                  }}
+                />
               </View>
             </>
           )}
 
           <Text style={style.modalSubtitle}>Select month</Text>
           <View style={style.pickerContainer}>
-            <Picker
-              selectedValue={selectedMonth}
+            <RNPickerSelect
+              value={selectedMonth}
+              itemKey={selectedMonth}
               onValueChange={setSelectedMonth}
-              style={style.picker}
-            >
-              <Picker.Item label="Select a month..." value="" />
-              {months.map((month) => {
-                const isPaid = paidMonths?.includes(month.value);
-
-                return (
-                  <Picker.Item
-                    key={month.value}
-                    label={isPaid ? `${month.label} (Paid)` : month.label}
-                    value={month.value}
-                    enabled={!isPaid}
-                  />
-                );
-              })}
-            </Picker>
+              items={months.map((month) => ({
+                label: paidMonths?.includes(month.value)
+                  ? `${month.label} (Paid)`
+                  : month.label,
+                value: month.value,
+                disabled: paidMonths?.includes(month.value),
+              }))}
+              placeholder={{
+                label: "Select a month...",
+                value: "",
+                color: colors.textSubtle,
+              }}
+              useNativeAndroidPickerStyle={false}
+              Icon={() => (
+                <Ionicons
+                  name="chevron-down"
+                  size={20}
+                  color={colors.text}
+                />
+              )}
+              style={{
+                inputIOS: style.picker,
+                inputAndroid: style.picker,
+                placeholder: {
+                  color: colors.textSubtle,
+                },
+                iconContainer: {
+                  top: 14,
+                  right: 12,
+                },
+              }}
+            />
           </View>
 
           <TouchableOpacity
