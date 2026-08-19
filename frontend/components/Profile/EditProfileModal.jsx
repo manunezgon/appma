@@ -8,8 +8,10 @@ import {
     View,
 } from "react-native";
 import styles from "../../Styles/ProfileStyles.jsx";
+import { colors } from "../../Styles/theme";
 
-export default function EditProfileModal({
+
+export default function EditProfileModal({ 
   visible,
   onClose,
   editName,
