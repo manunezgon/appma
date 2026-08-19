@@ -2,6 +2,7 @@ import { Text, TouchableOpacity } from "react-native";
 import style from "../../Styles/ScheduleStyles.jsx";
 import DayPicker from "./DayPicker.jsx";
 import TextInputField from "./TextInputField.jsx";
+import { colors } from "../../Styles/theme";
 
 const daysOfWeek = [
   { label: "Monday", value: "MONDAY" },

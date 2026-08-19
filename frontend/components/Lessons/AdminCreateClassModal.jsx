@@ -1,9 +1,10 @@
 import RNPickerSelect from "react-native-picker-select";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Text, TextInput, TouchableOpacity, View, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Modal from "react-native-modal";
 import styles from "../../Styles/LessonStyles.jsx";
 import { colors } from "../../Styles/theme";
+
 
 export default function AdminCreateClassModal({
   visible,
@@ -28,7 +29,9 @@ export default function AdminCreateClassModal({
   onCreateNew,
 }) {
   return (
+
     <Modal isVisible={visible} onBackdropPress={onClose}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.adminModal}>
         <Text style={styles.titleCenter}>Create Class</Text>
 
@@ -146,6 +149,7 @@ export default function AdminCreateClassModal({
           </>
         )}
       </View>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 }

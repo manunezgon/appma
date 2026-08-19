@@ -3,6 +3,7 @@ import style from "../../Styles/ScheduleStyles.jsx";
 import LessonSummary from "./LessonSummary.jsx";
 import SelectableList from "./SelectableList.jsx";
 import TextInputField from "./TextInputField.jsx";
+import { colors } from "../../Styles/theme";
 
 export default function Step3Lesson({
   mode,

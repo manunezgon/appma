@@ -7,6 +7,7 @@ import AttendanceModal from "../../components/Lessons/AttendanceModal";
 import ClassList from "../../components/Lessons/ClassList";
 import Calendar from "../../components/Lessons/WeekCalendar";
 
+
 import PaymentErrorModal from "../../components/Lessons/PaymentErrorModal.jsx";
 
 import useAdminClassActions from "../../hooks/useAdminClassActions.jsx";
@@ -60,6 +61,7 @@ export default function HomeScreen() {
   const adminModal = useAdminClassModal(adminActions);
 
   return (
+
     <View style={styles.container}>
       {/* CALENDAR */}
 
