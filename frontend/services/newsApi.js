@@ -4,9 +4,10 @@ export const getAnnouncements = (token) =>
   apiRequest("/announcements", { token });
 
 export const createAnnouncementRequest = (message, token) =>
-  apiRequest(`/announcements?message=${encodeURIComponent(message)}`, {
+  apiRequest("/announcements", {
     method: "POST",
     token,
+    body: JSON.stringify({ message }),
   });
 
 export const deleteAnnouncementRequest = (id, token) =>

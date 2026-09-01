@@ -42,7 +42,7 @@ const style = StyleSheet.create({
     marginBottom: spacing.xl,
   },
   carruselContainer: {
-    aspectRatio: 3/2,
+    aspectRatio: 3 / 2,
     width: "100%",
     borderRadius: radii.md,
     overflow: "hidden",
@@ -98,19 +98,19 @@ const style = StyleSheet.create({
     marginTop: spacing.md,
   },
   imagePreviewWrapper: {
-  width: 120,
-  aspectRatio: 3/2,
-  margin: 5,
-  position: "relative",
-  justifyContent: "center",
-  alignItems: "center",
-},
+    width: 120,
+    aspectRatio: 3 / 2,
+    margin: 5,
+    position: "relative",
+    justifyContent: "center",
+    alignItems: "center",
+  },
 
-imagePreview: {
-  width: "100%",
-  height: "100%",
-  borderRadius: radii.sm,
-},
+  imagePreview: {
+    width: "100%",
+    height: "100%",
+    borderRadius: radii.sm,
+  },
   deleteImageButton: {
     position: "absolute",
     top: -5,
@@ -138,14 +138,14 @@ imagePreview: {
     alignItems: "center",
   },
   addImageButton: {
-  width: 120,
-  aspectRatio: 3 / 2,
-  borderRadius: radii.sm,
-  backgroundColor: colors.surface,
-  justifyContent: "center",
-  alignItems: "center",
-  margin: 5,
-},
+    width: 120,
+    aspectRatio: 3 / 2,
+    borderRadius: radii.sm,
+    backgroundColor: colors.surface,
+    justifyContent: "center",
+    alignItems: "center",
+    margin: 5,
+  },
   saveButton: {
     marginTop: 10,
     paddingVertical: 10,
@@ -159,22 +159,82 @@ imagePreview: {
     marginBottom: 10,
   },
 
-  nextClassContainer: { flexDirection: "row", alignItems: "center", backgroundColor: colors.surface, borderRadius: radii.md, padding: spacing.md, marginBottom: spacing.xl, borderLeftWidth: 3, borderLeftColor: colors.primary, }, nextClassIcon: { width: 42, height: 42, borderRadius: radii.sm, backgroundColor: colors.overlaySoft, justifyContent: "center", alignItems: "center", marginRight: spacing.md, }, nextClassContent: { flex: 1, }, nextClassLabel: { fontSize: 11, fontWeight: "700", color: colors.textSubtle, letterSpacing: 0.8, marginBottom: 3, }, nextClassName: { fontSize: 18, fontWeight: "700", color: colors.text, marginBottom: 3, }, nextClassInfo: { fontSize: 13, color: colors.textMuted, marginBottom: 2, }, nextClassProfessor: { fontSize: 12, color: colors.textSubtle, },
-  
-  inputContainer: {
+  nextClassContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: spacing.xl,
-    paddingHorizontal: spacing.lg,
     backgroundColor: colors.surface,
     borderRadius: radii.md,
-    gap: spacing.md,
+    padding: spacing.md,
+    marginBottom: spacing.xl,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.primary,
   },
-  input: {
-    flex: 1,
-    borderRadius: radii.md,
+  nextClassIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: radii.sm,
+    backgroundColor: colors.overlaySoft,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: spacing.md,
+  },
+  nextClassContent: { flex: 1 },
+  nextClassLabel: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: colors.textSubtle,
+    letterSpacing: 0.8,
+    marginBottom: 3,
+  },
+  nextClassName: {
+    fontSize: 18,
+    fontWeight: "700",
     color: colors.text,
+    marginBottom: 3,
   },
+  nextClassInfo: { fontSize: 13, color: colors.textMuted, marginBottom: 2 },
+  nextClassProfessor: { fontSize: 12, color: colors.textSubtle },
+
+  inputContainer: {
+    marginBottom: spacing.xl,
+    backgroundColor: colors.surface,
+    borderRadius: radii.md,
+    overflow: "hidden",
+  },
+
+  editorContainer: {
+    width: "100%",
+    paddingBottom: spacing.sm,
+  },
+
+  richEditor: {
+    minHeight: 100,
+    backgroundColor: colors.surface,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.sm,
+  },
+
+  editorActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderTopWidth: 1,
+    borderTopColor: colors.textSubtle,
+    minHeight: 46,
+  },
+
+  richToolbar: {
+    flex: 1,
+    height: 46,
+    backgroundColor: colors.surface,
+  },
+
+  sendButton: {
+    width: 50,
+    height: 46,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
   card: {
     backgroundColor: colors.surface,
     borderRadius: radii.lg,
@@ -185,8 +245,6 @@ imagePreview: {
   },
   message: {
     fontSize: 15,
-    fontWeight: "600",
-    textTransform: "uppercase",
     marginBottom: 6,
     color: colors.textMuted,
   },
