@@ -83,7 +83,7 @@ export function useNewsData() {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [16, 9], 
+      aspect: [3, 2], 
       quality: 0.8,
     });
 

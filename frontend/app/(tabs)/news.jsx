@@ -8,11 +8,15 @@ import Carousel from "../../components/news/Carrousel";
 import { useUser } from "../../context/UserContext";
 import { useNewsData } from "../../hooks/useNewsData";
 import style from "../../Styles/NewsStyles";
+import { useEnrollments } from "../../context/EnrollmentsContext";
+import NextClassCard from "../../components/news/NextClassCard";
+
 
 export default function News() {
   const { user } = useUser();
   const [showCarouselEditor, setShowCarouselEditor] = useState(false);
   const [newMessage, setNewMessage] = useState("");
+  const { enrollments } = useEnrollments();
 
   const {
     announcements,
@@ -77,6 +81,10 @@ export default function News() {
         onDelete={(idx) => deleteImage(carouselImages[idx].id)}
         onReorder={reorderImages}
       />
+
+{user?.role === "MEMBER" && (
+  <NextClassCard enrollments={enrollments} />
+)}
 
       <Text style={style.subtitle}>News</Text>
 

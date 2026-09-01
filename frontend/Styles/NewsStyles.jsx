@@ -13,7 +13,8 @@ const style = StyleSheet.create({
     marginBottom: spacing.md,
   },
   logo: {
-    height: 200,
+    marginTop: spacing.md,
+    height: 100,
     width: "100%",
     resizeMode: "contain",
   },
@@ -41,7 +42,8 @@ const style = StyleSheet.create({
     marginBottom: spacing.xl,
   },
   carruselContainer: {
-    height: 200,
+    aspectRatio: 3/2,
+    width: "100%",
     borderRadius: radii.md,
     overflow: "hidden",
   },
@@ -96,18 +98,19 @@ const style = StyleSheet.create({
     marginTop: spacing.md,
   },
   imagePreviewWrapper: {
-    width: 90,
-    height: 90,
-    margin: 5,
-    position: "relative",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  imagePreview: {
-    width: 90,
-    height: 90,
-    borderRadius: radii.sm,
-  },
+  width: 120,
+  aspectRatio: 3/2,
+  margin: 5,
+  position: "relative",
+  justifyContent: "center",
+  alignItems: "center",
+},
+
+imagePreview: {
+  width: "100%",
+  height: "100%",
+  borderRadius: radii.sm,
+},
   deleteImageButton: {
     position: "absolute",
     top: -5,
@@ -135,14 +138,14 @@ const style = StyleSheet.create({
     alignItems: "center",
   },
   addImageButton: {
-    width: 90,
-    height: 90,
-    borderRadius: radii.sm,
-    backgroundColor: colors.surface,
-    justifyContent: "center",
-    alignItems: "center",
-    margin: 5,
-  },
+  width: 120,
+  aspectRatio: 3 / 2,
+  borderRadius: radii.sm,
+  backgroundColor: colors.surface,
+  justifyContent: "center",
+  alignItems: "center",
+  margin: 5,
+},
   saveButton: {
     marginTop: 10,
     paddingVertical: 10,
@@ -155,6 +158,9 @@ const style = StyleSheet.create({
     alignSelf: "flex-end",
     marginBottom: 10,
   },
+
+  nextClassContainer: { flexDirection: "row", alignItems: "center", backgroundColor: colors.surface, borderRadius: radii.md, padding: spacing.md, marginBottom: spacing.xl, borderLeftWidth: 3, borderLeftColor: colors.primary, }, nextClassIcon: { width: 42, height: 42, borderRadius: radii.sm, backgroundColor: colors.overlaySoft, justifyContent: "center", alignItems: "center", marginRight: spacing.md, }, nextClassContent: { flex: 1, }, nextClassLabel: { fontSize: 11, fontWeight: "700", color: colors.textSubtle, letterSpacing: 0.8, marginBottom: 3, }, nextClassName: { fontSize: 18, fontWeight: "700", color: colors.text, marginBottom: 3, }, nextClassInfo: { fontSize: 13, color: colors.textMuted, marginBottom: 2, }, nextClassProfessor: { fontSize: 12, color: colors.textSubtle, },
+  
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
