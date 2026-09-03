@@ -20,6 +20,9 @@ import {
   updatePasswordRequest,
   updateUserRequest,
 } from "../../services/usersApi";
+import PaymentStatusCard from "../../components/Profile/PaymentStatusCard.jsx";
+import PaymentHistoryModal from "../../components/Profile/PaymentHistoryModal.jsx";
+import { usePayments } from "../../context/PaymentsContext";
 
 export default function Profile() {
   const { user, setUser, logout, token, updateProfileImage } = useUser();
@@ -35,6 +38,9 @@ export default function Profile() {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
 
+  const { payments, fetchPaymentsByUser } = usePayments();
+  const [paymentHistoryVisible, setPaymentHistoryVisible] = useState(false);
+
   useEffect(() => {
     if (user) {
       setEditName(user.name || "");
@@ -42,6 +48,12 @@ export default function Profile() {
       setEditPhone(user.phone || "");
     }
   }, [user]);
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchPaymentsByUser(user.id);
+    }
+  }, [user?.id, fetchPaymentsByUser]);
 
   const handleLogout = async () => {
     await logout();
@@ -125,6 +137,17 @@ export default function Profile() {
         <Text style={styles.title}>Loading profile...</Text>
       </View>
     );
+
+  const now = new Date();
+
+  const currentMonth = `${now.getFullYear()}-${String(
+    now.getMonth() + 1,
+  ).padStart(2, "0")}`;
+
+  const currentMonthPayment = payments.find(
+    (payment) => payment.monthPaid === currentMonth,
+  );
+
   return (
     <>
       <ScrollView contentContainerStyle={styles.container}>
@@ -139,9 +162,7 @@ export default function Profile() {
                 }
                 style={styles.profileImage}
               />
-              <View
-                style={styles.profileImageBadge}
-              >
+              <View style={styles.profileImageBadge}>
                 <Ionicons name="add" size={16} color={colors.text} />
               </View>
             </View>
@@ -161,6 +182,21 @@ export default function Profile() {
             <Text style={styles.value}>{user.phone || "-"}</Text>
           </View>
         </View>
+
+        {user.role !== "ADMIN" && (
+          <PaymentStatusCard
+            payment={currentMonthPayment}
+            month={currentMonth}
+            onHistoryPress={() => setPaymentHistoryVisible(true)}
+          />
+        )}
+
+        {user.role !== "ADMIN" && (
+          <PaymentHistoryModal
+            visible={paymentHistoryVisible}
+            onClose={() => setPaymentHistoryVisible(false)}
+          />
+        )}
 
         <View style={styles.buttonContainer}>
           <TouchableOpacity

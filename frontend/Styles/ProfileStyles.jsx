@@ -177,6 +177,71 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
     gap: spacing.xl,
   },
+
+  paymentBox: {
+    width: "80%",
+    borderRadius: radii.md,
+    backgroundColor: colors.surfaceAlt,
+    padding: spacing.lg,
+    marginBottom: spacing.xxl,
+  },
+
+  paymentStatusIcon: {
+    width: 26,
+    height: 26,
+    borderRadius: radii.round,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  paymentStatusPaid: {
+    backgroundColor: colors.success,
+  },
+
+  paymentStatusPending: {
+    backgroundColor: colors.danger,
+  },
+
+  paymentInfo: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: spacing.sm,
+  },
+
+  paymentMonth: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: colors.textMuted,
+    marginBottom: spacing.xs,
+  },
+
+  paymentModality: {
+    fontSize: 15,
+  },
+
+  paymentModalityPaid: {
+    color: colors.success,
+  },
+
+  paymentModalityPending: {
+    color: colors.danger,
+  },
+
+  paymentHistoryButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    marginTop: spacing.md,
+    paddingTop: spacing.md,
+  },
+
+  paymentHistoryText: {
+    fontSize: 14,
+    color: colors.textMuted,
+  },
 });
 
 export default styles;
