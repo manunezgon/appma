@@ -35,6 +35,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(404).body(Map.of("error", ex.getMessage()));
     }
 
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidCredentials(
+            InvalidCredentialsException ex) {
+        return ResponseEntity.status(401)
+                .body(Map.of("error", ex.getMessage()));
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleResourceNotFound(ResourceNotFoundException ex) {
         return ResponseEntity.status(404).body(Map.of("error", ex.getMessage()));
