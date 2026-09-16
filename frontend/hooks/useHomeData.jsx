@@ -1,4 +1,4 @@
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect } from "expo-router";
 import { useCallback, useMemo, useRef, useState } from "react";
 
 import { useEnrollments } from "../context/EnrollmentsContext";

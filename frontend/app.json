@@ -6,14 +6,10 @@
     "runtimeVersion": {
       "policy": "appVersion"
     },
-
     "orientation": "portrait",
     "icon": "./app/assets/images/black_logo.png",
     "scheme": "laforjaapp",
-
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-
     "ios": {
       "bundleIdentifier": "com.jabega.laforjaapp",
       "buildNumber": "1",
@@ -22,17 +18,14 @@
         "ITSAppUsesNonExemptEncryption": false
       }
     },
-
     "android": {
       "package": "com.jabega.laforjaapp",
       "versionCode": 1,
-      "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
         "foregroundImage": "./app/assets/images/black_logo.png",
         "backgroundColor": "#ffffff"
       }
     },
-
     "plugins": [
       "expo-router",
       [
@@ -46,9 +39,11 @@
       ],
       "expo-secure-store",
       "expo-font",
-      "expo-web-browser"
+      "expo-web-browser",
+      "@react-native-community/datetimepicker",
+      "expo-image",
+      "expo-status-bar"
     ],
-
     "extra": {
       "router": {},
       "eas": {

@@ -1,4 +1,4 @@
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect } from "expo-router";
 import { useCallback, useRef, useState } from "react";
 import { Image, RefreshControl, ScrollView, Text, View } from "react-native";
 import AdminInput from "../../components/news/AdminInput";
@@ -10,7 +10,6 @@ import { useNewsData } from "../../hooks/useNewsData";
 import style from "../../Styles/NewsStyles";
 import { useEnrollments } from "../../context/EnrollmentsContext";
 import NextClassCard from "../../components/news/NextClassCard";
-
 
 export default function News() {
   const { user } = useUser();
@@ -82,9 +81,7 @@ export default function News() {
         onReorder={reorderImages}
       />
 
-{user?.role === "MEMBER" && (
-  <NextClassCard enrollments={enrollments} />
-)}
+      {user?.role === "MEMBER" && <NextClassCard enrollments={enrollments} />}
 
       <Text style={style.subtitle}>News</Text>
 
