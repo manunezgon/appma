@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import EditProfileModal from "../../components/Profile/EditProfileModal.jsx";
+import SettingsModal from "../../components/Profile/SettingsModal.jsx";
 import { useUser } from "../../context/UserContext";
 import styles from "../../Styles/ProfileStyles.jsx";
 import { colors } from "../../Styles/theme";
@@ -23,12 +24,15 @@ import {
 import PaymentStatusCard from "../../components/Profile/PaymentStatusCard.jsx";
 import PaymentHistoryModal from "../../components/Profile/PaymentHistoryModal.jsx";
 import { usePayments } from "../../context/PaymentsContext";
+import { useTranslation } from "../../hooks/useTranslation";
 
 export default function Profile() {
   const { user, setUser, logout, token, updateProfileImage } = useUser();
   const router = useRouter();
+  const { t } = useTranslation();
 
   const [modalVisible, setModalVisible] = useState(false);
+  const [settingsVisible, setSettingsVisible] = useState(false);
 
   const [editName, setEditName] = useState(user?.name || "");
   const [editEmail, setEditEmail] = useState(user?.email || "");
@@ -71,9 +75,7 @@ export default function Profile() {
 
   const handleSaveProfile = async () => {
     if (!currentPassword || currentPassword.length < 6) {
-      Alert.alert(
-        "You must enter your current password (minimum 6 characters) to save changes",
-      );
+      Alert.alert(t("profile.currentPasswordRequired"));
       return;
     }
 
@@ -93,27 +95,25 @@ export default function Profile() {
       setModalVisible(false);
     } catch (error) {
       console.error(error);
-      Alert.alert("Error updating profile");
+      Alert.alert(t("profile.updateProfileError"));
     }
   };
 
   const handleChangePassword = async () => {
     if (!oldPassword || !newPassword || newPassword.length < 6) {
-      Alert.alert(
-        "Please fill in the current password and a new password with at least 6 characters",
-      );
+      Alert.alert(t("profile.passwordRequirements"));
       return;
     }
 
     try {
       await updatePasswordRequest(user.id, { oldPassword, newPassword }, token);
-      Alert.alert("Password updated");
+      Alert.alert(t("profile.passwordUpdated"));
       setOldPassword("");
       setNewPassword("");
       setModalVisible(false);
     } catch (error) {
       console.error(error);
-      Alert.alert("Error updating password");
+      Alert.alert(t("profile.updatePasswordError"));
     }
   };
 
@@ -134,7 +134,7 @@ export default function Profile() {
   if (!user)
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>Loading profile...</Text>
+        <Text style={styles.title}>{t("profile.loading")}</Text>{" "}
       </View>
     );
 
@@ -174,11 +174,11 @@ export default function Profile() {
 
         <View style={styles.infoBox}>
           <View style={styles.infoRow}>
-            <Text style={styles.label}>Email:</Text>
+            <Text style={styles.label}>{t("profile.email")}:</Text>
             <Text style={styles.value}>{user.email}</Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.label}>Phone:</Text>
+            <Text style={styles.label}>{t("profile.phone")}:</Text>
             <Text style={styles.value}>{user.phone || "-"}</Text>
           </View>
         </View>
@@ -197,20 +197,31 @@ export default function Profile() {
             onClose={() => setPaymentHistoryVisible(false)}
           />
         )}
-
         <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            onPress={() => setModalVisible(true)}
-            style={styles.button}
-          >
-            <Text style={styles.buttonText}>Edit profile</Text>
-          </TouchableOpacity>
+          <View style={styles.profileButtonRow}>
+            <TouchableOpacity
+              onPress={() => setModalVisible(true)}
+              style={styles.button}
+            >
+              <Text style={styles.buttonText}>{t("profile.editProfile")}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => setSettingsVisible(true)}
+              style={styles.button}
+            >
+              <Text style={styles.buttonText}>{t("profile.settings")}</Text>
+            </TouchableOpacity>
+          </View>
 
           <TouchableOpacity
             onPress={handleLogout}
-            style={[styles.button, styles.logoutButton]}
+            style={[
+              styles.logoutButton,
+              styles.profileLogoutButton,
+            ]}
           >
-            <Text style={styles.buttonText}>Logout</Text>
+            <Text style={styles.buttonText}>{t("profile.logout")}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -231,6 +242,10 @@ export default function Profile() {
         newPassword={newPassword}
         setNewPassword={setNewPassword}
         handleChangePassword={handleChangePassword}
+      />
+      <SettingsModal
+        visible={settingsVisible}
+        onClose={() => setSettingsVisible(false)}
       />
     </>
   );

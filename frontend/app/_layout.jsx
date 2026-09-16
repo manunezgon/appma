@@ -9,6 +9,7 @@ import { PaymentsProvider } from "../context/PaymentsContext";
 import { SchedulesProvider } from "../context/SchedulesContext";
 import { UserProvider, useUser } from "../context/UserContext";
 import { EnrollmentsProvider } from "../context/EnrollmentsContext";
+import { LanguageProvider } from "../context/LanguageContext";
 
 function RootGuard({ children }) {
   const { user } = useUser();
@@ -51,28 +52,33 @@ export default function RootLayout() {
   TextInput.defaultProps.style = { fontFamily: "Heebo-Medium" };
 
   return (
-    <UserProvider>
-      <EnrollmentsProvider>
-        <PaymentsProvider>
-          <LessonsProvider>
-            <SchedulesProvider>
-              <RootGuard>
-                <Stack screenOptions={{ headerShown: false }}>
-                  <Stack.Screen
-                    name="(tabs)"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen name="login" options={{ headerShown: false }} />
-                  <Stack.Screen
-                    name="register"
-                    options={{ headerShown: false }}
-                  />
-                </Stack>
-              </RootGuard>
-            </SchedulesProvider>
-          </LessonsProvider>
-        </PaymentsProvider>
-      </EnrollmentsProvider>
-    </UserProvider>
+    <LanguageProvider>
+      <UserProvider>
+        <EnrollmentsProvider>
+          <PaymentsProvider>
+            <LessonsProvider>
+              <SchedulesProvider>
+                <RootGuard>
+                  <Stack screenOptions={{ headerShown: false }}>
+                    <Stack.Screen
+                      name="(tabs)"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="login"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="register"
+                      options={{ headerShown: false }}
+                    />
+                  </Stack>
+                </RootGuard>
+              </SchedulesProvider>
+            </LessonsProvider>
+          </PaymentsProvider>
+        </EnrollmentsProvider>
+      </UserProvider>
+    </LanguageProvider>
   );
 }

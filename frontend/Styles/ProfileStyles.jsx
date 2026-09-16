@@ -72,10 +72,20 @@ const styles = StyleSheet.create({
   },
 
   buttonContainer: {
-    flexDirection: "row",
-    gap: spacing.xl,
     width: "80%",
     marginBottom: 50,
+  },
+
+  profileButtonRow: {
+    flexDirection: "row",
+    gap: spacing.xl,
+    width: "100%",
+    marginBottom: spacing.md,
+  },
+
+  profileLogoutButton: {
+    padding: spacing.md,
+    borderRadius: radii.md,
   },
 
   button: {
@@ -176,6 +186,49 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginTop: spacing.lg,
     gap: spacing.xl,
+  },
+
+  settingsHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: spacing.xl,
+  },
+
+  settingsOption: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    paddingVertical: spacing.xs,
+    backgroundColor: colors.surfaceAlt,
+    marginBottom: spacing.md,
+    borderRadius: radii.sm,
+  },
+
+  settingsOptionIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: radii.round,
+    backgroundColor: colors.surfaceAlt,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: spacing.md,
+  },
+
+  settingsOptionContent: {
+    flex: 1,
+  },
+
+  settingsOptionTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: colors.textMuted,
+    marginBottom: spacing.xs,
+  },
+
+  settingsOptionSubtitle: {
+    fontSize: 13,
+    color: colors.textSubtle,
   },
 
   paymentBox: {
