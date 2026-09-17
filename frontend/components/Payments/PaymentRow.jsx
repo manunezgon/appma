@@ -1,43 +1,49 @@
 import { Ionicons } from "@expo/vector-icons";
 import { memo, useCallback } from "react";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
+import { useTranslation } from "../../hooks/useTranslation";
 import style from "../../Styles/PaymentStyle";
 import { colors } from "../../Styles/theme";
 
 const PaymentRowComponent = ({ payment, onDelete }) => {
+  const { t } = useTranslation();
+
   const formatMonth = (monthString) => {
     const [year, month] = monthString.split("-");
     const date = new Date(year, month - 1);
 
-    return date.toLocaleString("en-US", {
-      month: "long",
-      year: "numeric",
-    });
+    return `${t(
+      `paymentHistory.months.${date.getMonth()}`,
+    )} ${date.getFullYear()}`;
   };
 
   const confirmDelete = useCallback(() => {
     Alert.alert(
-      "Delete payment",
-      "Are you sure you want to delete this payment?",
+      t("payments.deletePayment"),
+      t("payments.confirmDeletePayment"),
       [
-        { text: "Cancel", style: "cancel" },
         {
-          text: "Delete",
+          text: t("payments.cancel"),
+          style: "cancel",
+        },
+        {
+          text: t("payments.delete"),
           style: "destructive",
           onPress: () => onDelete(payment.id),
         },
       ],
     );
-  }, [onDelete, payment.id]);
+  }, [onDelete, payment.id, t]);
 
   return (
     <View style={style.paymentRow}>
       <View style={style.paymentInfo}>
         <Text style={style.modalityName}>
-          Month: {formatMonth(payment.monthPaid)}
+          {t("payments.month")}: {formatMonth(payment.monthPaid)}{" "}
         </Text>
         <Text style={style.modalityStatus}>
-          Lesson: {payment.lessonName} ({payment.professorName})
+          {t("payments.lesson")}: {payment.lessonName} ({payment.professorName}
+          ){" "}
         </Text>
       </View>
       <TouchableOpacity onPress={confirmDelete}>

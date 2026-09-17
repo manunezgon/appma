@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import { useEffect, useState } from "react";
+import { useTranslation } from "../../hooks/useTranslation";
 
 import { PaymentRow } from "./PaymentRow";
 import style from "../../Styles/PaymentStyle";
@@ -34,6 +35,8 @@ export const PaymentModal = ({
   registering,
   onClose,
 }) => {
+  const { t } = useTranslation();
+
   const [isGlobal, setIsGlobal] = useState(false);
 
   useEffect(() => {
@@ -59,34 +62,24 @@ export const PaymentModal = ({
     >
       <View style={style.modalOverlay}>
         <View style={style.modalContent}>
-
-          {/* ========================= */}
-          {/* PAGOS DEL ALUMNO           */}
-          {/* ========================= */}
-
           {mode === "student" && (
             <>
-              <Text style={style.modalTitle}>
-                {student?.name}
-              </Text>
+              <Text style={style.modalTitle}>{student?.name}</Text>
 
               {loadingPayments ? (
                 <Text style={style.loadingText}>
-                  Loading payments...
+                  {t("payments.loadingPayments")}
                 </Text>
               ) : payments.length === 0 ? (
                 <Text style={style.noPaymentsText}>
-                  No payments registered
+                  {t("payments.noPayments")}
                 </Text>
               ) : (
                 <FlatList
                   data={payments}
                   keyExtractor={(item) => item.id.toString()}
                   renderItem={({ item }) => (
-                    <PaymentRow
-                      payment={item}
-                      onDelete={onDelete}
-                    />
+                    <PaymentRow payment={item} onDelete={onDelete} />
                   )}
                   style={style.paymentsList}
                 />
@@ -97,41 +90,34 @@ export const PaymentModal = ({
                 onPress={onRegister}
               >
                 <Text style={style.registerButtonText}>
-                  Register Payment
+                  {t("payments.registerPayment")}
                 </Text>
               </TouchableOpacity>
             </>
           )}
 
-          {/* ========================= */}
-          {/* REGISTRAR PAGO             */}
-          {/* ========================= */}
-
           {mode === "register" && (
             <>
               <Text style={style.modalTitle}>
-                Register Payment
+                {t("payments.registerPayment")}
               </Text>
 
               <Text style={style.modalSubtitle}>
-                Student: {student?.name}
+                {t("payments.student")}: {student?.name}
               </Text>
 
               <View style={style.globalSwitchContainer}>
                 <Text style={style.globalSwitchLabel}>
-                  Global payment
+                  {t("payments.globalPayment")}
                 </Text>
 
-                <Switch
-                  value={isGlobal}
-                  onValueChange={setIsGlobal}
-                />
+                <Switch value={isGlobal} onValueChange={setIsGlobal} />
               </View>
 
               {!isGlobal && (
                 <>
                   <Text style={style.modalSubtitle}>
-                    Select lesson
+                    {t("payments.selectLesson")}
                   </Text>
 
                   <View style={style.pickerContainer}>
@@ -143,7 +129,7 @@ export const PaymentModal = ({
                         value: lesson.id,
                       }))}
                       placeholder={{
-                        label: "Select a lesson...",
+                        label: t("payments.selectLessonPlaceholder"),
                         value: null,
                         color: colors.textSubtle,
                       }}
@@ -172,7 +158,7 @@ export const PaymentModal = ({
               )}
 
               <Text style={style.modalSubtitle}>
-                Select month
+                {t("payments.selectMonth")}
               </Text>
 
               <View style={style.pickerContainer}>
@@ -181,13 +167,13 @@ export const PaymentModal = ({
                   onValueChange={setSelectedMonth}
                   items={months.map((month) => ({
                     label: paidMonths?.includes(month.value)
-                      ? `${month.label} (Paid)`
+                      ? `${month.label} (${t("payments.paid")})`
                       : month.label,
                     value: month.value,
                     disabled: paidMonths?.includes(month.value),
                   }))}
                   placeholder={{
-                    label: "Select a month...",
+                    label: t("payments.selectMonthPlaceholder"),
                     value: "",
                     color: colors.textSubtle,
                   }}
@@ -224,8 +210,8 @@ export const PaymentModal = ({
               >
                 <Text style={style.registerButtonText}>
                   {registering
-                    ? "Registering.."
-                    : "Confirm Payment"}
+                    ? t("payments.registering")
+                    : t("payments.confirmPayment")}
                 </Text>
               </TouchableOpacity>
             </>
@@ -237,11 +223,7 @@ export const PaymentModal = ({
 
           <TouchableOpacity
             style={style.closeButton}
-            onPress={
-              mode === "register"
-                ? onBack
-                : onClose
-            }
+            onPress={mode === "register" ? onBack : onClose}
           >
             <Ionicons
               name={mode === "register" ? "arrow-back" : "close"}
@@ -249,10 +231,8 @@ export const PaymentModal = ({
               color={colors.primary}
             />
           </TouchableOpacity>
-
         </View>
       </View>
     </Modal>
   );
 };
-

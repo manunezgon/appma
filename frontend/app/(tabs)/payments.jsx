@@ -1,8 +1,8 @@
-
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FlatList, Text, TextInput, View } from "react-native";
 import { useLessons } from "../../context/LessonsContext";
 import { usePayments } from "../../context/PaymentsContext";
+import { useTranslation } from "../../hooks/useTranslation";
 import { useUser } from "../../context/UserContext";
 import { getUsers } from "../../services/usersApi";
 
@@ -11,21 +11,21 @@ import { StudentCard } from "../../components/Payments/StudentCard";
 import style from "../../Styles/PaymentStyle";
 import { colors } from "../../Styles/theme";
 
-const generateMonths = () => {
+const generateMonths = (t) => {
   const months = [];
   const now = new Date();
 
   for (let i = 0; i <= 12; i++) {
     const date = new Date(now.getFullYear(), now.getMonth() + i, 1);
 
-    const value = `${date.getFullYear()}-${String(
-      date.getMonth() + 1,
-    ).padStart(2, "0")}`;
+    const value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+      2,
+      "0",
+    )}`;
 
-    const label = date.toLocaleString("en-US", {
-      month: "long",
-      year: "numeric",
-    });
+    const label = `${t(
+      `paymentHistory.months.${date.getMonth()}`,
+    )} ${date.getFullYear()}`;
 
     months.push({
       label,
@@ -39,6 +39,8 @@ const generateMonths = () => {
 export default function Payments() {
   const { token } = useUser();
   const { lessons } = useLessons();
+
+  const { t } = useTranslation();
 
   const {
     payments,
@@ -60,7 +62,7 @@ export default function Payments() {
   const [selectedLessonId, setSelectedLessonId] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState("");
 
-  const [months] = useState(generateMonths());
+  const months = useMemo(() => generateMonths(t), [t]);
 
   const fetchStudents = useCallback(async () => {
     if (!token) return;
@@ -160,22 +162,17 @@ export default function Payments() {
   );
 
   const renderStudent = useCallback(
-    ({ item }) => (
-      <StudentCard
-        student={item}
-        onPress={handleStudentPress}
-      />
-    ),
+    ({ item }) => <StudentCard student={item} onPress={handleStudentPress} />,
     [handleStudentPress],
   );
 
   return (
     <View style={style.container}>
-      <Text style={style.title}>Students</Text>
+      <Text style={style.title}>{t("payments.students")}</Text>
 
       <View style={style.searchBox}>
         <TextInput
-          placeholder="Search students..."
+          placeholder={t("payments.searchStudents")}
           placeholderTextColor={colors.textSubtle}
           style={style.searchInput}
           value={search}
@@ -184,14 +181,14 @@ export default function Payments() {
       </View>
 
       {loadingStudents ? (
-        <Text style={style.loadingText}>Loading students...</Text>
+        <Text style={style.loadingText}>{t("payments.loadingStudents")}</Text>
       ) : (
         <FlatList
           data={filteredStudents}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderStudent}
           ListEmptyComponent={
-            <Text style={style.empty}>No students</Text>
+            <Text style={style.empty}>{t("payments.noStudents")}</Text>
           }
         />
       )}
