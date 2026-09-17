@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useTranslation } from "../../hooks/useTranslation";
 import style from "../../Styles/NewsStyles";
 import { colors } from "../../Styles/theme";
 
@@ -19,6 +20,7 @@ export default function CarouselEditorModal({
   onDelete,
   onReorder,
 }) {
+  const { t } = useTranslation();
   const [localImages, setLocalImages] = useState(images);
 
   useEffect(() => {
@@ -37,10 +39,10 @@ export default function CarouselEditorModal({
   };
 
   const handleDelete = (index) => {
-    Alert.alert("Delete Image", "Are you sure you want to delete this image?", [
-      { text: "Cancel", style: "cancel" },
+    Alert.alert(t("news.deleteImage"), t("news.confirmDeleteImage"), [
+      { text: t("news.cancel"), style: "cancel" },
       {
-        text: "Delete",
+        text: t("news.delete"),
         style: "destructive",
         onPress: () => {
           const newImages = [...localImages];
@@ -120,7 +122,7 @@ export default function CarouselEditorModal({
               onClose();
             }}
           >
-            <Text style={style.text}>Save</Text>
+<Text style={style.text}>{t("news.save")}</Text>
           </TouchableOpacity>
         </View>
       </View>

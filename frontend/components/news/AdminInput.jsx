@@ -6,6 +6,7 @@ import {
   RichEditor,
   RichToolbar,
 } from "react-native-pell-rich-editor";
+import { useTranslation } from "../../hooks/useTranslation";
 import style from "../../Styles/NewsStyles";
 import { colors } from "../../Styles/theme";
 
@@ -21,6 +22,8 @@ const hasContent = (html) => {
 };
 
 export default function AdminInput({ value, onChange, onSend }) {
+  const { t } = useTranslation();
+
   const editorRef = useRef(null);
 
   const handleChange = (html) => {
@@ -44,7 +47,7 @@ export default function AdminInput({ value, onChange, onSend }) {
           ref={editorRef}
           style={style.richEditor}
           initialContentHTML={value}
-          placeholder="Share a message..."
+          placeholder={t("news.shareMessage")}
           onChange={handleChange}
           editorStyle={{
             backgroundColor: colors.surface,
@@ -91,11 +94,7 @@ export default function AdminInput({ value, onChange, onSend }) {
             },
           ]}
         >
-          <Ionicons
-            name="megaphone-outline"
-            size={28}
-            color={colors.primary}
-          />
+          <Ionicons name="megaphone-outline" size={28} color={colors.primary} />
         </TouchableOpacity>
       </View>
     </View>

@@ -1,10 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useMemo } from "react";
+import { useTranslation } from "../../hooks/useTranslation";
 import { Text, View } from "react-native";
 import style from "../../Styles/NewsStyles";
 import { colors } from "../../Styles/theme";
 
 export default function NextClassCard({ enrollments = [] }) {
+  const { t } = useTranslation();
   const nextClass = useMemo(() => {
     const now = new Date();
 
@@ -43,33 +45,26 @@ export default function NextClassCard({ enrollments = [] }) {
   })();
 
   const formattedDate = isToday
-    ? "Today"
+    ? t("nextClass.today")
     : isTomorrow
-      ? "Tomorrow"
+      ? t("nextClass.tomorrow")
       : nextClass.date;
 
   return (
     <View style={style.nextClassContainer}>
       <View style={style.nextClassIcon}>
-        <Ionicons
-          name="calendar-outline"
-          size={24}
-          color={colors.primary}
-        />
+        <Ionicons name="calendar-outline" size={24} color={colors.primary} />
       </View>
 
       <View style={style.nextClassContent}>
-        <Text style={style.nextClassLabel}>NEXT CLASS</Text>
-
+        <Text style={style.nextClassLabel}>{t("nextClass.title")}</Text>
         <Text style={style.nextClassName}>{nextClass.lessonName}</Text>
 
         <Text style={style.nextClassInfo}>
           {formattedDate} · {nextClass.time}
         </Text>
 
-        <Text style={style.nextClassProfessor}>
-          {nextClass.professorName}
-        </Text>
+        <Text style={style.nextClassProfessor}>{nextClass.professorName}</Text>
       </View>
     </View>
   );

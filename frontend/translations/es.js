@@ -188,4 +188,31 @@ createClass: {
   selectClass: "Selecciona una clase",
   save: "Guardar",
 },
+
+news: {
+  title: "Noticias",
+  noNews: "No hay noticias por ahora",
+  shareMessage: "Escribe un mensaje...",
+  deleteAnnouncement: "¿Eliminar este anuncio?",
+  deleteImage: "Eliminar imagen",
+confirmDeleteImage: "¿Estás seguro de que quieres eliminar esta imagen?",
+cancel: "Cancelar",
+delete: "Eliminar",
+save: "Guardar",
+},
+
+nextClass: {
+  title: "PRÓXIMA CLASE",
+  today: "Hoy",
+  tomorrow: "Mañana",
+},
+
+tabs: {
+  news: "Noticias",
+  calendar: "Calendario",
+  sessions: "Clases",
+  ranking: "Ranking",
+  payments: "Pagos",
+  profile: "Perfil",
+},
 };

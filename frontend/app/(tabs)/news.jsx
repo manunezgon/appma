@@ -7,11 +7,13 @@ import CarouselEditorModal from "../../components/news/CarouselEditorModal";
 import Carousel from "../../components/news/Carrousel";
 import { useUser } from "../../context/UserContext";
 import { useNewsData } from "../../hooks/useNewsData";
+import { useTranslation } from "../../hooks/useTranslation";
 import style from "../../Styles/NewsStyles";
 import { useEnrollments } from "../../context/EnrollmentsContext";
 import NextClassCard from "../../components/news/NextClassCard";
 
 export default function News() {
+  const { t } = useTranslation();
   const { user } = useUser();
   const [showCarouselEditor, setShowCarouselEditor] = useState(false);
   const [newMessage, setNewMessage] = useState("");
@@ -83,7 +85,7 @@ export default function News() {
 
       {user?.role === "MEMBER" && <NextClassCard enrollments={enrollments} />}
 
-      <Text style={style.subtitle}>News</Text>
+      <Text style={style.subtitle}>{t("news.title")}</Text>
 
       {user?.role === "ADMIN" && (
         <AdminInput
@@ -95,7 +97,7 @@ export default function News() {
 
       {announcements.length === 0 ? (
         <View style={style.newsContainer}>
-          <Text style={style.text}>No hay noticias por ahora</Text>
+          <Text style={style.text}>{t("news.noNews")}</Text>
         </View>
       ) : (
         announcements.map((item) => (

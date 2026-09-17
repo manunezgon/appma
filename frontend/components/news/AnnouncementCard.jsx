@@ -9,10 +9,12 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { useUser } from "../../context/UserContext";
+import { useTranslation } from "../../hooks/useTranslation";
 import style from "../../Styles/NewsStyles";
 import { colors } from "../../Styles/theme";
 
 export default function AnnouncementCard({ announcement, onDelete }) {
+  const { t, language } = useTranslation();
   const { user } = useUser();
   const [confirmVisible, setConfirmVisible] = useState(false);
   const { width } = useWindowDimensions();
@@ -53,7 +55,9 @@ export default function AnnouncementCard({ announcement, onDelete }) {
       />
 
       <Text style={style.date}>
-        {new Date(announcement.createdAt).toLocaleString("es-ES")}
+        {new Date(announcement.createdAt).toLocaleString(
+          language === "es" ? "es-ES" : "en-US",
+        )}
       </Text>
 
       {user?.role === "ADMIN" && (
@@ -68,8 +72,7 @@ export default function AnnouncementCard({ announcement, onDelete }) {
       <Modal visible={confirmVisible} transparent animationType="fade">
         <View style={style.modalOverlay}>
           <View style={style.modalContent}>
-            <Text style={style.modalText}>¿Eliminar este anuncio?</Text>
-
+            <Text style={style.modalText}>{t("news.deleteAnnouncement")}</Text>
             <View style={style.modalButtons}>
               <TouchableOpacity onPress={() => setConfirmVisible(false)}>
                 <Ionicons name="close" size={28} color={colors.primary} />
