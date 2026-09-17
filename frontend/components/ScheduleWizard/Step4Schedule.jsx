@@ -1,4 +1,5 @@
 import { Text, TouchableOpacity } from "react-native";
+import { useTranslation } from "../../hooks/useTranslation";
 import style from "../../Styles/ScheduleStyles.jsx";
 import DayPicker from "./DayPicker.jsx";
 import TextInputField from "./TextInputField.jsx";
@@ -23,30 +24,39 @@ export default function Step4Schedule({
   setEndTime,
   setStep,
 }) {
+  const { t } = useTranslation();
+
+  const translatedDays = daysOfWeek.map((day) => ({
+    ...day,
+    label: t(`scheduleManagement.days.${day.value}`),
+  }));
+
   return (
     <>
-      <Text style={style.subtitle}>Select Day and Time</Text>
+      <Text style={style.subtitle}>
+        {t("scheduleManagement.selectDayAndTime")}
+      </Text>
 
       <DayPicker
-        days={daysOfWeek}
+        days={translatedDays}
         selectedDay={selectedDay}
         onSelect={setSelectedDay}
       />
 
-      <Text style={style.subtitle2}>Start Time</Text>
+      <Text style={style.subtitle2}>{t("scheduleManagement.startTime")}</Text>
       <TextInputField
         value={startTime}
         onChangeText={setStartTime}
-        placeholder="e.g. 18:00"
+        placeholder={t("scheduleManagement.startTimePlaceholder")}
         placeholderTextColor={colors.textOnLite}
         style={style.inputField}
       />
 
-      <Text style={style.subtitle2}>End Time</Text>
+      <Text style={style.subtitle2}>{t("scheduleManagement.endTime")}</Text>
       <TextInputField
         value={endTime}
         onChangeText={setEndTime}
-        placeholder="e.g. 19:00"
+        placeholder={t("scheduleManagement.endTimePlaceholder")}
         placeholderTextColor={colors.textOnLite}
         style={style.inputField}
       />
@@ -55,7 +65,7 @@ export default function Step4Schedule({
         style={[style.button, { marginTop: 10 }]}
         onPress={() => setStep(5)}
       >
-        <Text style={style.buttonText}>Next</Text>
+        <Text style={style.buttonText}>{t("scheduleManagement.next")}</Text>
       </TouchableOpacity>
     </>
   );

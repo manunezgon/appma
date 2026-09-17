@@ -1,4 +1,5 @@
 import { Text, TouchableOpacity } from "react-native";
+import { useTranslation } from "../../hooks/useTranslation";
 import style from "../../Styles/ScheduleStyles.jsx";
 import LessonSummary from "./LessonSummary.jsx";
 
@@ -10,10 +11,14 @@ export default function Step5Confirm({
   endTime,
   handleSaveSchedule,
 }) {
+  const { t } = useTranslation();
+
   return (
     <>
       <Text style={style.subtitle}>
-        {mode === "editSchedule" ? "Confirm Changes" : "Confirm Schedule"}
+        {mode === "editSchedule"
+          ? t("scheduleManagement.confirmChanges")
+          : t("scheduleManagement.confirmSchedule")}
       </Text>
 
       <LessonSummary
@@ -28,7 +33,9 @@ export default function Step5Confirm({
         onPress={handleSaveSchedule}
       >
         <Text style={style.buttonText}>
-          {mode === "editSchedule" ? "Save Changes" : "Save Schedule"}
+          {mode === "editSchedule"
+            ? t("scheduleManagement.saveChanges")
+            : t("scheduleManagement.saveSchedule")}
         </Text>
       </TouchableOpacity>
     </>

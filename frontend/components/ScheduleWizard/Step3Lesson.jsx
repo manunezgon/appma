@@ -1,4 +1,5 @@
 import { Alert, Text, TouchableOpacity, View } from "react-native";
+import { useTranslation } from "../../hooks/useTranslation";
 import style from "../../Styles/ScheduleStyles.jsx";
 import LessonSummary from "./LessonSummary.jsx";
 import SelectableList from "./SelectableList.jsx";
@@ -27,16 +28,18 @@ export default function Step3Lesson({
   handleDeleteLesson,
   handleDeleteSchedule,
 }) {
+  const { t } = useTranslation();
+
   const handleNext = () => {
     if (lessonMode === "new") {
       if (!newLessonName || !newProfessorName || !newAmountMonthly) {
-        Alert.alert("Please fill in all lesson details");
+        Alert.alert(t("scheduleManagement.fillLessonDetails"));
         return;
       }
     }
 
     if (lessonMode === "existing" && !selectedLessonId) {
-      Alert.alert("Please select a lesson");
+      Alert.alert(t("scheduleManagement.selectLesson"));
       return;
     }
 
@@ -46,23 +49,27 @@ export default function Step3Lesson({
   if (mode === "editLesson") {
     return (
       <>
-        <Text style={style.subtitle}>Edit Lesson</Text>
+        <Text style={style.subtitle}>{t("scheduleManagement.editLesson")}</Text>
 
-        <Text style={style.subtitle2}>Name</Text>
+        <Text style={style.subtitle2}>{t("scheduleManagement.name")}</Text>
         <TextInputField
           value={newLessonName}
           onChangeText={setNewLessonName}
           style={style.inputField}
         />
 
-        <Text style={style.subtitle2}>Instructor</Text>
+        <Text style={style.subtitle2}>
+          {t("scheduleManagement.instructor")}
+        </Text>
         <TextInputField
           value={newProfessorName}
           onChangeText={setNewProfessorName}
           style={style.inputField}
         />
 
-        <Text style={style.subtitle2}>Monthly Price</Text>
+        <Text style={style.subtitle2}>
+          {t("scheduleManagement.monthlyPrice")}
+        </Text>
         <TextInputField
           value={newAmountMonthly}
           onChangeText={setNewAmountMonthly}
@@ -74,12 +81,16 @@ export default function Step3Lesson({
             style={[style.button, style.saveButton]}
             onPress={handleUpdateLesson}
           >
-            <Text style={style.buttonText}>Save Changes</Text>
+            <Text style={style.buttonText}>
+              {t("scheduleManagement.saveChanges")}
+            </Text>
           </TouchableOpacity>
 
           {selectedLessonId && (
             <TouchableOpacity style={style.button} onPress={handleDeleteLesson}>
-              <Text style={style.buttonText}>Delete Lesson</Text>
+              <Text style={style.buttonText}>
+                {t("scheduleManagement.deleteLesson")}
+              </Text>
             </TouchableOpacity>
           )}
         </View>
@@ -91,30 +102,38 @@ export default function Step3Lesson({
     <>
       {lessonMode === "new" && (
         <>
-          <Text style={style.subtitle}>Create New Lesson</Text>
-          <Text style={style.subtitle2}>New Lesson Name</Text>
+          <Text style={style.subtitle}>
+            {t("scheduleManagement.createNewLesson")}
+          </Text>
+          <Text style={style.subtitle2}>
+            {t("scheduleManagement.newLessonName")}
+          </Text>
           <TextInputField
             value={newLessonName}
             onChangeText={setNewLessonName}
-            placeholder="e.g. Advanced Yoga"
+            placeholder={t("scheduleManagement.lessonNamePlaceholder")}
             placeholderTextColor={colors.textOnLite}
             style={style.inputField}
           />
 
-          <Text style={style.subtitle2}>Instructor</Text>
+          <Text style={style.subtitle2}>
+            {t("scheduleManagement.instructor")}
+          </Text>
           <TextInputField
             value={newProfessorName}
             onChangeText={setNewProfessorName}
-            placeholder="Instructor name"
+            placeholder={t("scheduleManagement.instructorPlaceholder")}
             placeholderTextColor={colors.textOnLite}
             style={style.inputField}
           />
 
-          <Text style={style.subtitle2}>Monthly Price</Text>
+          <Text style={style.subtitle2}>
+            {t("scheduleManagement.monthlyPrice")}
+          </Text>
           <TextInputField
             value={newAmountMonthly}
             onChangeText={setNewAmountMonthly}
-            placeholder="e.g. 35"
+            placeholder={t("scheduleManagement.pricePlaceholder")}
             placeholderTextColor={colors.textOnLite}
             keyboardType="numeric"
             style={style.inputField}
@@ -124,9 +143,11 @@ export default function Step3Lesson({
 
       {lessonMode === "existing" && mode === "create" && (
         <>
-          <Text style={style.subtitle}>Select a lesson</Text>
+          <Text style={style.subtitle}>
+            {t("scheduleManagement.selectLesson")}
+          </Text>
           {loadingLessons ? (
-            <Text>Loading lessons...</Text>
+            <Text>{t("scheduleManagement.loadingLessons")}</Text>
           ) : (
             <SelectableList
               items={lessons}
@@ -159,7 +180,9 @@ export default function Step3Lesson({
 
       {lessonMode === "existing" && mode === "editSchedule" && (
         <>
-          <Text style={style.subtitle}>Edit Schedule</Text>
+          <Text style={style.subtitle}>
+            {t("scheduleManagement.editSchedule")}
+          </Text>
           <LessonSummary
             lesson={selectedLessonObj}
             day={selectedDay}
@@ -173,7 +196,7 @@ export default function Step3Lesson({
         style={[style.button, { marginTop: 10 }]}
         onPress={handleNext}
       >
-        <Text style={style.buttonText}>Next</Text>
+        <Text style={style.buttonText}>{t("scheduleManagement.next")}</Text>
       </TouchableOpacity>
 
       {mode === "editSchedule" && (
@@ -181,7 +204,9 @@ export default function Step3Lesson({
           style={[style.button, style.deleteButton]}
           onPress={handleDeleteSchedule}
         >
-          <Text style={style.buttonText}>Delete Schedule</Text>
+          <Text style={style.buttonText}>
+            {t("scheduleManagement.deleteSchedule")}
+          </Text>
         </TouchableOpacity>
       )}
     </>

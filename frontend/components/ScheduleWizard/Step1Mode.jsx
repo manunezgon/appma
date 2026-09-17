@@ -1,4 +1,5 @@
 import { Text, TouchableOpacity, View } from "react-native";
+import { useTranslation } from "../../hooks/useTranslation";
 import style from "../../Styles/ScheduleStyles.jsx";
 
 export default function Step1Mode({
@@ -8,6 +9,7 @@ export default function Step1Mode({
   setSelectedScheduleId,
   setStep,
 }) {
+  const { t } = useTranslation();
   return (
     <View style={style.container}>
       <TouchableOpacity
@@ -20,7 +22,9 @@ export default function Step1Mode({
           setStep(2);
         }}
       >
-        <Text style={style.buttonText}>Create new schedule</Text>
+        <Text style={style.buttonText}>
+          {t("scheduleManagement.createNewSchedule")}
+        </Text>
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -33,7 +37,9 @@ export default function Step1Mode({
           setStep(2);
         }}
       >
-        <Text style={style.buttonText}>Edit existing schedule</Text>
+        <Text style={style.buttonText}>
+          {t("scheduleManagement.editExistingSchedule")}
+        </Text>
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -46,7 +52,9 @@ export default function Step1Mode({
           setStep(2);
         }}
       >
-        <Text style={style.buttonText}>Edit existing lesson</Text>
+        <Text style={style.buttonText}>
+          {t("scheduleManagement.editExistingLesson")}
+        </Text>
       </TouchableOpacity>
     </View>
   );
