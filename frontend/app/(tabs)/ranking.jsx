@@ -9,10 +9,12 @@ import { useUser } from "../../context/UserContext";
 import styles from "../../Styles/RankingStyles";
 import { colors } from "../../Styles/theme";
 import { getRanking } from "../../services/metricsApi";
+import { useTranslation } from "../../hooks/useTranslation";
 
 export default function Ranking() {
   const { user, token } = useUser();
   const { lessons } = useLessons();
+  const { t } = useTranslation();
 
   const [ranking, setRanking] = useState([]);
   const [selectedLesson, setSelectedLesson] = useState(null);
@@ -34,8 +36,7 @@ export default function Ranking() {
 
   const now = new Date();
 
-  const monthName = now.toLocaleString("en-US", { month: "long" });
-  const formattedMonth = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+  const monthIndex = now.getMonth();
 
   const year = now.getFullYear();
 
@@ -60,7 +61,8 @@ export default function Ranking() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.title}>
-        Ranking · {selectedType === "month" ? formattedMonth : year}
+        Ranking ·{" "}
+        {selectedType === "month" ? t(`ranking.months.${monthIndex}`) : year}
       </Text>
 
       <RankingFilters

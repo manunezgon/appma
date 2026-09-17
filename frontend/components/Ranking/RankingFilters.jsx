@@ -3,6 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { colors } from "../../Styles/theme";
 import { Text, TouchableOpacity, View } from "react-native";
 import styles from "../../Styles/RankingStyles";
+import { useTranslation } from "../../hooks/useTranslation";
 
 export default function RankingFilters({
   selectedType,
@@ -11,6 +12,8 @@ export default function RankingFilters({
   setSelectedLesson,
   lessons,
 }) {
+  const { t } = useTranslation();
+
   return (
     <>
       <View style={styles.segmentedControl}>
@@ -27,7 +30,7 @@ export default function RankingFilters({
               selectedType === "month" && styles.segmentTextActive,
             ]}
           >
-            Month
+            {t("ranking.month")}
           </Text>
         </TouchableOpacity>
 
@@ -44,7 +47,7 @@ export default function RankingFilters({
               selectedType === "year" && styles.segmentTextActive,
             ]}
           >
-            Year
+            {t("ranking.year")}
           </Text>
         </TouchableOpacity>
       </View>
@@ -59,17 +62,13 @@ export default function RankingFilters({
             value: lesson.id,
           }))}
           placeholder={{
-            label: "All lessons",
+            label: t("ranking.allLessons"),
             value: null,
             color: colors.textSubtle,
           }}
           useNativeAndroidPickerStyle={false}
           Icon={() => (
-            <Ionicons
-              name="chevron-down"
-              size={20}
-              color={colors.text}
-            />
+            <Ionicons name="chevron-down" size={20} color={colors.text} />
           )}
           style={{
             inputIOS: styles.picker,
