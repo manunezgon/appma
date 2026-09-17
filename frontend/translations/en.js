@@ -1,48 +1,63 @@
 export default {
-profile: {
-  loading: "Loading profile...",
-  email: "Email",
-  phone: "Phone",
-  editProfile: "Edit profile",
-  settings: "Settings",
-  logout: "Logout",
-
-  currentPasswordRequired:
-    "You must enter your current password (minimum 6 characters) to save changes",
-
-  passwordRequirements:
-    "Please fill in the current password and a new password with at least 6 characters",
-
-  passwordUpdated: "Password updated",
-  updateProfileError: "Error updating profile",
-  updatePasswordError: "Error updating password",
-},
-
-  settings: {
-    theme: "Theme",
-    language: "Language",
-    chooseTheme: "Choose Theme",
-    chooseLanguage: "Choose Language",
-    light: "Light",
-    dark: "Dark",
-    spanish: "Español",
-    english: "English",
-    save: "Save",
-    cancel: "Cancel",
-  },
-
-  editProfile: {
-    profile: "Profile",
-    password: "Password",
-    title: "Edit Profile",
-    changePassword: "Change Password",
-    name: "Name",
+  profile: {
+    loading: "Loading profile...",
     email: "Email",
     phone: "Phone",
+    editProfile: "Edit profile",
+    settings: "Settings",
+    logout: "Logout",
+
+    currentPasswordRequired:
+      "You must enter your current password (minimum 6 characters) to save changes",
+
+    passwordRequirements:
+      "Please fill in the current password and a new password with at least 6 characters",
+
+    passwordUpdated: "Password updated",
+    updateProfileError: "Error updating profile",
+    updatePasswordError: "Error updating password",
+
+    editProfileTab: "Profile",
+    passwordTab: "Password",
+    name: "Name",
     currentPassword: "Current Password",
-    newPassword: "New Password",
     saveChanges: "Save changes",
-    updatePassword: "Update Password",
     cancel: "Cancel",
+    changePassword: "Change Password",
+    newPassword: "New Password",
+    updatePassword: "Update Password",
   },
+
+  paymentHistory: { 
+    title: "Payment History", 
+    notPaid: "Not paid", 
+    globalPass: "Global Pass", 
+    months: [ 
+      "January", 
+      "February", 
+      "March", 
+      "April", 
+      "May", 
+      "June", 
+      "July", 
+      "August", 
+      "September", 
+      "October", 
+      "November", 
+      "December", 
+    ], 
+    viewHistory: "View payment history",
+
+  },
+
+  settings: {
+  theme: "Theme",
+  language: "Language",
+  chooseTheme: "Choose Theme",
+  light: "Light",
+  dark: "Dark",
+  chooseLanguage: "Choose Language",
+  save: "Save",
+  cancel: "Cancel",
+},
 };

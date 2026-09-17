@@ -2,32 +2,30 @@ import { Ionicons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
 import { colors } from "../../Styles/theme";
 import styles from "../../Styles/ProfileStyles";
+import { useTranslation } from "../../hooks/useTranslation";
 
 export default function PaymentStatusCard({ payment, month, onHistoryPress }) {
+  const { t } = useTranslation();
+
   const formatMonth = (monthString) => {
     const [year, monthNumber] = monthString.split("-");
-    const date = new Date(Number(year), Number(monthNumber) - 1);
 
-    return date.toLocaleString("en-US", {
-      month: "long",
-      year: "numeric",
-    });
+    return `${t(`paymentHistory.months.${Number(monthNumber) - 1}`)} ${year}`;
   };
 
   const getPaymentModality = () => {
     if (!payment) {
-      return "Not paid";
+      return t("paymentHistory.notPaid");
     }
 
     if (payment.type === "GLOBAL") {
-      return "Global Pass";
+      return t("paymentHistory.globalPass");
     }
 
     return `${payment.lessonName}`;
   };
 
   const isPaid = !!payment;
-
 
   return (
     <View style={styles.paymentBox}>
@@ -65,8 +63,10 @@ export default function PaymentStatusCard({ payment, month, onHistoryPress }) {
         style={styles.paymentHistoryButton}
         onPress={onHistoryPress}
       >
-        <Text style={styles.paymentHistoryText}>View payment history</Text>
-
+        <Text style={styles.paymentHistoryText}>
+          {t("paymentHistory.viewHistory")}
+        </Text>
+        
         <Ionicons
           name="chevron-forward-outline"
           size={20}

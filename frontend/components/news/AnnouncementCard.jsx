@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import RenderHTML from "react-native-render-html";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Modal,
   Text,
@@ -16,31 +16,40 @@ export default function AnnouncementCard({ announcement, onDelete }) {
   const { user } = useUser();
   const [confirmVisible, setConfirmVisible] = useState(false);
   const { width } = useWindowDimensions();
+  const source = useMemo(
+    () => ({ html: announcement.message }),
+    [announcement.message],
+  );
+
+  const tagsStyles = useMemo(
+    () => ({
+      body: style.message,
+      p: {
+        marginTop: 0,
+        marginBottom: 8,
+      },
+      strong: {
+        fontWeight: "700",
+      },
+      b: {
+        fontWeight: "700",
+      },
+      em: {
+        fontStyle: "italic",
+      },
+      i: {
+        fontStyle: "italic",
+      },
+    }),
+    [],
+  );
 
   return (
     <View style={style.card}>
       <RenderHTML
         contentWidth={width - 40}
-        source={{ html: announcement.message }}
-        tagsStyles={{
-          body: style.message,
-          p: {
-            marginTop: 0,
-            marginBottom: 8,
-          },
-          strong: {
-            fontWeight: "700",
-          },
-          b: {
-            fontWeight: "700",
-          },
-          em: {
-            fontStyle: "italic",
-          },
-          i: {
-            fontStyle: "italic",
-          },
-        }}
+        source={source}
+        tagsStyles={tagsStyles}
       />
 
       <Text style={style.date}>

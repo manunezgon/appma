@@ -4,11 +4,13 @@ import { Ionicons } from "@expo/vector-icons";
 import styles from "../../Styles/ProfileStyles.jsx";
 import { colors } from "../../Styles/theme";
 import { useLanguage } from "../../context/LanguageContext";
+import { useTranslation } from "../../hooks/useTranslation";
 
 export default function SettingsModal({ visible, onClose }) {
   const [activeTab, setActiveTab] = useState("theme");
   const { language, setLanguage } = useLanguage();
   const [selectedLanguage, setSelectedLanguage] = useState(language);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (visible) {
@@ -33,7 +35,7 @@ export default function SettingsModal({ visible, onClose }) {
               ]}
               onPress={() => setActiveTab("theme")}
             >
-              <Text style={styles.tabText}>Theme</Text>
+              <Text style={styles.tabText}>{t("settings.theme")}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -43,15 +45,16 @@ export default function SettingsModal({ visible, onClose }) {
               ]}
               onPress={() => setActiveTab("language")}
             >
-              <Text style={styles.tabText}>Language</Text>
+              <Text style={styles.tabText}>{t("settings.language")}</Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.modalScroll}>
             {activeTab === "theme" && (
               <>
-                <Text style={styles.modalTitle}>Choose Theme</Text>
-
+                <Text style={styles.modalTitle}>
+                  {t("settings.chooseTheme")}
+                </Text>
                 <TouchableOpacity style={styles.settingsOption}>
                   <View style={styles.settingsOptionIcon}>
                     <Ionicons
@@ -62,7 +65,9 @@ export default function SettingsModal({ visible, onClose }) {
                   </View>
 
                   <View style={styles.settingsOptionContent}>
-                    <Text style={styles.settingsOptionTitle}>Light</Text>
+                    <Text style={styles.settingsOptionTitle}>
+                      {t("settings.light")}
+                    </Text>
                   </View>
                 </TouchableOpacity>
 
@@ -76,7 +81,9 @@ export default function SettingsModal({ visible, onClose }) {
                   </View>
 
                   <View style={styles.settingsOptionContent}>
-                    <Text style={styles.settingsOptionTitle}>Dark</Text>
+                    <Text style={styles.settingsOptionTitle}>
+                      {t("settings.dark")}
+                    </Text>
                   </View>
                 </TouchableOpacity>
               </>
@@ -84,8 +91,9 @@ export default function SettingsModal({ visible, onClose }) {
 
             {activeTab === "language" && (
               <>
-                <Text style={styles.modalTitle}>Choose Language</Text>
-
+                <Text style={styles.modalTitle}>
+                  {t("settings.chooseLanguage")}
+                </Text>
                 <TouchableOpacity
                   style={styles.settingsOption}
                   onPress={() => setSelectedLanguage("es")}
@@ -141,14 +149,14 @@ export default function SettingsModal({ visible, onClose }) {
               }}
               style={[styles.button, styles.saveButton]}
             >
-              <Text style={styles.buttonText}>Save</Text>
+              <Text style={styles.buttonText}>{t("settings.save")}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={onClose}
               style={[styles.button, styles.cancelButton]}
             >
-              <Text style={styles.buttonText}>Cancel</Text>
+              <Text style={styles.buttonText}>{t("settings.cancel")}</Text>
             </TouchableOpacity>
           </View>
         </View>

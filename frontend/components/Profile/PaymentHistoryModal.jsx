@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { useUser } from "../../context/UserContext";
 import { usePayments } from "../../context/PaymentsContext";
+import { useTranslation } from "../../hooks/useTranslation";
 import styles from "../../Styles/PaymentHistoryStyles";
 import { colors } from "../../Styles/theme";
 
@@ -32,6 +33,8 @@ export default function PaymentHistoryModal({ visible, onClose }) {
   const { user } = useUser();
   const { payments, loadingPayments, fetchPaymentsByUser } = usePayments();
 
+  const { t } = useTranslation();
+
   const currentYear = new Date().getFullYear();
 
   useEffect(() => {
@@ -44,18 +47,16 @@ export default function PaymentHistoryModal({ visible, onClose }) {
     const month = String(monthIndex + 1).padStart(2, "0");
     const monthString = `${currentYear}-${month}`;
 
-    return payments.find(
-      (payment) => payment.monthPaid === monthString,
-    );
+    return payments.find((payment) => payment.monthPaid === monthString);
   };
 
   const getPaymentLabel = (payment) => {
     if (!payment) {
-      return "Not paid";
+      return t("paymentHistory.notPaid");
     }
 
     if (payment.type === "GLOBAL") {
-      return "Global Pass";
+      return t("paymentHistory.globalPass");
     }
 
     return `${payment.lessonName}`;
@@ -71,7 +72,9 @@ export default function PaymentHistoryModal({ visible, onClose }) {
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
-            <Text style={styles.title}>Payment History {currentYear}</Text>
+            <Text style={styles.title}>
+              {t("paymentHistory.title")} {currentYear}
+            </Text>
           </View>
 
           {loadingPayments ? (
@@ -92,8 +95,9 @@ export default function PaymentHistoryModal({ visible, onClose }) {
 
                   return (
                     <View key={monthName} style={styles.paymentRow}>
-                      <Text style={styles.month}>{monthName}</Text>
-
+                      <Text style={styles.month}>
+                        {t(`paymentHistory.months.${index}`)}
+                      </Text>
                       <View style={styles.modalityContainer}>
                         <Text
                           style={[
