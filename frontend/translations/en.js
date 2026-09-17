@@ -92,6 +92,8 @@ sessions: {
   loading: "Loading...",
   noClasses: "No classes today or upcoming.",
   confirmUnenroll: "Are you sure you want to unenroll from this class?",
+  noClassesScheduled: "No classes scheduled.",
+  confirmDeleteClass: 'Are you sure you want to delete the class "{{lessonName}}"?',
 },
 
 scheduleManagement: {
@@ -168,5 +170,23 @@ payments: {
   confirmDeletePayment: "Are you sure you want to delete this payment?",
   cancel: "Cancel",
   delete: "Delete",
+  payCurrentMonth: "Please pay the current month to access this class.",
+},
+
+attendance: {
+  noStudents: "No students enrolled",
+  saving: "Saving...",
+  save: "Save attendance",
+},
+
+createClass: {
+  title: "Create Class",
+  createNewLesson: "Create new lesson",
+  useExistingLesson: "Use existing lesson",
+  description: "Description",
+  startTime: "Start time (HH:MM)",
+  endTime: "End time (HH:MM)",
+  selectClass: "Select a class",
+  save: "Save",
 },
 };

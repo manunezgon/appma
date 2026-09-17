@@ -7,6 +7,7 @@ import {
   View,
 } from "react-native";
 import Modal from "react-native-modal";
+import { useTranslation } from "../../hooks/useTranslation";
 import styles from "../../Styles/LessonStyles.jsx";
 import { colors } from "../../Styles/theme";
 
@@ -21,10 +22,11 @@ export default function AttendanceModal({
   onToggle,
   onSave,
 }) {
+  const { t } = useTranslation();
+
   return (
     <Modal isVisible={visible} onBackdropPress={onClose}>
       <View style={styles.modalContainer}>
-        {/* HEADER */}
         <View style={styles.modalHeader}>
           <Text style={styles.title}>{selectedClass?.lessonName}</Text>
           <Ionicons
@@ -35,7 +37,6 @@ export default function AttendanceModal({
           />
         </View>
 
-        {/* CONTENT */}
         {loading ? (
           <ActivityIndicator size="large" color={colors.primary} />
         ) : (
@@ -57,7 +58,7 @@ export default function AttendanceModal({
             ))}
 
             {(students ?? []).length === 0 && (
-              <Text style={styles.empty}>No students enrolled</Text>
+              <Text style={styles.empty}>{t("attendance.noStudents")}</Text>
             )}
           </ScrollView>
         )}
@@ -69,7 +70,7 @@ export default function AttendanceModal({
           disabled={saving}
         >
           <Text style={styles.saveText}>
-            {saving ? "Saving..." : "Save attendance"}
+            {saving ? t("attendance.saving") : t("attendance.save")}
           </Text>
         </TouchableOpacity>
       </View>

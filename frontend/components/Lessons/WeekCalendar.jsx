@@ -6,11 +6,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useTranslation } from "../../hooks/useTranslation";
 import styles from "../../Styles/LessonStyles.jsx";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 export default function WeekCalendar({ selectedDay, setSelectedDay }) {
+  const { t } = useTranslation();
   const daysShort = ["M", "T", "W", "T", "F", "S", "S"];
   const flatListRef = useRef(null);
 
@@ -36,12 +38,7 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
   const [currentWeekIndex, setCurrentWeekIndex] = useState(10);
 
   const [currentMonthName, setCurrentMonthName] = useState(
-    weeks[currentWeekIndex][0]
-      .toLocaleDateString("en-US", {
-        month: "long",
-        year: "numeric",
-      })
-      .replace(" ", " · "),
+    `${t(`paymentHistory.months.${weeks[currentWeekIndex][0].getMonth()}`)} · ${weeks[currentWeekIndex][0].getFullYear()}`,
   );
 
   const formatDate = (date) => date.toISOString().split("T")[0];
@@ -51,7 +48,7 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
     setCurrentWeekIndex(10);
     flatListRef.current?.scrollToIndex({ index: 10, animated: true });
     setCurrentMonthName(
-      today.toLocaleDateString("en-US", { month: "long", year: "numeric" }),
+      `${t(`paymentHistory.months.${today.getMonth()}`)} · ${today.getFullYear()}`,
     );
   };
 
@@ -60,10 +57,7 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
     setCurrentWeekIndex(index);
 
     const firstDayOfWeek = weeks[index][0];
-    const newMonthName = firstDayOfWeek.toLocaleDateString("en-US", {
-      month: "long",
-      year: "numeric",
-    });
+    const newMonthName = `${t(`paymentHistory.months.${firstDayOfWeek.getMonth()}`)} · ${firstDayOfWeek.getFullYear()}`;
     setCurrentMonthName(newMonthName);
   };
 
@@ -72,7 +66,7 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
       <View style={styles.header}>
         <Text style={styles.monthTitle}>{currentMonthName}</Text>
         <TouchableOpacity style={styles.todayButton} onPress={goToToday}>
-          <Text style={styles.todayText}>Today</Text>
+          <Text style={styles.todayText}>{t("sessions.today")}</Text>
         </TouchableOpacity>
       </View>
 

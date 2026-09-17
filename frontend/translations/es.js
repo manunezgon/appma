@@ -91,6 +91,8 @@ sessions: {
   loading: "Cargando...",
   noClasses: "No hay clases hoy ni próximas.",
   confirmUnenroll: "¿Estás seguro de que quieres cancelar tu inscripción a esta clase?",
+  noClassesScheduled: "No hay clases programadas.",
+  confirmDeleteClass: '¿Estás seguro de que quieres eliminar la clase "{{lessonName}}"?',
 },
 
 scheduleManagement: {
@@ -167,5 +169,23 @@ payments: {
   confirmDeletePayment: "¿Estás seguro de que quieres eliminar este pago?",
   cancel: "Cancelar",
   delete: "Eliminar",
+  payCurrentMonth: "Debes pagar el mes actual para acceder a esta clase.",
+},
+
+attendance: {
+  noStudents: "No hay alumnos inscritos",
+  saving: "Guardando...",
+  save: "Guardar asistencia",
+},
+
+createClass: {
+  title: "Crear clase",
+  createNewLesson: "Crear nueva clase",
+  useExistingLesson: "Usar clase existente",
+  description: "Descripción",
+  startTime: "Hora de inicio (HH:MM)",
+  endTime: "Hora de fin (HH:MM)",
+  selectClass: "Selecciona una clase",
+  save: "Guardar",
 },
 };

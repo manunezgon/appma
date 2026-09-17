@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useCallback, useState } from "react";
+import { useTranslation } from "../../hooks/useTranslation";
 import {
   FlatList,
   Modal,
@@ -21,6 +22,7 @@ export default function ClassList({
   onDeleteClass,
   onTakeAttendance,
 }) {
+  const { t } = useTranslation();
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [selectedClass, setSelectedClass] = useState(null);
 
@@ -66,7 +68,9 @@ export default function ClassList({
         initialNumToRender={8}
         windowSize={7}
         ListEmptyComponent={
-          <Text style={styles.noClasses}>No classes scheduled.</Text>
+          <Text style={styles.noClasses}>
+            {t("sessions.noClassesScheduled")}
+          </Text>
         }
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -77,18 +81,22 @@ export default function ClassList({
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalText}>
-              {`Are you sure you want to delete the class "${selectedClass?.lessonName}"?`}
+              {t("sessions.confirmDeleteClass").replace(
+                "{{lessonName}}",
+                selectedClass?.lessonName ?? "",
+              )}
             </Text>
-
             <View style={styles.modalButtons}>
-              <TouchableOpacity
-                onPress={closeConfirm}
-              >
+              <TouchableOpacity onPress={closeConfirm}>
                 <Ionicons name="close" size={28} color={colors.primary} />
               </TouchableOpacity>
 
               <TouchableOpacity onPress={handleDelete}>
-                <Ionicons name="trash-outline" size={28} color={colors.danger} />
+                <Ionicons
+                  name="trash-outline"
+                  size={28}
+                  color={colors.danger}
+                />
               </TouchableOpacity>
             </View>
           </View>

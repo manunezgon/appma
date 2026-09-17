@@ -96,8 +96,6 @@ export default function HomeScreen() {
         />
       )}
 
-      {/* ATTENDANCE MODAL */}
-
       <AttendanceModal
         visible={attendance.attendanceVisible}
         onClose={attendance.closeAttendance}
