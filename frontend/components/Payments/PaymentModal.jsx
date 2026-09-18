@@ -12,8 +12,8 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "../../hooks/useTranslation";
 
 import { PaymentRow } from "./PaymentRow";
-import style from "../../Styles/PaymentStyle";
-import { colors } from "../../Styles/theme";
+import { createPaymentStyles } from "../../Styles/PaymentStyle";
+import { useTheme } from "../../context/ThemeContext";
 
 export const PaymentModal = ({
   visible,
@@ -36,6 +36,8 @@ export const PaymentModal = ({
   onClose,
 }) => {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const style = createPaymentStyles(colors);
 
   const [isGlobal, setIsGlobal] = useState(false);
 
@@ -216,10 +218,6 @@ export const PaymentModal = ({
               </TouchableOpacity>
             </>
           )}
-
-          {/* ========================= */}
-          {/* BOTÓN CERRAR / ATRÁS       */}
-          {/* ========================= */}
 
           <TouchableOpacity
             style={style.closeButton}

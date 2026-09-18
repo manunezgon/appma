@@ -37,7 +37,7 @@ function RootGuard({ children }) {
 }
 
 function NavigationBarController() {
-  const { theme, colors } = useTheme();
+  const { theme } = useTheme();
 
   useEffect(() => {
     NavigationBar.setStyle(theme === "dark" ? "light" : "dark");

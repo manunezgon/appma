@@ -2,11 +2,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { memo, useCallback } from "react";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
 import { useTranslation } from "../../hooks/useTranslation";
-import style from "../../Styles/PaymentStyle";
-import { colors } from "../../Styles/theme";
+import { createPaymentStyles } from "../../Styles/PaymentStyle";
+import { useTheme } from "../../context/ThemeContext";
 
 const PaymentRowComponent = ({ payment, onDelete }) => {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const style = createPaymentStyles(colors);
 
   const formatMonth = (monthString) => {
     const [year, month] = monthString.split("-");

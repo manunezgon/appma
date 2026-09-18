@@ -8,8 +8,8 @@ import { getUsers } from "../../services/usersApi";
 
 import { PaymentModal } from "../../components/Payments/PaymentModal";
 import { StudentCard } from "../../components/Payments/StudentCard";
-import style from "../../Styles/PaymentStyle";
-import { colors } from "../../Styles/theme";
+import { createPaymentStyles } from "../../Styles/PaymentStyle";
+import { useTheme } from "../../context/ThemeContext";
 
 const generateMonths = (t) => {
   const months = [];
@@ -39,6 +39,9 @@ const generateMonths = (t) => {
 export default function Payments() {
   const { token } = useUser();
   const { lessons } = useLessons();
+
+  const { colors } = useTheme();
+  const style = createPaymentStyles(colors);
 
   const { t } = useTranslation();
 
