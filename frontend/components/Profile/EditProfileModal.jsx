@@ -7,9 +7,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import styles from "../../Styles/ProfileStyles.jsx";
-import { colors } from "../../Styles/theme";
+import { createProfileStyles } from "../../Styles/ProfileStyles.jsx";
 import { useTranslation } from "../../hooks/useTranslation";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function EditProfileModal({
   visible,
@@ -33,6 +33,9 @@ export default function EditProfileModal({
 
   const { t } = useTranslation();
 
+  const { colors } = useTheme();
+  const styles = createProfileStyles(colors);
+
   return (
     <Modal
       visible={visible}
@@ -50,7 +53,12 @@ export default function EditProfileModal({
               ]}
               onPress={() => setActiveTab("profile")}
             >
-              <Text style={styles.tabText}>
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === "profile" && styles.activeTabText,
+                ]}
+              >
                 {t("profile.editProfileTab")}
               </Text>
             </TouchableOpacity>
@@ -61,7 +69,12 @@ export default function EditProfileModal({
               ]}
               onPress={() => setActiveTab("password")}
             >
-              <Text style={styles.tabText}>
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === "password" && styles.activeTabText,
+                ]}
+              >
                 {t("profile.passwordTab")}
               </Text>
             </TouchableOpacity>
@@ -80,7 +93,7 @@ export default function EditProfileModal({
                 <TextInput
                   style={styles.input}
                   placeholder={t("profile.name")}
-                  placeholderTextColor={colors.textSubtle}
+                  placeholderTextColor={colors.textMuted}
                   value={editName}
                   onChangeText={setEditName}
                   autoCapitalize="words"
@@ -90,7 +103,7 @@ export default function EditProfileModal({
                 <TextInput
                   style={styles.input}
                   placeholder={t("profile.email")}
-                  placeholderTextColor={colors.textSubtle}
+                  placeholderTextColor={colors.textMuted}
                   value={editEmail}
                   keyboardType="email-address"
                   autoCapitalize="none"
@@ -103,7 +116,7 @@ export default function EditProfileModal({
                 <TextInput
                   style={styles.input}
                   placeholder={t("profile.phone")}
-                  placeholderTextColor={colors.textSubtle}
+                  placeholderTextColor={colors.textMuted}
                   value={editPhone}
                   onChangeText={setEditPhone}
                   keyboardType="phone-pad"
@@ -113,7 +126,7 @@ export default function EditProfileModal({
                 <TextInput
                   style={styles.input}
                   placeholder={t("profile.currentPassword")}
-                  placeholderTextColor={colors.textSubtle}
+                  placeholderTextColor={colors.textMuted}
                   value={currentPassword}
                   onChangeText={setCurrentPassword}
                   secureTextEntry
@@ -125,7 +138,7 @@ export default function EditProfileModal({
                     onPress={handleSaveProfile}
                     style={[styles.button, styles.saveButton]}
                   >
-                    <Text style={styles.buttonText}>
+                    <Text style={styles.primaryButtonText}>
                       {t("profile.saveChanges")}
                     </Text>
                   </TouchableOpacity>
@@ -133,9 +146,7 @@ export default function EditProfileModal({
                     onPress={onClose}
                     style={[styles.button, styles.cancelButton]}
                   >
-                    <Text style={styles.buttonText}>
-                      {t("profile.cancel")}
-                    </Text>
+                    <Text style={styles.buttonText}>{t("profile.cancel")}</Text>
                   </TouchableOpacity>
                 </View>
               </>
@@ -149,7 +160,7 @@ export default function EditProfileModal({
                 <TextInput
                   style={styles.input}
                   placeholder={t("profile.currentPassword")}
-                  placeholderTextColor={colors.textSubtle}
+                  placeholderTextColor={colors.textMuted}
                   value={oldPassword}
                   onChangeText={setOldPassword}
                   secureTextEntry
@@ -159,7 +170,7 @@ export default function EditProfileModal({
                 <TextInput
                   style={styles.input}
                   placeholder={t("profile.newPassword")}
-                  placeholderTextColor={colors.textSubtle}
+                  placeholderTextColor={colors.textMuted}
                   value={newPassword}
                   onChangeText={setNewPassword}
                   secureTextEntry
@@ -171,7 +182,7 @@ export default function EditProfileModal({
                     onPress={handleChangePassword}
                     style={[styles.button, styles.saveButton]}
                   >
-                    <Text style={styles.buttonText}>
+                    <Text style={styles.primaryButtonText}>
                       {t("profile.updatePassword")}
                     </Text>
                   </TouchableOpacity>
@@ -179,9 +190,7 @@ export default function EditProfileModal({
                     onPress={onClose}
                     style={[styles.button, styles.cancelButton]}
                   >
-                    <Text style={styles.buttonText}>
-                      {t("profile.cancel")}
-                    </Text>
+                    <Text style={styles.buttonText}>{t("profile.cancel")}</Text>
                   </TouchableOpacity>
                 </View>
               </>

@@ -1,11 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
-import { colors } from "../../Styles/theme";
-import styles from "../../Styles/ProfileStyles";
+import { createProfileStyles } from "../../Styles/ProfileStyles";
 import { useTranslation } from "../../hooks/useTranslation";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function PaymentStatusCard({ payment, month, onHistoryPress }) {
   const { t } = useTranslation();
+
+    const { colors } = useTheme();
+    const styles = createProfileStyles(colors);
 
   const formatMonth = (monthString) => {
     const [year, monthNumber] = monthString.split("-");

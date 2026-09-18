@@ -10,7 +10,9 @@ import { SchedulesProvider } from "../context/SchedulesContext";
 import { UserProvider, useUser } from "../context/UserContext";
 import { EnrollmentsProvider } from "../context/EnrollmentsContext";
 import { LanguageProvider } from "../context/LanguageContext";
+import { ThemeProvider, useTheme } from "../context/ThemeContext";
 import { useTranslation } from "../hooks/useTranslation";
+import * as NavigationBar from "expo-navigation-bar";
 
 function RootGuard({ children }) {
   const { user } = useUser();
@@ -34,6 +36,16 @@ function RootGuard({ children }) {
     : null;
 }
 
+function NavigationBarController() {
+  const { theme, colors } = useTheme();
+
+  useEffect(() => {
+    NavigationBar.setStyle(theme === "dark" ? "light" : "dark");
+  }, [theme]);
+
+  return null;
+}
+
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     "Heebo-Medium": require("./assets/fonts/Heebo-Medium.ttf"),
@@ -55,32 +67,35 @@ export default function RootLayout() {
 
   return (
     <LanguageProvider>
-      <UserProvider>
-        <EnrollmentsProvider>
-          <PaymentsProvider>
-            <LessonsProvider>
-              <SchedulesProvider>
-                <RootGuard>
-                  <Stack screenOptions={{ headerShown: false }}>
-                    <Stack.Screen
-                      name="(tabs)"
-                      options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                      name="login"
-                      options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                      name="register"
-                      options={{ headerShown: false }}
-                    />
-                  </Stack>
-                </RootGuard>
-              </SchedulesProvider>
-            </LessonsProvider>
-          </PaymentsProvider>
-        </EnrollmentsProvider>
-      </UserProvider>
+      <ThemeProvider>
+        <NavigationBarController />
+        <UserProvider>
+          <EnrollmentsProvider>
+            <PaymentsProvider>
+              <LessonsProvider>
+                <SchedulesProvider>
+                  <RootGuard>
+                    <Stack screenOptions={{ headerShown: false }}>
+                      <Stack.Screen
+                        name="(tabs)"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="login"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="register"
+                        options={{ headerShown: false }}
+                      />
+                    </Stack>
+                  </RootGuard>
+                </SchedulesProvider>
+              </LessonsProvider>
+            </PaymentsProvider>
+          </EnrollmentsProvider>
+        </UserProvider>
+      </ThemeProvider>
     </LanguageProvider>
   );
 }

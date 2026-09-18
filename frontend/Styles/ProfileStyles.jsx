@@ -1,300 +1,330 @@
 import { StyleSheet } from "react-native";
-import { colors, layout, radii, spacing, typography } from "./theme";
+import {
+  colors,
+  createLayout,
+  createTypography,
+  radii,
+  spacing,
+} from "./theme";
 
-const styles = StyleSheet.create({
-  container: {
-    ...layout.screen,
-    paddingTop: spacing.xl,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+export const createProfileStyles = (colors) => {
+  const layout = createLayout(colors);
+  const typography = createTypography(colors);
 
-  title: {
-    fontSize: 18,
-    color: colors.textMuted,
-  },
+  return StyleSheet.create({
+    container: {
+      ...layout.screen,
+      paddingTop: spacing.xl,
+      alignItems: "center",
+      justifyContent: "center",
+    },
 
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: spacing.xxl,
-    gap: spacing.md,
-  },
+    title: {
+      fontSize: 18,
+      color: colors.textMuted,
+    },
 
-  profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    borderWidth: 2,
-    borderColor: colors.primary,
-  },
+    profileHeaderBox: {
+      width: "80%",
+      borderRadius: radii.md,
+      backgroundColor: colors.surfaceAlt,
+      padding: spacing.lg,
+      marginBottom: spacing.xxl,
+    },
 
-  profileImageBadge: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    backgroundColor: colors.primary,
-    borderRadius: radii.lg,
-    padding: spacing.xs,
-  },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: spacing.md,
+    },
 
-  headerText: {
-    marginLeft: 10,
-  },
+    profileImage: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      borderWidth: 3,
+      borderColor: colors.primary,
+    },
 
-  name: {
-    ...typography.screenTitle,
-    textTransform: "uppercase",
-  },
+    profileImageBadge: {
+      position: "absolute",
+      bottom: 0,
+      right: 0,
+      backgroundColor: colors.primary,
+      borderRadius: radii.lg,
+      padding: spacing.xs,
+    },
 
-  infoBox: {
-    width: "80%",
-    borderRadius: radii.md,
-    backgroundColor: colors.surfaceAlt,
-    padding: spacing.lg,
-    marginBottom: spacing.xxl,
-  },
+    headerText: {
+      marginLeft: 10,
+    },
 
-  infoRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: spacing.sm,
-  },
+    name: {
+      ...typography.screenTitle,
+      textTransform: "uppercase",
+    },
 
-  label: {
-    fontSize: 15,
-    color: colors.textSubtle,
-  },
+    infoBox: {
+      width: "80%",
+      borderRadius: radii.md,
+      backgroundColor: colors.surfaceAlt,
+      padding: spacing.lg,
+      marginBottom: spacing.xxl,
+    },
 
-  value: {
-    fontSize: 15,
-    color: colors.textMuted,
-  },
+    infoRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      paddingVertical: spacing.sm,
+    },
 
-  buttonContainer: {
-    width: "80%",
-    marginBottom: 50,
-  },
+    label: {
+      fontSize: 15,
+      color: colors.textSubtle,
+    },
 
-  profileButtonRow: {
-    flexDirection: "row",
-    gap: spacing.xl,
-    width: "100%",
-    marginBottom: spacing.md,
-  },
+    value: {
+      fontSize: 15,
+      color: colors.textMuted,
+    },
 
-  profileLogoutButton: {
-    padding: spacing.md,
-    borderRadius: radii.md,
-  },
+    buttonContainer: {
+      width: "80%",
+      marginBottom: 50,
+    },
 
-  button: {
-    flex: 1,
-    padding: spacing.md,
-    borderRadius: radii.md,
-    backgroundColor: colors.primary,
-  },
+    profileButtonRow: {
+      flexDirection: "row",
+      gap: spacing.xl,
+      width: "100%",
+      marginBottom: spacing.md,
+    },
 
-  buttonText: {
-    textAlign: "center",
-    color: colors.textMuted,
-    paddingVertical: spacing.xs,
-  },
+    profileLogoutButton: {
+      padding: spacing.md,
+      borderRadius: radii.md,
+    },
 
-  saveButton: {
-    backgroundColor: colors.primary,
-  },
+    button: {
+      flex: 1,
+      padding: spacing.md,
+      borderRadius: radii.md,
+      backgroundColor: colors.primary,
+    },
 
-  cancelButton: {
-    backgroundColor: colors.surfaceMuted,
-  },
+    buttonText: {
+      textAlign: "center",
+      color: colors.textMuted,
+      paddingVertical: spacing.xs,
+    },
 
-  logoutButton: {
-    backgroundColor: colors.surfaceMuted,
-  },
+    primaryButtonText: {
+      textAlign: "center",
+      color: colors.grey,
+      paddingVertical: spacing.xs,
+    },
 
-  modalOverlay: {
-    ...layout.modalOverlay,
-  },
+    saveButton: {
+      backgroundColor: colors.primary,
+    },
 
-  modalContent: {
-    width: "90%",
-    maxHeight: "85%",
-    backgroundColor: colors.surface,
-    borderRadius: radii.md,
-    padding: spacing.xl,
-  },
+    cancelButton: {
+      backgroundColor: colors.surfaceMuted,
+    },
 
-  tabsContainer: {
-    flexDirection: "row",
-    marginBottom: spacing.xl,
-    backgroundColor: colors.surfaceAlt,
-    borderRadius: radii.sm,
-    overflow: "hidden",
-  },
+    logoutButton: {
+      backgroundColor: colors.surfaceMuted,
+    },
 
-  tabButton: {
-    flex: 1,
-    paddingVertical: spacing.md,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+    modalOverlay: {
+      ...layout.modalOverlay,
+    },
 
-  tabActive: {
-    backgroundColor: colors.primary,
-    borderRadius: radii.sm,
-  },
+    modalContent: {
+      width: "90%",
+      maxHeight: "85%",
+      backgroundColor: colors.surface,
+      borderRadius: radii.md,
+      padding: spacing.xl,
+    },
 
-  tabText: {
-    fontSize: 14,
-    color: colors.textMuted,
-  },
+    tabsContainer: {
+      flexDirection: "row",
+      marginBottom: spacing.xl,
+      backgroundColor: colors.surfaceAlt,
+      borderRadius: radii.sm,
+      overflow: "hidden",
+    },
 
-  modalScroll: {
-    flexGrow: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+    tabButton: {
+      flex: 1,
+      paddingVertical: spacing.md,
+      alignItems: "center",
+      justifyContent: "center",
+    },
 
-  modalTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: colors.textMuted,
-    marginBottom: spacing.lg,
-    textAlign: "center",
-    textTransform: "uppercase",
-  },
+    tabActive: {
+      backgroundColor: colors.primary,
+      borderRadius: radii.sm,
+    },
 
-  input: {
-    width: "100%",
-    backgroundColor: colors.surfaceAlt,
-    color: colors.white,
-    padding: spacing.md,
-    borderRadius: radii.sm,
-    marginBottom: spacing.md,
-  },
+    tabText: {
+      fontSize: 14,
+      color: colors.textMuted,
+    },
+    activeTabText: {
+      color: colors.grey,
+    },
 
-  separator: {
-    height: 1,
-    width: "100%",
-    backgroundColor: colors.surfaceMuted,
-    marginVertical: spacing.lg,
-  },
+    modalScroll: {
+      flexGrow: 1,
+      justifyContent: "center",
+      alignItems: "center",
+    },
 
-  buttonRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: spacing.lg,
-    gap: spacing.xl,
-  },
+    modalTitle: {
+      fontSize: 16,
+      fontWeight: "bold",
+      color: colors.textMuted,
+      marginBottom: spacing.lg,
+      textAlign: "center",
+      textTransform: "uppercase",
+    },
 
-  settingsHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: spacing.xl,
-  },
+    input: {
+      width: "100%",
+      backgroundColor: colors.surfaceAlt,
+      color: colors.text,
+      padding: spacing.md,
+      borderRadius: radii.sm,
+      marginBottom: spacing.md,
+    },
 
-  settingsOption: {
-    flexDirection: "row",
-    alignItems: "center",
-    width: "100%",
-    paddingVertical: spacing.xs,
-    backgroundColor: colors.surfaceAlt,
-    marginBottom: spacing.md,
-    borderRadius: radii.sm,
-  },
+    separator: {
+      height: 1,
+      width: "100%",
+      backgroundColor: colors.surfaceMuted,
+      marginVertical: spacing.lg,
+    },
 
-  settingsOptionIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: radii.round,
-    backgroundColor: colors.surfaceAlt,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: spacing.md,
-  },
+    buttonRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginTop: spacing.lg,
+      gap: spacing.xl,
+    },
 
-  settingsOptionContent: {
-    flex: 1,
-  },
+    settingsHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: spacing.xl,
+    },
 
-  settingsOptionTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: colors.textMuted,
-    marginBottom: spacing.xs,
-  },
+    settingsOption: {
+      flexDirection: "row",
+      alignItems: "center",
+      width: "100%",
+      paddingVertical: spacing.xs,
+      backgroundColor: colors.surfaceAlt,
+      marginBottom: spacing.md,
+      borderRadius: radii.sm,
+    },
 
-  settingsOptionSubtitle: {
-    fontSize: 13,
-    color: colors.textSubtle,
-  },
+    settingsOptionIcon: {
+      width: 42,
+      height: 42,
+      borderRadius: radii.round,
+      backgroundColor: colors.surfaceAlt,
+      alignItems: "center",
+      justifyContent: "center",
+      marginRight: spacing.md,
+    },
 
-  paymentBox: {
-    width: "80%",
-    borderRadius: radii.md,
-    backgroundColor: colors.surfaceAlt,
-    padding: spacing.lg,
-    marginBottom: spacing.xxl,
-  },
+    settingsOptionContent: {
+      flex: 1,
+    },
 
-  paymentStatusIcon: {
-    width: 26,
-    height: 26,
-    borderRadius: radii.round,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+    settingsOptionTitle: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: colors.textMuted,
+      marginBottom: spacing.xs,
+    },
 
-  paymentStatusPaid: {
-    backgroundColor: colors.success,
-  },
+    settingsOptionSubtitle: {
+      fontSize: 13,
+      color: colors.textSubtle,
+    },
 
-  paymentStatusPending: {
-    backgroundColor: colors.danger,
-  },
+    paymentBox: {
+      width: "80%",
+      borderRadius: radii.md,
+      backgroundColor: colors.surfaceAlt,
+      padding: spacing.lg,
+      marginBottom: spacing.xxl,
+    },
 
-  paymentInfo: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: spacing.sm,
-  },
+    paymentStatusIcon: {
+      width: 26,
+      height: 26,
+      borderRadius: radii.round,
+      alignItems: "center",
+      justifyContent: "center",
+    },
 
-  paymentMonth: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: colors.textMuted,
-    marginBottom: spacing.xs,
-  },
+    paymentStatusPaid: {
+      backgroundColor: colors.success,
+    },
 
-  paymentModality: {
-    fontSize: 15,
-  },
+    paymentStatusPending: {
+      backgroundColor: colors.danger,
+    },
 
-  paymentModalityPaid: {
-    color: colors.success,
-  },
+    paymentInfo: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingVertical: spacing.sm,
+    },
 
-  paymentModalityPending: {
-    color: colors.danger,
-  },
+    paymentMonth: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: colors.textMuted,
+      marginBottom: spacing.xs,
+    },
 
-  paymentHistoryButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    marginTop: spacing.md,
-    paddingTop: spacing.md,
-  },
+    paymentModality: {
+      fontSize: 15,
+    },
 
-  paymentHistoryText: {
-    fontSize: 14,
-    color: colors.textMuted,
-  },
-});
+    paymentModalityPaid: {
+      color: colors.success,
+    },
+
+    paymentModalityPending: {
+      color: colors.danger,
+    },
+
+    paymentHistoryButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      marginTop: spacing.md,
+      paddingTop: spacing.md,
+    },
+
+    paymentHistoryText: {
+      fontSize: 14,
+      color: colors.textMuted,
+    },
+  });
+};
+
+const styles = createProfileStyles(colors);
 
 export default styles;

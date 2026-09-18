@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Modal, Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import styles from "../../Styles/ProfileStyles.jsx";
-import { colors } from "../../Styles/theme";
+import { createProfileStyles } from "../../Styles/ProfileStyles.jsx";
 import { useLanguage } from "../../context/LanguageContext";
+import { useTheme } from "../../context/ThemeContext";
 import { useTranslation } from "../../hooks/useTranslation";
 
 export default function SettingsModal({ visible, onClose }) {
@@ -11,12 +11,16 @@ export default function SettingsModal({ visible, onClose }) {
   const { language, setLanguage } = useLanguage();
   const [selectedLanguage, setSelectedLanguage] = useState(language);
   const { t } = useTranslation();
+  const { theme, setTheme, colors } = useTheme();
+  const [selectedTheme, setSelectedTheme] = useState(theme);
+  const styles = createProfileStyles(colors);
 
   useEffect(() => {
     if (visible) {
       setSelectedLanguage(language);
+      setSelectedTheme(theme);
     }
-  }, [visible, language]);
+  }, [visible, language, theme]);
 
   return (
     <Modal
@@ -35,7 +39,14 @@ export default function SettingsModal({ visible, onClose }) {
               ]}
               onPress={() => setActiveTab("theme")}
             >
-              <Text style={styles.tabText}>{t("settings.theme")}</Text>
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === "theme" && styles.activeTabText,
+                ]}
+              >
+                {t("settings.theme")}
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -45,7 +56,14 @@ export default function SettingsModal({ visible, onClose }) {
               ]}
               onPress={() => setActiveTab("language")}
             >
-              <Text style={styles.tabText}>{t("settings.language")}</Text>
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === "language" && styles.activeTabText,
+                ]}
+              >
+                {t("settings.language")}
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -55,7 +73,10 @@ export default function SettingsModal({ visible, onClose }) {
                 <Text style={styles.modalTitle}>
                   {t("settings.chooseTheme")}
                 </Text>
-                <TouchableOpacity style={styles.settingsOption}>
+                <TouchableOpacity
+                  style={styles.settingsOption}
+                  onPress={() => setSelectedTheme("light")}
+                >
                   <View style={styles.settingsOptionIcon}>
                     <Ionicons
                       name="sunny-outline"
@@ -69,9 +90,21 @@ export default function SettingsModal({ visible, onClose }) {
                       {t("settings.light")}
                     </Text>
                   </View>
+                  {selectedTheme === "light" && (
+                    <View style={styles.settingsOptionIcon}>
+                      <Ionicons
+                        name="checkmark"
+                        size={22}
+                        color={colors.text}
+                      />
+                    </View>
+                  )}
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.settingsOption}>
+                <TouchableOpacity
+                  style={styles.settingsOption}
+                  onPress={() => setSelectedTheme("dark")}
+                >
                   <View style={styles.settingsOptionIcon}>
                     <Ionicons
                       name="moon-outline"
@@ -85,6 +118,16 @@ export default function SettingsModal({ visible, onClose }) {
                       {t("settings.dark")}
                     </Text>
                   </View>
+
+                  {selectedTheme === "dark" && (
+                    <View style={styles.settingsOptionIcon}>
+                      <Ionicons
+                        name="checkmark"
+                        size={22}
+                        color={colors.text}
+                      />
+                    </View>
+                  )}
                 </TouchableOpacity>
               </>
             )}
@@ -145,11 +188,12 @@ export default function SettingsModal({ visible, onClose }) {
             <TouchableOpacity
               onPress={() => {
                 setLanguage(selectedLanguage);
+                setTheme(selectedTheme);
                 onClose();
               }}
               style={[styles.button, styles.saveButton]}
             >
-              <Text style={styles.buttonText}>{t("settings.save")}</Text>
+              <Text style={styles.primaryButtonText}>{t("settings.save")}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity

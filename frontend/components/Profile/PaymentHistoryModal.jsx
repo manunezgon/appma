@@ -10,9 +10,9 @@ import {
 } from "react-native";
 import { useUser } from "../../context/UserContext";
 import { usePayments } from "../../context/PaymentsContext";
+import { useTheme } from "../../context/ThemeContext";
 import { useTranslation } from "../../hooks/useTranslation";
-import styles from "../../Styles/PaymentHistoryStyles";
-import { colors } from "../../Styles/theme";
+import { createPaymentHistoryStyles } from "../../Styles/PaymentHistoryStyles";
 
 const MONTHS = [
   "January",
@@ -34,6 +34,9 @@ export default function PaymentHistoryModal({ visible, onClose }) {
   const { payments, loadingPayments, fetchPaymentsByUser } = usePayments();
 
   const { t } = useTranslation();
+
+  const { colors } = useTheme();
+  const styles = createPaymentHistoryStyles(colors);
 
   const currentYear = new Date().getFullYear();
 

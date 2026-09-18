@@ -2,12 +2,14 @@ import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { useUser } from "../../context/UserContext";
 import { useTranslation } from "../../hooks/useTranslation";
-import { colors } from "../../Styles/theme";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function TabLayout() {
   const { t } = useTranslation();
 
   const { user, loading } = useUser();
+
+  const { colors } = useTheme();
 
   if (loading) return null;
 
@@ -18,8 +20,8 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: colors.black,
-          borderTopColor: colors.surface,
+          backgroundColor: colors.surface,
+          borderTopColor: colors.border,
           borderTopWidth: 1,
         },
         tabBarActiveTintColor: colors.text,

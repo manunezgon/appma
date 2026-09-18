@@ -13,8 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import EditProfileModal from "../../components/Profile/EditProfileModal.jsx";
 import SettingsModal from "../../components/Profile/SettingsModal.jsx";
 import { useUser } from "../../context/UserContext";
-import styles from "../../Styles/ProfileStyles.jsx";
-import { colors } from "../../Styles/theme";
+import { createProfileStyles,  } from "../../Styles/ProfileStyles.jsx";
 import profilePic from "../assets/images/white_logo_circle.png";
 import {
   getCurrentUser,
@@ -24,12 +23,16 @@ import {
 import PaymentStatusCard from "../../components/Profile/PaymentStatusCard.jsx";
 import PaymentHistoryModal from "../../components/Profile/PaymentHistoryModal.jsx";
 import { usePayments } from "../../context/PaymentsContext";
+import { useTheme } from "../../context/ThemeContext";
 import { useTranslation } from "../../hooks/useTranslation";
 
 export default function Profile() {
   const { user, setUser, logout, token, updateProfileImage } = useUser();
   const router = useRouter();
   const { t } = useTranslation();
+
+  const { colors } = useTheme();
+  const styles = createProfileStyles(colors);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [settingsVisible, setSettingsVisible] = useState(false);
@@ -151,24 +154,27 @@ export default function Profile() {
   return (
     <>
       <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={pickProfileImage}>
-            <View style={{ position: "relative" }}>
-              <Image
-                source={
-                  user.profileImageUrl
-                    ? { uri: user.profileImageUrl }
-                    : profilePic
-                }
-                style={styles.profileImage}
-              />
-              <View style={styles.profileImageBadge}>
-                <Ionicons name="add" size={16} color={colors.text} />
+        <View style={styles.profileHeaderBox}>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={pickProfileImage}>
+              <View style={{ position: "relative" }}>
+                <Image
+                  source={
+                    user.profileImageUrl
+                      ? { uri: user.profileImageUrl }
+                      : profilePic
+                  }
+                  style={styles.profileImage}
+                />
+                <View style={styles.profileImageBadge}>
+                  <Ionicons name="add" size={16} color={colors.grey} />
+                </View>
               </View>
+            </TouchableOpacity>
+
+            <View style={styles.headerText}>
+              <Text style={styles.name}>{user.name}</Text>
             </View>
-          </TouchableOpacity>
-          <View style={styles.headerText}>
-            <Text style={styles.name}>{user.name}</Text>
           </View>
         </View>
 
@@ -203,23 +209,24 @@ export default function Profile() {
               onPress={() => setModalVisible(true)}
               style={styles.button}
             >
-              <Text style={styles.buttonText}>{t("profile.editProfile")}</Text>
+              <Text style={styles.primaryButtonText}>
+                {t("profile.editProfile")}
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={() => setSettingsVisible(true)}
               style={styles.button}
             >
-              <Text style={styles.buttonText}>{t("profile.settings")}</Text>
+              <Text style={styles.primaryButtonText}>
+                {t("profile.settings")}
+              </Text>
             </TouchableOpacity>
           </View>
 
           <TouchableOpacity
             onPress={handleLogout}
-            style={[
-              styles.logoutButton,
-              styles.profileLogoutButton,
-            ]}
+            style={[styles.logoutButton, styles.profileLogoutButton]}
           >
             <Text style={styles.buttonText}>{t("profile.logout")}</Text>
           </TouchableOpacity>
