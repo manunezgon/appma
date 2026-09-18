@@ -39,11 +39,11 @@ const PaymentRowComponent = ({ payment, onDelete }) => {
     <View style={style.paymentRow}>
       <View style={style.paymentInfo}>
         <Text style={style.modalityName}>
-          {t("payments.month")}: {formatMonth(payment.monthPaid)}{" "}
+          {t("payments.month")}: {formatMonth(payment.monthPaid)}
         </Text>
         <Text style={style.modalityStatus}>
           {t("payments.lesson")}: {payment.lessonName} ({payment.professorName}
-          ){" "}
+          )
         </Text>
       </View>
       <TouchableOpacity onPress={confirmDelete}>

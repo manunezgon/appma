@@ -15,11 +15,13 @@ import {
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useUser } from "../context/UserContext";
+import { useTranslation } from "../hooks/useTranslation";
 import styles from "../Styles/GlobalStyles";
 import { colors } from "../Styles/theme";
 import { loginRequest } from "../services/usersApi";
 
 export default function Login() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loggingIn, setLoggingIn] = useState(false);
@@ -32,7 +34,7 @@ export default function Login() {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert("Error", "Email and password are required");
+      Alert.alert(t("login.error"), t("login.credentialsRequired"));
       return;
     }
 
@@ -51,7 +53,10 @@ export default function Login() {
     } catch (error) {
       console.error(error);
       setPassword("");
-      Alert.alert("Error", error?.message || "Unable to connect to the server");
+      Alert.alert(
+        t("login.error"),
+        error?.message || t("login.connectionError"),
+      );
     } finally {
       setLoggingIn(false);
     }
@@ -81,7 +86,7 @@ export default function Login() {
         resizeMode="contain"
       />
       <TextInput
-        placeholder="Email"
+        placeholder={t("login.email")}
         placeholderTextColor={colors.textSubtle}
         value={email}
         onChangeText={setEmail}
@@ -92,7 +97,7 @@ export default function Login() {
         style={styles.input}
       />
       <TextInput
-        placeholder="Password"
+        placeholder={t("login.password")}
         placeholderTextColor={colors.textSubtle}
         value={password}
         onChangeText={setPassword}
@@ -108,11 +113,11 @@ export default function Login() {
         {loggingIn ? (
           <ActivityIndicator color={colors.text} />
         ) : (
-          <Text style={styles.buttonText}>LOG IN</Text>
+          <Text style={styles.buttonText}>{t("login.login")}</Text>
         )}
       </TouchableOpacity>
       <Text style={styles.linkText} onPress={goToRegister}>
-        Don&apos;t have an account? Sign up
+        {t("login.noAccount")}
       </Text>
     </KeyboardAwareScrollView>
   );

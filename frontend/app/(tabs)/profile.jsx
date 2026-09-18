@@ -134,7 +134,7 @@ export default function Profile() {
   if (!user)
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>{t("profile.loading")}</Text>{" "}
+        <Text style={styles.title}>{t("profile.loading")}</Text>
       </View>
     );
 

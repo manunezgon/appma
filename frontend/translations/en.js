@@ -145,6 +145,21 @@ scheduleManagement: {
   confirmChanges: "Confirm Changes",
   confirmSchedule: "Confirm Schedule",
   saveSchedule: "Save Schedule",
+  error: "An error occurred",
+  completeDayTime: "Please complete day, start time, and end time",
+  completeLessonFields: "Please complete all lesson fields",
+  invalidAmount: "Monthly amount must be a valid number",
+  scheduleUpdated: "Schedule updated successfully",
+  scheduleCreated: "Schedule created successfully",
+  deleteSchedule: "Delete schedule",
+  confirmDeleteSchedule: "Are you sure?",
+  delete: "Delete",
+  scheduleDeleted: "Schedule deleted successfully",
+  completeAllFields: "Please complete all fields",
+  lessonUpdated: "Lesson updated successfully",
+  confirmDeleteLesson:
+    "All associated schedules will also be deleted. Are you sure?",
+  lessonDeleted: "Lesson deleted successfully",
 },
 
 payments: {
@@ -171,6 +186,9 @@ payments: {
   cancel: "Cancel",
   delete: "Delete",
   payCurrentMonth: "Please pay the current month to access this class.",
+  errorDeletingPayment: "Error deleting payment",
+  paymentRegistered: "Payment registered successfully",
+  errorRegisteringPayment: "Error registering payment",
 },
 
 attendance: {
@@ -206,6 +224,41 @@ nextClass: {
   title: "NEXT CLASS",
   today: "Today",
   tomorrow: "Tomorrow",
+},
+
+adminClassModal: {
+  requiredFields: "Please fill in all required fields",
+},
+
+common: {
+  loading: "Loading...",
+},
+
+notFound: {
+  title: "Oops!",
+  message: "Oops! This screen doesn't exist.",
+},
+
+login: {
+  error: "Error",
+  credentialsRequired: "Email and password are required",
+  connectionError: "Unable to connect to the server",
+  email: "Email",
+  password: "Password",
+  login: "LOG IN",
+  noAccount: "Don't have an account? Sign up",
+},
+
+register: {
+  error: "Error",
+  credentialsRequired: "Name, email and password are required",
+  connectionError: "Unable to connect to the server",
+  name: "Name",
+  email: "Email",
+  password: "Password",
+  phone: "Phone",
+  register: "REGISTER",
+  alreadyAccount: "Already have an account? Log in",
 },
 
 tabs: {

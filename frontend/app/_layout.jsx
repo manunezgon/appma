@@ -10,9 +10,11 @@ import { SchedulesProvider } from "../context/SchedulesContext";
 import { UserProvider, useUser } from "../context/UserContext";
 import { EnrollmentsProvider } from "../context/EnrollmentsContext";
 import { LanguageProvider } from "../context/LanguageContext";
+import { useTranslation } from "../hooks/useTranslation";
 
 function RootGuard({ children }) {
   const { user } = useUser();
+  const { t } = useTranslation();
   const router = useRouter();
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
@@ -25,7 +27,7 @@ function RootGuard({ children }) {
     }
   }, [mounted, user, pathname, router]);
 
-  if (!mounted) return <Text>Cargando...</Text>;
+  if (!mounted) return <Text>{t("common.loading")}</Text>;
 
   return user || pathname === "/login" || pathname === "/register"
     ? children

@@ -22,12 +22,12 @@ export default function LessonSummary({
       </Text>
       {showAmount && lesson.amountMonthly != null && (
         <Text style={style.summaryText}>
-          {t("scheduleManagement.monthlyPrice")}:{" "}
+          {t("scheduleManagement.monthlyPrice")}:
           {lesson.amountMonthly.toFixed(2)} €
         </Text>
       )}
       <Text style={style.summaryText}>
-        {t("scheduleManagement.day")}:{" "}
+        {t("scheduleManagement.day")}:
         {day ? t(`scheduleManagement.days.${day}`) : ""}
       </Text>
       <Text style={style.summaryText}>

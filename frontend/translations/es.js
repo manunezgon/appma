@@ -144,6 +144,21 @@ scheduleManagement: {
   confirmChanges: "Confirmar cambios",
   confirmSchedule: "Confirmar horario",
   saveSchedule: "Guardar horario",
+  error: "Ha ocurrido un error",
+  completeDayTime: "Completa el día, la hora de inicio y la hora de fin",
+  completeLessonFields: "Completa todos los campos de la clase",
+  invalidAmount: "El importe mensual debe ser un número válido",
+  scheduleUpdated: "Horario actualizado correctamente",
+  scheduleCreated: "Horario creado correctamente",
+  deleteSchedule: "Eliminar horario",
+  confirmDeleteSchedule: "¿Estás seguro?",
+  delete: "Eliminar",
+  scheduleDeleted: "Horario eliminado correctamente",
+  completeAllFields: "Completa todos los campos",
+  lessonUpdated: "Clase actualizada correctamente",
+  confirmDeleteLesson:
+    "También se eliminarán todos los horarios asociados. ¿Estás seguro?",
+  lessonDeleted: "Clase eliminada correctamente",
 },
 
 payments: {
@@ -170,6 +185,9 @@ payments: {
   cancel: "Cancelar",
   delete: "Eliminar",
   payCurrentMonth: "Debes pagar el mes actual para acceder a esta clase.",
+  errorDeletingPayment: "Error eliminando pago",
+  paymentRegistered: "Pago registrado correctamente",
+  errorRegisteringPayment: "Error registrando pago",
 },
 
 attendance: {
@@ -205,6 +223,41 @@ nextClass: {
   title: "PRÓXIMA CLASE",
   today: "Hoy",
   tomorrow: "Mañana",
+},
+
+adminClassModal: {
+  requiredFields: "Completa todos los campos obligatorios",
+},
+
+common: {
+  loading: "Cargando...",
+},
+
+notFound: {
+  title: "¡Vaya!",
+  message: "¡Vaya! Esta pantalla no existe.",
+},
+
+login: {
+  error: "Error",
+  credentialsRequired: "El correo electrónico y la contraseña son obligatorios",
+  connectionError: "No se puede conectar con el servidor",
+  email: "Correo electrónico",
+  password: "Contraseña",
+  login: "INICIAR SESIÓN",
+  noAccount: "¿No tienes una cuenta? Regístrate",
+},
+
+register: {
+  error: "Error",
+  credentialsRequired: "El nombre, el correo electrónico y la contraseña son obligatorios",
+  connectionError: "No se puede conectar con el servidor",
+  name: "Nombre",
+  email: "Correo electrónico",
+  password: "Contraseña",
+  phone: "Teléfono",
+  register: "REGISTRARSE",
+  alreadyAccount: "¿Ya tienes una cuenta? Inicia sesión",
 },
 
 tabs: {
