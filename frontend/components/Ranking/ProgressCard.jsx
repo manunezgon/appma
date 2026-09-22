@@ -1,9 +1,12 @@
 import { Text, View } from "react-native";
-import styles from "../../Styles/RankingStyles";
+import { createRankingStyles } from "../../Styles/RankingStyles";
+import { useTheme } from "../../context/ThemeContext";
 import { useTranslation } from "../../hooks/useTranslation";
 
 export default function ProgressCard({ position, classes }) {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = createRankingStyles(colors);
 
   if (position == null) return null;
   

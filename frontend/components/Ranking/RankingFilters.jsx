@@ -1,8 +1,8 @@
 import RNPickerSelect from "react-native-picker-select";
 import { Ionicons } from "@expo/vector-icons";
-import { colors } from "../../Styles/theme";
 import { Text, TouchableOpacity, View } from "react-native";
-import styles from "../../Styles/RankingStyles";
+import { createRankingStyles } from "../../Styles/RankingStyles";
+import { useTheme } from "../../context/ThemeContext";
 import { useTranslation } from "../../hooks/useTranslation";
 
 export default function RankingFilters({
@@ -13,6 +13,8 @@ export default function RankingFilters({
   lessons,
 }) {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = createRankingStyles(colors);
 
   return (
     <>
@@ -64,7 +66,6 @@ export default function RankingFilters({
           placeholder={{
             label: t("ranking.allLessons"),
             value: null,
-            color: colors.textSubtle,
           }}
           useNativeAndroidPickerStyle={false}
           Icon={() => (

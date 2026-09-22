@@ -123,6 +123,7 @@ export const createProfileStyles = (colors) => {
       textAlign: "center",
       color: colors.grey,
       paddingVertical: spacing.xs,
+      
     },
 
     saveButton: {
@@ -175,6 +176,7 @@ export const createProfileStyles = (colors) => {
     },
     activeTabText: {
       color: colors.grey,
+      fontWeight: "600",
     },
 
     modalScroll: {

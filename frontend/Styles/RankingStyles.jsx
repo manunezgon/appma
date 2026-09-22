@@ -1,153 +1,156 @@
 import { StyleSheet } from "react-native";
-import { colors, layout, radii, spacing, typography } from "./theme";
+import { createLayout, createTypography, radii, spacing } from "./theme";
 
-const styles = StyleSheet.create({
-  container: {
-    ...layout.screen,
-    paddingTop: 20,
-  },
-  content: { padding: 16, paddingTop: 50 },
+export const createRankingStyles = (colors) => {
+  const layout = createLayout(colors);
+  const typography = createTypography(colors);
 
-  title: {
-    ...typography.screenTitle,
-    paddingBottom: spacing.xxl,
-  },
+  return StyleSheet.create({
+    container: {
+      ...layout.screen,
+      paddingTop: 20,
+    },
+    content: { padding: 16, paddingTop: 50 },
 
-  segmentedControl: {
-    flexDirection: "row",
-    backgroundColor: colors.surfaceMuted,
-    borderRadius: radii.sm,
-    marginBottom: spacing.lg,
-  },
+    title: {
+      ...typography.screenTitle,
+      paddingBottom: spacing.xxl,
+    },
 
-  segmentButton: {
-    flex: 1,
-    paddingVertical: spacing.md,
-    alignItems: "center",
-    borderRadius: radii.sm,
-  },
+    segmentedControl: {
+      flexDirection: "row",
+      backgroundColor: colors.surfaceMuted,
+      borderRadius: radii.sm,
+      marginBottom: spacing.lg,
+    },
 
-  segmentActive: {
-    backgroundColor: colors.primary,
-  },
+    segmentButton: {
+      flex: 1,
+      paddingVertical: spacing.md,
+      alignItems: "center",
+      borderRadius: radii.sm,
+    },
 
-  segmentText: {
-    color: colors.textMuted,
-  },
+    segmentActive: {
+      backgroundColor: colors.primary,
+    },
 
-  segmentTextActive: {
-    color: colors.textMuted,
-    fontWeight: "600",
-  },
+    segmentText: {
+      color: colors.textMuted,
+    },
 
-  pickerContainer: {
-    backgroundColor: colors.surfaceMuted,
-    borderRadius: radii.md,
-    marginBottom: spacing.lg,
-  },
+    segmentTextActive: {
+      color: colors.grey,
+      fontWeight: "600",
+    },
 
-  picker: {
-    backgroundColor: colors.surfaceMuted,
-    color: colors.textMuted,
-    borderRadius: radii.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-    width: "100%",
-  },
+    pickerContainer: {
+      backgroundColor: colors.surfaceMuted,
+      borderRadius: radii.md,
+      marginBottom: spacing.lg,
+    },
 
-  myProgressCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radii.md,
-    padding: spacing.lg,
-    marginBottom: spacing.lg,
-  },
+    picker: {
+      backgroundColor: colors.surfaceMuted,
+      color: colors.textMuted,
+      borderRadius: radii.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.md,
+      width: "100%",
+    },
 
-  myProgressTitle: {
-    ...typography.screenTitle,
-    marginBottom: spacing.md,
-  },
+    myProgressCard: {
+      backgroundColor: colors.surface,
+      borderRadius: radii.md,
+      padding: spacing.lg,
+      marginBottom: spacing.lg,
+    },
 
-  myProgressRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.xs,
-    justifyContent: "center", 
-    paddingVertical: spacing.xs,
-  },
+    myProgressTitle: {
+      ...typography.screenTitle,
+      marginBottom: spacing.md,
+    },
 
-  myProgressValue: {
-    color: colors.primary,
-    fontSize: 22,
-    fontWeight: "bold",
-  },
+    myProgressRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.xs,
+      justifyContent: "center",
+      paddingVertical: spacing.xs,
+    },
 
-  myProgressLabel: { color: colors.textMuted },
+    myProgressValue: {
+      color: colors.primary,
+      fontSize: 22,
+      fontWeight: "bold",
+    },
 
-  podiumContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "flex-end",
-    marginBottom: spacing.xl,
-    gap: 80,
-  },
+    myProgressLabel: { color: colors.textMuted },
 
-  podiumFirst: {
-    alignItems: "center",
-  },
+    podiumContainer: {
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "flex-end",
+      marginBottom: spacing.xl,
+      gap: 80,
+    },
 
-  podiumSecond: {
-    alignItems: "center",
-    marginHorizontal: 10,
-    justifyContent: "flex-end",
-  },
+    podiumFirst: {
+      alignItems: "center",
+    },
 
-  podiumThird: {
-    alignItems: "center",
-    marginHorizontal: 10,
-    justifyContent: "flex-end",
-  },
+    podiumSecond: {
+      alignItems: "center",
+      marginHorizontal: 10,
+      justifyContent: "flex-end",
+    },
 
-  podiumPlace: {
-    fontSize: 30,
-    marginBottom: spacing.xs,
-  },
+    podiumThird: {
+      alignItems: "center",
+      marginHorizontal: 10,
+      justifyContent: "flex-end",
+    },
 
-  podiumName: {
-    color: colors.textMuted,
-    fontWeight: "bold",
-    textTransform: "uppercase",
-    fontSize: 14,
-    marginBottom: 2,
-  },
+    podiumPlace: {
+      fontSize: 30,
+      marginBottom: spacing.xs,
+    },
 
-  podiumClasses: {
-    color: colors.surfaceMuted,
-    fontWeight: "bold",
-  },
+    podiumName: {
+      color: colors.textMuted,
+      fontWeight: "bold",
+      textTransform: "uppercase",
+      fontSize: 14,
+      marginBottom: 2,
+    },
 
-  rankingCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radii.md,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-  },
+    podiumClasses: {
+      color: colors.textSubtle,
+      fontWeight: "bold",
+    },
 
-  rankingRow: {
-    flexDirection: "row",
-    paddingVertical: spacing.md,
-    borderBottomWidth: 0.5,
-    borderBottomColor: colors.surfaceMuted,
-  },
+    rankingCard: {
+      backgroundColor: colors.surface,
+      borderRadius: radii.md,
+      paddingVertical: 10,
+      paddingHorizontal: 12,
+    },
 
-  position: { width: 30, color: colors.textMuted, fontWeight: "bold" },
+    rankingRow: {
+      flexDirection: "row",
+      paddingVertical: spacing.md,
+      borderBottomWidth: 0.5,
+      borderBottomColor: colors.surfaceMuted,
+    },
 
-  userName: { flex: 1, color: colors.textMuted, fontWeight: "600" },
+    position: { width: 30, color: colors.textMuted, fontWeight: "bold" },
 
-  classes: { color: colors.textMuted },
+    userName: { flex: 1, color: colors.textMuted, fontWeight: "600" },
 
-  diffText: { color: colors.surfaceMuted, fontSize: 11 },
-});
+    classes: { color: colors.textMuted },
 
-export default styles;
+    diffText: { color: colors.surfaceMuted, fontSize: 11 },
+  });
+};

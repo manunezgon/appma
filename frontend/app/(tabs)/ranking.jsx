@@ -6,8 +6,8 @@ import RankingFilters from "../../components/Ranking/RankingFilters";
 import RankingList from "../../components/Ranking/RankingList";
 import { useLessons } from "../../context/LessonsContext";
 import { useUser } from "../../context/UserContext";
-import styles from "../../Styles/RankingStyles";
-import { colors } from "../../Styles/theme";
+import { createRankingStyles } from "../../Styles/RankingStyles";
+import { useTheme } from "../../context/ThemeContext";
 import { getRanking } from "../../services/metricsApi";
 import { useTranslation } from "../../hooks/useTranslation";
 
@@ -15,6 +15,8 @@ export default function Ranking() {
   const { user, token } = useUser();
   const { lessons } = useLessons();
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = createRankingStyles(colors);
 
   const [ranking, setRanking] = useState([]);
   const [selectedLesson, setSelectedLesson] = useState(null);
