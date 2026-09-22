@@ -206,7 +206,7 @@ export const createLessonStyles = (colors) => {
       borderRadius: radii.sm,
     },
     todayText: {
-      color: colors.textMuted,
+      color: colors.grey,
       fontWeight: "600",
     },
     weekContainer: {
@@ -235,7 +235,7 @@ export const createLessonStyles = (colors) => {
       color: colors.textMuted,
     },
     activeText: {
-      color: colors.textMuted,
+      color: colors.grey,
     },
     modalContainer: {
       backgroundColor: colors.surface,

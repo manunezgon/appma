@@ -77,7 +77,7 @@ export default function HomeScreen() {
           style={styles.addButton}
           onPress={adminModal.openModal}
         >
-          <Ionicons name="add" size={20} color={colors.text} />
+          <Ionicons name="add" size={20} color={colors.grey} />
         </TouchableOpacity>
       )}
 

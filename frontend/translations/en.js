@@ -25,7 +25,7 @@ export default {
     cancel: "Cancel",
     changePassword: "Change Password",
     newPassword: "New Password",
-    updatePassword: "Update Password",
+    updatePassword: "Update",
   },
 
   paymentHistory: { 
