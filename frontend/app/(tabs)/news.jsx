@@ -84,14 +84,19 @@ export default function News() {
         onEdit={() => setShowCarouselEditor(true)}
       />
 
-      <CarouselEditorModal
-        visible={showCarouselEditor}
-        onClose={() => setShowCarouselEditor(false)}
-        images={carouselImages}
-        onAdd={addImage}
-        onDelete={(idx) => deleteImage(carouselImages[idx].id)}
-        onReorder={reorderImages}
-      />
+      {showCarouselEditor && (
+        <CarouselEditorModal
+          key={carouselImages
+            .map((image) => `${image.id}:${image.imageUrl}`)
+            .join("-")}
+          visible
+          onClose={() => setShowCarouselEditor(false)}
+          images={carouselImages}
+          onAdd={addImage}
+          onDelete={(idx) => deleteImage(carouselImages[idx].id)}
+          onReorder={reorderImages}
+        />
+      )}
 
       {user?.role === "MEMBER" && <NextClassCard enrollments={enrollments} />}
 

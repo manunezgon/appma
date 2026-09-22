@@ -89,7 +89,8 @@ export function useNewsData() {
 
     if (result.canceled) return;
 
-    const localUri = result.assets[0].uri;
+    const asset = result.assets[0];
+    const localUri = asset.uri;
 
     const tempId = Date.now();
 
@@ -103,7 +104,7 @@ export function useNewsData() {
     ]);
 
     try {
-      await uploadCarouselImageRequest(localUri, token);
+      await uploadCarouselImageRequest(asset, token);
       await fetchCarouselImages();
     } catch (err) {
       console.error(err);

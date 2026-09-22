@@ -1,4 +1,5 @@
 import { apiRequest } from "./apiClient";
+import { File } from "expo-file-system";
 
 export const getAnnouncements = (token) =>
   apiRequest("/announcements", { token });
@@ -19,13 +20,10 @@ export const deleteAnnouncementRequest = (id, token) =>
 export const getCarouselImages = (token) =>
   apiRequest("/carousel", { token });
 
-export const uploadCarouselImageRequest = (localUri, token) => {
+export const uploadCarouselImageRequest = (asset, token) => {
   const formData = new FormData();
-  formData.append("file", {
-    uri: localUri,
-    type: "image/jpeg",
-    name: "carousel.jpg",
-  });
+  const file = asset.file ?? new File(asset.uri);
+  formData.append("file", file);
 
   return apiRequest("/carousel/upload", {
     method: "POST",

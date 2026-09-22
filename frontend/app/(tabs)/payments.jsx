@@ -94,7 +94,7 @@ export default function Payments() {
   }, [token]);
 
   useEffect(() => {
-    fetchStudents();
+    void Promise.resolve().then(fetchStudents);
   }, [fetchStudents]);
 
   const filteredStudents = useMemo(() => {
@@ -197,6 +197,7 @@ export default function Payments() {
       )}
 
       <PaymentModal
+        key={modalMode ?? "closed"}
         visible={modalMode !== null}
         mode={modalMode}
         student={selectedStudent}

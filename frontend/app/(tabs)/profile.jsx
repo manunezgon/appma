@@ -48,22 +48,21 @@ export default function Profile() {
   const [paymentHistoryVisible, setPaymentHistoryVisible] = useState(false);
 
   useEffect(() => {
-    if (user) {
-      setEditName(user.name || "");
-      setEditEmail(user.email || "");
-      setEditPhone(user.phone || "");
-    }
-  }, [user]);
-
-  useEffect(() => {
     if (user?.id) {
-      fetchPaymentsByUser(user.id);
+      void Promise.resolve().then(() => fetchPaymentsByUser(user.id));
     }
   }, [user?.id, fetchPaymentsByUser]);
 
   const handleLogout = async () => {
     await logout();
     router.replace("/login");
+  };
+
+  const handleOpenEditProfile = () => {
+    setEditName(user?.name || "");
+    setEditEmail(user?.email || "");
+    setEditPhone(user?.phone || "");
+    setModalVisible(true);
   };
 
   const refreshUser = async () => {
@@ -207,7 +206,7 @@ export default function Profile() {
         <View style={styles.buttonContainer}>
           <View style={styles.profileButtonRow}>
             <TouchableOpacity
-              onPress={() => setModalVisible(true)}
+              onPress={handleOpenEditProfile}
               style={styles.button}
             >
               <Text style={styles.primaryButtonText}>
@@ -251,10 +250,9 @@ export default function Profile() {
         setNewPassword={setNewPassword}
         handleChangePassword={handleChangePassword}
       />
-      <SettingsModal
-        visible={settingsVisible}
-        onClose={() => setSettingsVisible(false)}
-      />
+      {settingsVisible && (
+        <SettingsModal visible onClose={() => setSettingsVisible(false)} />
+      )}
     </>
   );
 }

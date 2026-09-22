@@ -2,7 +2,7 @@
 
 import { useFonts } from "expo-font";
 import { Stack, usePathname, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { ActivityIndicator, Text, TextInput, View } from "react-native";
 import { LessonsProvider } from "../context/LessonsContext";
 import { PaymentsProvider } from "../context/PaymentsContext";
@@ -11,25 +11,24 @@ import { UserProvider, useUser } from "../context/UserContext";
 import { EnrollmentsProvider } from "../context/EnrollmentsContext";
 import { LanguageProvider } from "../context/LanguageContext";
 import { ThemeProvider, useTheme } from "../context/ThemeContext";
-import { useTranslation } from "../hooks/useTranslation";
 import * as NavigationBar from "expo-navigation-bar";
+
+Text.defaultProps = Text.defaultProps || {};
+Text.defaultProps.style = { fontFamily: "Heebo-Medium" };
+
+TextInput.defaultProps = TextInput.defaultProps || {};
+TextInput.defaultProps.style = { fontFamily: "Heebo-Medium" };
 
 function RootGuard({ children }) {
   const { user } = useUser();
-  const { t } = useTranslation();
   const router = useRouter();
   const pathname = usePathname();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
-    if (mounted && !user && pathname !== "/login" && pathname !== "/register") {
+    if (!user && pathname !== "/login" && pathname !== "/register") {
       router.replace("/login");
     }
-  }, [mounted, user, pathname, router]);
-
-  if (!mounted) return <Text>{t("common.loading")}</Text>;
+  }, [user, pathname, router]);
 
   return user || pathname === "/login" || pathname === "/register"
     ? children
@@ -58,12 +57,6 @@ export default function RootLayout() {
       </View>
     );
   }
-
-  Text.defaultProps = Text.defaultProps || {};
-  Text.defaultProps.style = { fontFamily: "Heebo-Medium" };
-
-  TextInput.defaultProps = TextInput.defaultProps || {};
-  TextInput.defaultProps.style = { fontFamily: "Heebo-Medium" };
 
   return (
     <LanguageProvider>

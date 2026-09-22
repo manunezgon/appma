@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Modal, Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { createProfileStyles } from "../../Styles/ProfileStyles.jsx";
@@ -14,13 +14,6 @@ export default function SettingsModal({ visible, onClose }) {
   const { theme, setTheme, colors } = useTheme();
   const [selectedTheme, setSelectedTheme] = useState(theme);
   const styles = createProfileStyles(colors);
-
-  useEffect(() => {
-    if (visible) {
-      setSelectedLanguage(language);
-      setSelectedTheme(theme);
-    }
-  }, [visible, language, theme]);
 
   return (
     <Modal

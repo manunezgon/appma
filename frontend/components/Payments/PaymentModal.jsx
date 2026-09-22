@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "../../hooks/useTranslation";
 
 import { PaymentRow } from "./PaymentRow";
@@ -40,12 +40,6 @@ export const PaymentModal = ({
   const style = createPaymentStyles(colors);
 
   const [isGlobal, setIsGlobal] = useState(false);
-
-  useEffect(() => {
-    if (mode !== "register") {
-      setIsGlobal(false);
-    }
-  }, [mode]);
 
   const handleConfirm = () => {
     onConfirm({

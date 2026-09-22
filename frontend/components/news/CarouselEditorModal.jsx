@@ -1,5 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Alert,
   Image,
@@ -24,10 +24,6 @@ export default function CarouselEditorModal({
   const { colors } = useTheme();
   const style = createNewsStyles(colors);
   const [localImages, setLocalImages] = useState(images);
-
-  useEffect(() => {
-    setLocalImages(images ?? []);
-  }, [images]);
 
   const moveImage = (index, direction) => {
     const newIndex = index + direction;

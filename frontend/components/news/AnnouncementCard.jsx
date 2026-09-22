@@ -25,28 +25,25 @@ export default function AnnouncementCard({ announcement, onDelete }) {
     [announcement.message],
   );
 
-  const tagsStyles = useMemo(
-    () => ({
-      body: style.message,
-      p: {
-        marginTop: 0,
-        marginBottom: 8,
-      },
-      strong: {
-        fontWeight: "700",
-      },
-      b: {
-        fontWeight: "700",
-      },
-      em: {
-        fontStyle: "italic",
-      },
-      i: {
-        fontStyle: "italic",
-      },
-    }),
-    [colors],
-  );
+  const tagsStyles = {
+    body: style.message,
+    p: {
+      marginTop: 0,
+      marginBottom: 8,
+    },
+    strong: {
+      fontWeight: "700",
+    },
+    b: {
+      fontWeight: "700",
+    },
+    em: {
+      fontStyle: "italic",
+    },
+    i: {
+      fontStyle: "italic",
+    },
+  };
 
   return (
     <View style={style.card}>

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import {
   Dimensions,
   FlatList,
@@ -45,17 +45,9 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
 
   const [currentWeekIndex, setCurrentWeekIndex] = useState(10);
 
-  const [currentMonthName, setCurrentMonthName] = useState(
-    `${t(`paymentHistory.months.${weeks[currentWeekIndex][0].getMonth()}`)} · ${weeks[currentWeekIndex][0].getFullYear()}`,
-  );
-
-  useEffect(() => {
-    const firstDayOfWeek = weeks[currentWeekIndex][0];
-
-    setCurrentMonthName(
-      `${t(`paymentHistory.months.${firstDayOfWeek.getMonth()}`)} · ${firstDayOfWeek.getFullYear()}`,
-    );
-  }, [language, currentWeekIndex]);
+  const currentMonthName = `${t(
+    `paymentHistory.months.${weeks[currentWeekIndex][0].getMonth()}`,
+  )} · ${weeks[currentWeekIndex][0].getFullYear()}`;
 
   const formatDate = (date) => date.toISOString().split("T")[0];
 
@@ -63,18 +55,12 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
     setSelectedDay(today);
     setCurrentWeekIndex(10);
     flatListRef.current?.scrollToIndex({ index: 10, animated: true });
-    setCurrentMonthName(
-      `${t(`paymentHistory.months.${today.getMonth()}`)} · ${today.getFullYear()}`,
-    );
   };
 
   const handleMomentumScrollEnd = (event) => {
     const index = Math.round(event.nativeEvent.contentOffset.x / SCREEN_WIDTH);
     setCurrentWeekIndex(index);
 
-    const firstDayOfWeek = weeks[index][0];
-    const newMonthName = `${t(`paymentHistory.months.${firstDayOfWeek.getMonth()}`)} · ${firstDayOfWeek.getFullYear()}`;
-    setCurrentMonthName(newMonthName);
   };
 
   return (
