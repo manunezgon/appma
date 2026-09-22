@@ -55,6 +55,7 @@ public class LessonService {
 
         oldLesson.setLessonName(dto.lessonName());
         oldLesson.setProfessorName(dto.professorName());
+        oldLesson.setAmount_monthly(dto.amountMonthly());
     }
 
     public List<Lesson> validateLessonName(String lessonName, String professorName) {
