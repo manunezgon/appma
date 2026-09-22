@@ -68,7 +68,7 @@ export default function News() {
         <Image
           source={
             theme === "light"
-              ? require("../assets/images/black_logo.png")
+              ? require("../assets/images/black_logo_circle.png")
               : require("../assets/images/white_logo_circle.png")
           }
           style={style.logo}

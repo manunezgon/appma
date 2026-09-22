@@ -16,7 +16,7 @@ const StudentCardComponent = ({ student, onPress }) => {
             student.profileImageUrl
               ? { uri: student.profileImageUrl }
               : theme === "light"
-                ? require("../../app/assets/images/black_logo.png")
+                ? require("../../app/assets/images/black_logo_circle.png")
                 : require("../../app/assets/images/white_logo_circle.png")
           }
           style={style.avatar}

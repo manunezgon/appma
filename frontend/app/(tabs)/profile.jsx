@@ -162,7 +162,7 @@ export default function Profile() {
                     user.profileImageUrl
                       ? { uri: user.profileImageUrl }
                       : theme === "light"
-                        ? require("../assets/images/black_logo.png")
+                        ? require("../assets/images/black_logo_circle.png")
                         : require("../assets/images/white_logo_circle.png")
                   }
                   style={styles.profileImage}
