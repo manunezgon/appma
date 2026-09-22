@@ -99,45 +99,51 @@ export default function HomeScreen() {
         />
       )}
 
-      <AttendanceModal
-        visible={attendance.attendanceVisible}
-        onClose={attendance.closeAttendance}
-        selectedClass={attendance.selectedClass}
-        selectedDay={selectedDay}
-        students={attendance.students}
-        loading={attendance.loading}
-        saving={attendance.saving}
-        onToggle={attendance.toggleAttendance}
-        onSave={attendance.saveAttendance}
-      />
+      {attendance.attendanceVisible && (
+        <AttendanceModal
+          visible
+          onClose={attendance.closeAttendance}
+          selectedClass={attendance.selectedClass}
+          selectedDay={selectedDay}
+          students={attendance.students}
+          loading={attendance.loading}
+          saving={attendance.saving}
+          onToggle={attendance.toggleAttendance}
+          onSave={attendance.saveAttendance}
+        />
+      )}
 
       {/* PAYMENT ERROR MODAL */}
 
-      <PaymentErrorModal
-        visible={enrollmentActions.errorModalVisible}
-        message={enrollmentActions.errorMessage}
-        onClose={enrollmentActions.closeErrorModal}
-      />
+      {enrollmentActions.errorModalVisible && (
+        <PaymentErrorModal
+          visible
+          message={enrollmentActions.errorMessage}
+          onClose={enrollmentActions.closeErrorModal}
+        />
+      )}
 
       {/* ADMIN CREATE CLASS MODAL */}
 
-      <AdminCreateClassModal
-        visible={adminModal.visible}
-        onClose={adminModal.closeModal}
-        createMode={adminModal.createMode}
-        setCreateMode={adminModal.setCreateMode}
-        lessonsList={lessons}
-        selectedLessonId={adminModal.selectedLessonId}
-        setSelectedLessonId={adminModal.setSelectedLessonId}
-        newStartTime={adminModal.newStartTime}
-        setNewStartTime={adminModal.setNewStartTime}
-        newEndTime={adminModal.newEndTime}
-        setNewEndTime={adminModal.setNewEndTime}
-        newDescription={adminModal.newDescription}
-        setNewDescription={adminModal.setNewDescription}
-        onCreateExisting={adminModal.handleCreateExisting}
-        onCreateNew={adminModal.handleCreateNew}
-      />
+      {adminModal.visible && (
+        <AdminCreateClassModal
+          visible
+          onClose={adminModal.closeModal}
+          createMode={adminModal.createMode}
+          setCreateMode={adminModal.setCreateMode}
+          lessonsList={lessons}
+          selectedLessonId={adminModal.selectedLessonId}
+          setSelectedLessonId={adminModal.setSelectedLessonId}
+          newStartTime={adminModal.newStartTime}
+          setNewStartTime={adminModal.setNewStartTime}
+          newEndTime={adminModal.newEndTime}
+          setNewEndTime={adminModal.setNewEndTime}
+          newDescription={adminModal.newDescription}
+          setNewDescription={adminModal.setNewDescription}
+          onCreateExisting={adminModal.handleCreateExisting}
+          onCreateNew={adminModal.handleCreateNew}
+        />
+      )}
     </View>
   );
 }
