@@ -1,10 +1,10 @@
 import { Alert, Text, TouchableOpacity, View } from "react-native";
 import { useTranslation } from "../../hooks/useTranslation";
-import style from "../../Styles/ScheduleStyles.jsx";
+import { createScheduleStyles } from "../../Styles/ScheduleStyles.jsx";
+import { useTheme } from "../../context/ThemeContext";
 import LessonSummary from "./LessonSummary.jsx";
 import SelectableList from "./SelectableList.jsx";
 import TextInputField from "./TextInputField.jsx";
-import { colors } from "../../Styles/theme";
 
 export default function Step3Lesson({
   mode,
@@ -29,6 +29,8 @@ export default function Step3Lesson({
   handleDeleteSchedule,
 }) {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const style = createScheduleStyles(colors);
 
   const handleNext = () => {
     if (lessonMode === "new") {
@@ -112,7 +114,7 @@ export default function Step3Lesson({
             value={newLessonName}
             onChangeText={setNewLessonName}
             placeholder={t("scheduleManagement.lessonNamePlaceholder")}
-            placeholderTextColor={colors.textOnLite}
+            placeholderTextColor={colors.textOnLight}
             style={style.inputField}
           />
 
@@ -123,7 +125,7 @@ export default function Step3Lesson({
             value={newProfessorName}
             onChangeText={setNewProfessorName}
             placeholder={t("scheduleManagement.instructorPlaceholder")}
-            placeholderTextColor={colors.textOnLite}
+            placeholderTextColor={colors.textOnLight}
             style={style.inputField}
           />
 
@@ -134,7 +136,7 @@ export default function Step3Lesson({
             value={newAmountMonthly}
             onChangeText={setNewAmountMonthly}
             placeholder={t("scheduleManagement.pricePlaceholder")}
-            placeholderTextColor={colors.textOnLite}
+            placeholderTextColor={colors.textOnLight}
             keyboardType="numeric"
             style={style.inputField}
           />

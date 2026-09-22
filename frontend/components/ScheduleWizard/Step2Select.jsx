@@ -1,6 +1,7 @@
 import { Text, TouchableOpacity, View } from "react-native";
 import { useTranslation } from "../../hooks/useTranslation";
-import style from "../../Styles/ScheduleStyles.jsx";
+import { createScheduleStyles } from "../../Styles/ScheduleStyles.jsx";
+import { useTheme } from "../../context/ThemeContext";
 import SelectableList from "./SelectableList.jsx";
 
 export default function Step2Select({
@@ -24,6 +25,8 @@ export default function Step2Select({
   setNewAmountMonthly,
 }) {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const style = createScheduleStyles(colors);
 
   const weekOrder = [
     "MONDAY",

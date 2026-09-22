@@ -1,75 +1,81 @@
 import { StyleSheet } from "react-native";
-import { colors, layout, radii, spacing, typography } from "./theme";
+import { createLayout, createTypography, radii, spacing } from "./theme";
 
-const styles = StyleSheet.create({
-  container: {
-    ...layout.screen,
-  },
-  sectionHeaderContainer: { paddingTop: spacing.xl, paddingBottom: spacing.md },
-  sectionHeader: {
-    ...typography.screenTitle,
-  },
-  classCard: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-    borderRadius: radii.md,
-    backgroundColor: colors.cardLight,
-  },
+export const createSessionStyles = (colors) => {
+  const layout = createLayout(colors);
+  const typography = createTypography(colors);
 
-  infoContainer: {
-    flex: 1,
-  },
+  return StyleSheet.create({
+    container: {
+      ...layout.screen,
+    },
+    sectionHeaderContainer: {
+      paddingTop: spacing.xl,
+      paddingBottom: spacing.md,
+    },
+    sectionHeader: {
+      ...typography.screenTitle,
+    },
+    classCard: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      padding: spacing.lg,
+      marginBottom: spacing.md,
+      borderRadius: radii.md,
+      backgroundColor: colors.cardLight,
+    },
 
-  rightContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-  },
+    infoContainer: {
+      flex: 1,
+    },
 
-  dateTimeContainer: {
-    alignItems: "flex-end",
-  },
+    rightContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.sm,
+    },
 
-  upcomingCard: {
-    backgroundColor: colors.surfaceMuted,
-    opacity: 0.9,
-  },
+    dateTimeContainer: {
+      alignItems: "flex-end",
+    },
 
-  upcomingText: {
-    color: colors.textMuted,
-  },
+    upcomingCard: {
+      backgroundColor: colors.surfaceMuted,
+      opacity: 0.9,
+    },
 
-  upcomingSubText: {
-    color: colors.textMuted,
-  },
+    upcomingText: {
+      color: colors.textMuted,
+    },
 
-  className: { ...typography.cardTitle, color: colors.textOnLight },
-  professorName: { ...typography.body, color: colors.textOnLight },
-  date: { ...typography.body, color: colors.textOnLight },
-  time: { ...typography.body, color: colors.textOnLight },
-  noClasses: {
-    textAlign: "center",
-    marginTop: spacing.xl,
-    fontSize: 16,
-    color: colors.textMuted,
-  },
+    upcomingSubText: {
+      color: colors.textMuted,
+    },
 
-  modalOverlay: {
-    ...layout.modalOverlay,
-  },
-  modalContent: {
-    backgroundColor: colors.cardLight,
-    padding: spacing.xl,
-    borderRadius: radii.md,
-    width: "80%",
-  },
-  modalText: { fontSize: 16, marginBottom: spacing.xl, textAlign: "center" },
-  modalButtons: { flexDirection: "row", justifyContent: "space-between" },
-  modalButton: { padding: spacing.xs },
-  loading: { textAlign: "center", marginTop: 50, color: colors.textMuted },
-});
+    className: { ...typography.cardTitle, color: colors.textOnLight },
+    professorName: { ...typography.body, color: colors.textOnLight },
+    date: { ...typography.body, color: colors.textOnLight },
+    time: { ...typography.body, color: colors.textOnLight },
+    noClasses: {
+      textAlign: "center",
+      marginTop: spacing.xl,
+      fontSize: 16,
+      color: colors.textMuted,
+    },
 
-export default styles;
+    modalOverlay: {
+      ...layout.modalOverlay,
+    },
+    modalContent: {
+      backgroundColor: colors.cardLight,
+      padding: spacing.xl,
+      borderRadius: radii.md,
+      width: "80%",
+    },
+    modalText: { fontSize: 16, marginBottom: spacing.xl, textAlign: "center" },
+    modalButtons: { flexDirection: "row", justifyContent: "space-between" },
+    modalButton: { padding: spacing.xs },
+    loading: { textAlign: "center", marginTop: 50, color: colors.textMuted },
+  });
+}

@@ -12,12 +12,14 @@ import ScheduleWizardModal from "../../components/ScheduleWizard/ScheduleWizardM
 import { useEnrollments } from "../../context/EnrollmentsContext";
 import { useUser } from "../../context/UserContext";
 import { useTranslation } from "../../hooks/useTranslation";
-import styles from "../../Styles/SessionStyle.jsx";
-import { colors } from "../../Styles/theme";
+import { createSessionStyles } from "../../Styles/SessionStyle.jsx";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function Sessions() {
   const { t } = useTranslation();
   const { user } = useUser();
+ const { colors } = useTheme();
+ const styles = createSessionStyles(colors);
   const { enrollments, deleteEnrollment, fetchMyEnrollments } =
     useEnrollments();
 

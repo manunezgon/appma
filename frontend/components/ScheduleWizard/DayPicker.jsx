@@ -1,7 +1,11 @@
 import { Text, TouchableOpacity } from "react-native";
-import style from "../../Styles/ScheduleStyles.jsx";
+import { createScheduleStyles } from "../../Styles/ScheduleStyles.jsx";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function DayPicker({ days, selectedDay, onSelect }) {
+  const { colors } = useTheme();
+  const style = createScheduleStyles(colors);
+  
   return (
     <>
       {days.map((day) => {

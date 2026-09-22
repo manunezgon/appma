@@ -1,6 +1,7 @@
 import { Text, View } from "react-native";
 import { useTranslation } from "../../hooks/useTranslation";
-import style from "../../Styles/ScheduleStyles.jsx";
+import { createScheduleStyles } from "../../Styles/ScheduleStyles.jsx";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function LessonSummary({
   lesson,
@@ -10,6 +11,9 @@ export default function LessonSummary({
   showAmount = true,
 }) {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const style = createScheduleStyles(colors);
+  
   if (!lesson) return null;
 
   return (

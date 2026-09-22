@@ -1,6 +1,7 @@
 import { Text, TouchableOpacity, View } from "react-native";
 import { useTranslation } from "../../hooks/useTranslation";
-import style from "../../Styles/ScheduleStyles.jsx";
+import { createScheduleStyles } from "../../Styles/ScheduleStyles.jsx";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function Step1Mode({
   setMode,
@@ -10,6 +11,8 @@ export default function Step1Mode({
   setStep,
 }) {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const style = createScheduleStyles(colors);
   return (
     <View style={style.container}>
       <TouchableOpacity

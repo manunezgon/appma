@@ -1,9 +1,9 @@
 import { Text, TouchableOpacity } from "react-native";
 import { useTranslation } from "../../hooks/useTranslation";
-import style from "../../Styles/ScheduleStyles.jsx";
+import { createScheduleStyles } from "../../Styles/ScheduleStyles.jsx";
+import { useTheme } from "../../context/ThemeContext";
 import DayPicker from "./DayPicker.jsx";
 import TextInputField from "./TextInputField.jsx";
-import { colors } from "../../Styles/theme";
 
 const daysOfWeek = [
   { label: "Monday", value: "MONDAY" },
@@ -25,6 +25,8 @@ export default function Step4Schedule({
   setStep,
 }) {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const style = createScheduleStyles(colors);
 
   const translatedDays = daysOfWeek.map((day) => ({
     ...day,
@@ -48,7 +50,7 @@ export default function Step4Schedule({
         value={startTime}
         onChangeText={setStartTime}
         placeholder={t("scheduleManagement.startTimePlaceholder")}
-        placeholderTextColor={colors.textOnLite}
+        placeholderTextColor={colors.textOnLight}
         style={style.inputField}
       />
 
@@ -57,7 +59,7 @@ export default function Step4Schedule({
         value={endTime}
         onChangeText={setEndTime}
         placeholder={t("scheduleManagement.endTimePlaceholder")}
-        placeholderTextColor={colors.textOnLite}
+        placeholderTextColor={colors.textOnLight}
         style={style.inputField}
       />
 

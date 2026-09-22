@@ -1,7 +1,8 @@
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { useScheduleWizard } from "../../hooks/useScheduleWizard.jsx";
 import { useTranslation } from "../../hooks/useTranslation";
-import style from "../../Styles/ScheduleStyles.jsx";
+import { createScheduleStyles } from "../../Styles/ScheduleStyles.jsx";
+import { useTheme } from "../../context/ThemeContext";
 import Step1Mode from "./Step1Mode.jsx";
 import Step2Select from "./Step2Select.jsx";
 import Step3Lesson from "./Step3Lesson.jsx";
@@ -11,6 +12,8 @@ import Step5Confirm from "./Step5Confirm.jsx";
 export default function ScheduleWizardModal({ onClose }) {
   const wizard = useScheduleWizard(onClose);
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const style = createScheduleStyles(colors);
 
   const { step, goBack, handleClose } = wizard;
 

@@ -1,5 +1,6 @@
 import { TouchableOpacity, View } from "react-native";
-import style from "../../Styles/ScheduleStyles.jsx";
+import { createScheduleStyles } from "../../Styles/ScheduleStyles.jsx";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function SelectableList({
   items = [],
@@ -7,6 +8,9 @@ export default function SelectableList({
   onSelect,
   renderItem,
 }) {
+    const { colors } = useTheme();
+    const style = createScheduleStyles(colors); 
+    
   if (!items.length) return null;
 
   return (
