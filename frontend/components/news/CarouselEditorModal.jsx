@@ -9,8 +9,8 @@ import {
   View,
 } from "react-native";
 import { useTranslation } from "../../hooks/useTranslation";
-import style from "../../Styles/NewsStyles";
-import { colors } from "../../Styles/theme";
+import { createNewsStyles } from "../../Styles/NewsStyles";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function CarouselEditorModal({
   visible,
@@ -21,6 +21,8 @@ export default function CarouselEditorModal({
   onReorder,
 }) {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const style = createNewsStyles(colors);
   const [localImages, setLocalImages] = useState(images);
 
   useEffect(() => {
@@ -122,7 +124,7 @@ export default function CarouselEditorModal({
               onClose();
             }}
           >
-<Text style={style.text}>{t("news.save")}</Text>
+            <Text style={style.text}>{t("news.save")}</Text>
           </TouchableOpacity>
         </View>
       </View>

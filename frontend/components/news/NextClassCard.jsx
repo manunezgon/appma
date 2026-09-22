@@ -2,11 +2,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { useMemo } from "react";
 import { useTranslation } from "../../hooks/useTranslation";
 import { Text, View } from "react-native";
-import style from "../../Styles/NewsStyles";
-import { colors } from "../../Styles/theme";
+import { createNewsStyles } from "../../Styles/NewsStyles";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function NextClassCard({ enrollments = [] }) {
   const { t } = useTranslation();
+    const { colors } = useTheme();
+    const style = createNewsStyles(colors);
   const nextClass = useMemo(() => {
     const now = new Date();
 

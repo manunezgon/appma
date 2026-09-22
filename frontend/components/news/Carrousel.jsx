@@ -2,10 +2,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useRef, useState } from "react";
 import { Image, TouchableOpacity, View } from "react-native";
 import PagerView from "react-native-pager-view";
-import style from "../../Styles/NewsStyles";
-import { colors } from "../../Styles/theme";
+import { createNewsStyles } from "../../Styles/NewsStyles";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function Carousel({ images, interval = 3000, onEdit, isAdmin }) {
+    const { colors } = useTheme();
+    const style = createNewsStyles(colors);
   const pagerRef = useRef(null);
   const pageRef = useRef(0);
   const [page, setPage] = useState(0);

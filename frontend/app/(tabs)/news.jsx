@@ -8,12 +8,16 @@ import Carousel from "../../components/news/Carrousel";
 import { useUser } from "../../context/UserContext";
 import { useNewsData } from "../../hooks/useNewsData";
 import { useTranslation } from "../../hooks/useTranslation";
-import style from "../../Styles/NewsStyles";
+import { createNewsStyles } from "../../Styles/NewsStyles";
+import { useTheme } from "../../context/ThemeContext";
 import { useEnrollments } from "../../context/EnrollmentsContext";
 import NextClassCard from "../../components/news/NextClassCard";
 
 export default function News() {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const style = createNewsStyles(colors);
+  
   const { user } = useUser();
   const [showCarouselEditor, setShowCarouselEditor] = useState(false);
   const [newMessage, setNewMessage] = useState("");

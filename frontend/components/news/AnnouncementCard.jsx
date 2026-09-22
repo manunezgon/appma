@@ -10,11 +10,13 @@ import {
 } from "react-native";
 import { useUser } from "../../context/UserContext";
 import { useTranslation } from "../../hooks/useTranslation";
-import style from "../../Styles/NewsStyles";
-import { colors } from "../../Styles/theme";
+import { createNewsStyles } from "../../Styles/NewsStyles";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function AnnouncementCard({ announcement, onDelete }) {
   const { t, language } = useTranslation();
+    const { colors } = useTheme();
+    const style = createNewsStyles(colors);
   const { user } = useUser();
   const [confirmVisible, setConfirmVisible] = useState(false);
   const { width } = useWindowDimensions();

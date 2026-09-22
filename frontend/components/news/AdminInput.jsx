@@ -7,8 +7,8 @@ import {
   RichToolbar,
 } from "react-native-pell-rich-editor";
 import { useTranslation } from "../../hooks/useTranslation";
-import style from "../../Styles/NewsStyles";
-import { colors } from "../../Styles/theme";
+import { createNewsStyles } from "../../Styles/NewsStyles";
+import { useTheme } from "../../context/ThemeContext";
 
 const hasContent = (html) => {
   if (!html) return false;
@@ -23,6 +23,8 @@ const hasContent = (html) => {
 
 export default function AdminInput({ value, onChange, onSend }) {
   const { t } = useTranslation();
+    const { colors } = useTheme();
+    const style = createNewsStyles(colors);
 
   const editorRef = useRef(null);
 
