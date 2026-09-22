@@ -22,8 +22,8 @@ import { loginRequest } from "../services/usersApi";
 
 export default function Login() {
   const { t } = useTranslation();
-    const { colors } = useTheme();
-    const styles = createGlobalStyles(colors);
+  const { theme, colors } = useTheme();
+  const styles = createGlobalStyles(colors);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loggingIn, setLoggingIn] = useState(false);
@@ -83,7 +83,11 @@ export default function Login() {
       keyboardShouldPersistTaps="handled"
     >
       <Image
-        source={require("./assets/images/white_logo.png")}
+        source={
+          theme === "light"
+            ? require("./assets/images/black_logo.png")
+            : require("./assets/images/white_logo_circle.png")
+        }
         style={styles.logo}
         resizeMode="contain"
       />
@@ -113,7 +117,7 @@ export default function Login() {
         disabled={loggingIn || !email || !password}
       >
         {loggingIn ? (
-          <ActivityIndicator color={colors.text} />
+          <ActivityIndicator color={colors.grey} />
         ) : (
           <Text style={styles.buttonText}>{t("login.login")}</Text>
         )}

@@ -25,12 +25,12 @@ export const createGlobalStyles = (colors) =>
     input: {
       width: "90%",
       borderWidth: 1,
-      borderColor: colors.text,
+      borderColor: colors.border,
       borderRadius: radii.sm,
       padding: spacing.md,
       marginBottom: spacing.md,
-      backgroundColor: colors.text,
-      color: colors.black,
+      backgroundColor: colors.surface,
+      color: colors.text,
     },
     button: {
       backgroundColor: colors.primary,
@@ -39,7 +39,7 @@ export const createGlobalStyles = (colors) =>
       alignItems: "center",
     },
     buttonText: {
-      color: colors.text,
+      color: colors.grey,
       fontSize: 16,
     },
     linkText: {

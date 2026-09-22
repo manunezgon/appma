@@ -45,7 +45,7 @@ export default function AnnouncementCard({ announcement, onDelete }) {
         fontStyle: "italic",
       },
     }),
-    [],
+    [colors],
   );
 
   return (

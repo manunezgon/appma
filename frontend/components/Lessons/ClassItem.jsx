@@ -3,7 +3,6 @@ import { memo, useCallback } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { createLessonStyles } from "../../Styles/LessonStyles.jsx";
 import { useTheme } from "../../context/ThemeContext";
-import defaultProfileImg from "../../app/assets/images/white_logo_circle.png";
 
 const ClassItem = ({
   item,
@@ -12,7 +11,7 @@ const ClassItem = ({
   onDeleteClass,
   onTakeAttendance,
 }) => {
-  const { colors } = useTheme();
+  const { theme, colors } = useTheme();
   const styles = createLessonStyles(colors);
   
   const handleEnroll = useCallback(() => {
@@ -97,7 +96,9 @@ const ClassItem = ({
               source={
                 s.profileImageUrl
                   ? { uri: s.profileImageUrl }
-                  : defaultProfileImg
+                  : theme === "light"
+                    ? require("../../app/assets/images/black_logo.png")
+                    : require("../../app/assets/images/white_logo_circle.png")
               }
               style={styles.studentAvatar}
             />

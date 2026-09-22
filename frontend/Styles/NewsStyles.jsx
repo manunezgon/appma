@@ -21,6 +21,18 @@ export const createNewsStyles = (colors) => {
       alignItems: "center",
       marginBottom: spacing.md,
     },
+    headerTitle: {
+      ...typography.screenTitle,
+      fontSize: 24,
+      fontWeight: "700",
+      color: colors.text,
+    },
+    headerSubtitle: {
+      ...typography.screenTitle,
+      fontSize: 16,
+      fontWeight: "500",
+      color: colors.textMuted,
+    },
     logo: {
       marginTop: spacing.md,
       height: 100,

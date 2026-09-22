@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Dimensions,
   FlatList,
@@ -13,11 +13,15 @@ import { useTheme } from "../../context/ThemeContext";
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 export default function WeekCalendar({ selectedDay, setSelectedDay }) {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const { colors } = useTheme();
   const styles = createLessonStyles(colors);
 
-  const daysShort = ["M", "T", "W", "T", "F", "S", "S"];
+  const daysShort =
+    language === "es"
+      ? ["L", "M", "X", "J", "V", "S", "D"]
+      : ["M", "T", "W", "T", "F", "S", "S"];
+
   const flatListRef = useRef(null);
 
   const today = new Date();
@@ -44,6 +48,14 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
   const [currentMonthName, setCurrentMonthName] = useState(
     `${t(`paymentHistory.months.${weeks[currentWeekIndex][0].getMonth()}`)} · ${weeks[currentWeekIndex][0].getFullYear()}`,
   );
+
+  useEffect(() => {
+    const firstDayOfWeek = weeks[currentWeekIndex][0];
+
+    setCurrentMonthName(
+      `${t(`paymentHistory.months.${firstDayOfWeek.getMonth()}`)} · ${firstDayOfWeek.getFullYear()}`,
+    );
+  }, [language, currentWeekIndex]);
 
   const formatDate = (date) => date.toISOString().split("T")[0];
 

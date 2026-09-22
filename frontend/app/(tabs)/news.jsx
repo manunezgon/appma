@@ -15,9 +15,9 @@ import NextClassCard from "../../components/news/NextClassCard";
 
 export default function News() {
   const { t } = useTranslation();
-  const { colors } = useTheme();
+  const { theme, colors } = useTheme();
   const style = createNewsStyles(colors);
-  
+
   const { user } = useUser();
   const [showCarouselEditor, setShowCarouselEditor] = useState(false);
   const [newMessage, setNewMessage] = useState("");
@@ -66,9 +66,15 @@ export default function News() {
     >
       <View style={style.header}>
         <Image
-          source={require("../assets/images/white_logo.png")}
+          source={
+            theme === "light"
+              ? require("../assets/images/black_logo.png")
+              : require("../assets/images/white_logo_circle.png")
+          }
           style={style.logo}
         />
+        <Text style={style.headerTitle}>LA FORJA</Text>
+        <Text style={style.headerSubtitle}>MARTIAL ARTS</Text>
       </View>
 
       <Carousel

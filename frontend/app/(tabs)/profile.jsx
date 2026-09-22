@@ -14,7 +14,6 @@ import EditProfileModal from "../../components/Profile/EditProfileModal.jsx";
 import SettingsModal from "../../components/Profile/SettingsModal.jsx";
 import { useUser } from "../../context/UserContext";
 import { createProfileStyles,  } from "../../Styles/ProfileStyles.jsx";
-import profilePic from "../assets/images/white_logo_circle.png";
 import {
   getCurrentUser,
   updatePasswordRequest,
@@ -31,7 +30,7 @@ export default function Profile() {
   const router = useRouter();
   const { t } = useTranslation();
 
-  const { colors } = useTheme();
+  const { theme, colors } = useTheme();
   const styles = createProfileStyles(colors);
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -162,7 +161,9 @@ export default function Profile() {
                   source={
                     user.profileImageUrl
                       ? { uri: user.profileImageUrl }
-                      : profilePic
+                      : theme === "light"
+                        ? require("../assets/images/black_logo.png")
+                        : require("../assets/images/white_logo_circle.png")
                   }
                   style={styles.profileImage}
                 />

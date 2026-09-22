@@ -21,8 +21,8 @@ import { registerRequest } from "../services/usersApi";
 
 export default function Register() {
   const { t } = useTranslation();
-    const { colors } = useTheme();
-    const styles = createGlobalStyles(colors);
+  const { theme, colors } = useTheme();
+  const styles = createGlobalStyles(colors);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -81,7 +81,11 @@ export default function Register() {
       keyboardShouldPersistTaps="handled"
     >
       <Image
-        source={require("./assets/images/white_logo.png")}
+        source={
+          theme === "light"
+            ? require("./assets/images/black_logo.png")
+            : require("./assets/images/white_logo_circle.png")
+        }
         style={styles.logo}
         resizeMode="contain"
       />

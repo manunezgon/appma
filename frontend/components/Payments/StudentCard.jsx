@@ -5,7 +5,7 @@ import { createPaymentStyles } from "../../Styles/PaymentStyle";
 import { useTheme } from "../../context/ThemeContext";
 
 const StudentCardComponent = ({ student, onPress }) => {
-  const { colors } = useTheme();
+  const { theme, colors } = useTheme();
   const style = createPaymentStyles(colors);
 
   return (
@@ -15,7 +15,9 @@ const StudentCardComponent = ({ student, onPress }) => {
           source={
             student.profileImageUrl
               ? { uri: student.profileImageUrl }
-              : require("../../app/assets/images/white_logo_circle.png")
+              : theme === "light"
+                ? require("../../app/assets/images/black_logo.png")
+                : require("../../app/assets/images/white_logo_circle.png")
           }
           style={style.avatar}
         />
