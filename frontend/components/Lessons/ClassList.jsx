@@ -9,8 +9,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import styles from "../../Styles/LessonStyles.jsx";
-import { colors } from "../../Styles/theme";
+import { createLessonStyles } from "../../Styles/LessonStyles.jsx";
+import { useTheme } from "../../context/ThemeContext";
 import ClassItem from "./ClassItem";
 
 export default function ClassList({
@@ -23,6 +23,10 @@ export default function ClassList({
   onTakeAttendance,
 }) {
   const { t } = useTranslation();
+
+  const { colors } = useTheme();
+  const styles = createLessonStyles(colors);
+
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [selectedClass, setSelectedClass] = useState(null);
 

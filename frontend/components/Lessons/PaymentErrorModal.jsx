@@ -3,7 +3,8 @@ import { Text, View } from "react-native";
 import { useTranslation } from "../../hooks/useTranslation";
 import Modal from "react-native-modal";
 
-import styles from "../../Styles/LessonStyles.jsx";
+import { createLessonStyles } from "../../Styles/LessonStyles.jsx";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function PaymentErrorModal({
   visible,
@@ -11,6 +12,8 @@ export default function PaymentErrorModal({
   onClose,
 }) {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = createLessonStyles(colors);
 
   return (
     <Modal isVisible={visible} onBackdropPress={onClose}>

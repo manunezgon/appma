@@ -20,13 +20,16 @@ import { useEnrollments } from "../../context/EnrollmentsContext";
 import { useLessons } from "../../context/LessonsContext";
 import { useUser } from "../../context/UserContext.jsx";
 
-import styles from "../../Styles/LessonStyles.jsx";
-import { colors } from "../../Styles/theme";
+import { createLessonStyles } from "../../Styles/LessonStyles.jsx";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function HomeScreen() {
   const [selectedDay, setSelectedDay] = useState(new Date());
 
   const { user } = useUser();
+
+  const { colors } = useTheme();
+  const styles = createLessonStyles(colors);
 
   const { lessons } = useLessons();
 

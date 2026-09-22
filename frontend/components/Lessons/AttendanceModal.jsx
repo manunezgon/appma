@@ -8,8 +8,8 @@ import {
 } from "react-native";
 import Modal from "react-native-modal";
 import { useTranslation } from "../../hooks/useTranslation";
-import styles from "../../Styles/LessonStyles.jsx";
-import { colors } from "../../Styles/theme";
+import { createLessonStyles } from "../../Styles/LessonStyles.jsx";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function AttendanceModal({
   visible,
@@ -23,6 +23,8 @@ export default function AttendanceModal({
   onSave,
 }) {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = createLessonStyles(colors);
 
   return (
     <Modal isVisible={visible} onBackdropPress={onClose}>

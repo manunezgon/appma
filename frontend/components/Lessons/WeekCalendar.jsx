@@ -7,12 +7,16 @@ import {
   View,
 } from "react-native";
 import { useTranslation } from "../../hooks/useTranslation";
-import styles from "../../Styles/LessonStyles.jsx";
+import { createLessonStyles } from "../../Styles/LessonStyles.jsx";
+import { useTheme } from "../../context/ThemeContext";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 export default function WeekCalendar({ selectedDay, setSelectedDay }) {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = createLessonStyles(colors);
+
   const daysShort = ["M", "T", "W", "T", "F", "S", "S"];
   const flatListRef = useRef(null);
 

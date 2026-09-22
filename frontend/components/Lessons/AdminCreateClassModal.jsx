@@ -3,8 +3,8 @@ import { Text, TextInput, TouchableOpacity, View, TouchableWithoutFeedback, Keyb
 import { Ionicons } from "@expo/vector-icons";
 import Modal from "react-native-modal";
 import { useTranslation } from "../../hooks/useTranslation";
-import styles from "../../Styles/LessonStyles.jsx";
-import { colors } from "../../Styles/theme";
+import { createLessonStyles } from "../../Styles/LessonStyles.jsx";
+import { useTheme } from "../../context/ThemeContext";
 
 
 export default function AdminCreateClassModal({
@@ -30,6 +30,9 @@ export default function AdminCreateClassModal({
   onCreateNew,
 }) {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = createLessonStyles(colors);
+  
   return (
     <Modal isVisible={visible} onBackdropPress={onClose}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>

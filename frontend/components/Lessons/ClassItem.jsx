@@ -1,8 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import { memo, useCallback } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
-import styles from "../../Styles/LessonStyles.jsx";
-import { colors } from "../../Styles/theme";
+import { createLessonStyles } from "../../Styles/LessonStyles.jsx";
+import { useTheme } from "../../context/ThemeContext";
 import defaultProfileImg from "../../app/assets/images/white_logo_circle.png";
 
 const ClassItem = ({
@@ -12,6 +12,9 @@ const ClassItem = ({
   onDeleteClass,
   onTakeAttendance,
 }) => {
+  const { colors } = useTheme();
+  const styles = createLessonStyles(colors);
+  
   const handleEnroll = useCallback(() => {
     onEnroll(item.id, item.isException);
   }, [item.id, item.isException, onEnroll]);
