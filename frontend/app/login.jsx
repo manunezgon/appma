@@ -16,12 +16,14 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useUser } from "../context/UserContext";
 import { useTranslation } from "../hooks/useTranslation";
-import styles from "../Styles/GlobalStyles";
-import { colors } from "../Styles/theme";
+import { createGlobalStyles } from "../Styles/GlobalStyles";
+import { useTheme } from "../context/ThemeContext";
 import { loginRequest } from "../services/usersApi";
 
 export default function Login() {
   const { t } = useTranslation();
+    const { colors } = useTheme();
+    const styles = createGlobalStyles(colors);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loggingIn, setLoggingIn] = useState(false);
