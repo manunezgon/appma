@@ -3,6 +3,7 @@ package com.backend.service;
 import com.backend.dto.UserRegisterDTO;
 import com.backend.exception.EmailAlreadyRegisteredException;
 import com.backend.exception.EmailNotRegisteredException;
+import com.backend.exception.InvalidCredentialsException;
 import com.backend.exception.UserNotFoundException;
 import com.backend.model.User;
 import com.backend.repository.UserRepository;
@@ -114,10 +115,10 @@ public class UserService {
 
     public User login(String email, String password) {
         User user = userRepository.findByEmail(normalizeEmail(email))
-                .orElseThrow(() -> new EmailNotRegisteredException(email));
+                .orElseThrow(InvalidCredentialsException::new);
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new IllegalArgumentException("Incorrect password");
+            throw new InvalidCredentialsException();
         }
 
         return user;

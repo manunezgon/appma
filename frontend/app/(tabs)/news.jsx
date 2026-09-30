@@ -1,4 +1,4 @@
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect } from "expo-router";
 import { useCallback, useRef, useState } from "react";
 import { Image, RefreshControl, ScrollView, Text, View } from "react-native";
 import AdminInput from "../../components/news/AdminInput";
@@ -7,12 +7,21 @@ import CarouselEditorModal from "../../components/news/CarouselEditorModal";
 import Carousel from "../../components/news/Carrousel";
 import { useUser } from "../../context/UserContext";
 import { useNewsData } from "../../hooks/useNewsData";
-import style from "../../Styles/NewsStyles";
+import { useTranslation } from "../../hooks/useTranslation";
+import { createNewsStyles } from "../../Styles/NewsStyles";
+import { useTheme } from "../../context/ThemeContext";
+import { useEnrollments } from "../../context/EnrollmentsContext";
+import NextClassCard from "../../components/news/NextClassCard";
 
 export default function News() {
+  const { t } = useTranslation();
+  const { theme, colors } = useTheme();
+  const style = createNewsStyles(colors);
+
   const { user } = useUser();
   const [showCarouselEditor, setShowCarouselEditor] = useState(false);
   const [newMessage, setNewMessage] = useState("");
+  const { enrollments } = useEnrollments();
 
   const {
     announcements,
@@ -57,9 +66,15 @@ export default function News() {
     >
       <View style={style.header}>
         <Image
-          source={require("../assets/images/white_logo.png")}
+          source={
+            theme === "light"
+              ? require("../assets/images/black_logo_circle.png")
+              : require("../assets/images/white_logo_circle.png")
+          }
           style={style.logo}
         />
+        <Text style={style.headerTitle}>LA FORJA</Text>
+        <Text style={style.headerSubtitle}>MARTIAL ARTS</Text>
       </View>
 
       <Carousel
@@ -69,16 +84,23 @@ export default function News() {
         onEdit={() => setShowCarouselEditor(true)}
       />
 
-      <CarouselEditorModal
-        visible={showCarouselEditor}
-        onClose={() => setShowCarouselEditor(false)}
-        images={carouselImages}
-        onAdd={addImage}
-        onDelete={(idx) => deleteImage(carouselImages[idx].id)}
-        onReorder={reorderImages}
-      />
+      {showCarouselEditor && (
+        <CarouselEditorModal
+          key={carouselImages
+            .map((image) => `${image.id}:${image.imageUrl}`)
+            .join("-")}
+          visible
+          onClose={() => setShowCarouselEditor(false)}
+          images={carouselImages}
+          onAdd={addImage}
+          onDelete={(idx) => deleteImage(carouselImages[idx].id)}
+          onReorder={reorderImages}
+        />
+      )}
 
-      <Text style={style.subtitle}>News</Text>
+      {user?.role === "MEMBER" && <NextClassCard enrollments={enrollments} />}
+
+      <Text style={style.subtitle}>{t("news.title")}</Text>
 
       {user?.role === "ADMIN" && (
         <AdminInput
@@ -90,7 +112,7 @@ export default function News() {
 
       {announcements.length === 0 ? (
         <View style={style.newsContainer}>
-          <Text style={style.text}>No hay noticias por ahora</Text>
+          <Text style={style.text}>{t("news.noNews")}</Text>
         </View>
       ) : (
         announcements.map((item) => (

@@ -2,26 +2,31 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { FlatList, Text, TextInput, View } from "react-native";
 import { useLessons } from "../../context/LessonsContext";
 import { usePayments } from "../../context/PaymentsContext";
+import { useTranslation } from "../../hooks/useTranslation";
 import { useUser } from "../../context/UserContext";
 import { getUsers } from "../../services/usersApi";
 
 import { PaymentModal } from "../../components/Payments/PaymentModal";
-import { StudentPaymentsModal } from "../../components/Payments/StudentPaymentsModal";
 import { StudentCard } from "../../components/Payments/StudentCard";
-import style from "../../Styles/PaymentStyle";
-import { colors } from "../../Styles/theme";
+import { createPaymentStyles } from "../../Styles/PaymentStyle";
+import { useTheme } from "../../context/ThemeContext";
 
-const generateMonths = () => {
+const generateMonths = (t) => {
   const months = [];
   const now = new Date();
 
   for (let i = 0; i <= 12; i++) {
     const date = new Date(now.getFullYear(), now.getMonth() + i, 1);
-    const value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-    const label = date.toLocaleString("en-US", {
-      month: "long",
-      year: "numeric",
-    });
+
+    const value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+      2,
+      "0",
+    )}`;
+
+    const label = `${t(
+      `paymentHistory.months.${date.getMonth()}`,
+    )} ${date.getFullYear()}`;
+
     months.push({
       label,
       value,
@@ -34,6 +39,12 @@ const generateMonths = () => {
 export default function Payments() {
   const { token } = useUser();
   const { lessons } = useLessons();
+
+  const { colors } = useTheme();
+  const style = createPaymentStyles(colors);
+
+  const { t } = useTranslation();
+
   const {
     payments,
     loadingPayments,
@@ -49,17 +60,19 @@ export default function Payments() {
 
   const [selectedStudent, setSelectedStudent] = useState(null);
 
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [modalMode, setModalMode] = useState(null);
+
   const [selectedLessonId, setSelectedLessonId] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState("");
 
-  const [months] = useState(generateMonths());
+  const months = useMemo(() => generateMonths(t), [t]);
 
   const fetchStudents = useCallback(async () => {
     if (!token) return;
 
     try {
       setLoadingStudents(true);
+
       const data = await getUsers(token);
 
       const studentsOnly = data
@@ -81,7 +94,7 @@ export default function Payments() {
   }, [token]);
 
   useEffect(() => {
-    fetchStudents();
+    void Promise.resolve().then(fetchStudents);
   }, [fetchStudents]);
 
   const filteredStudents = useMemo(() => {
@@ -101,6 +114,7 @@ export default function Payments() {
     (student) => {
       setSelectedStudent(student);
       fetchPaymentsByUser(student.id);
+      setModalMode("student");
     },
     [fetchPaymentsByUser],
   );
@@ -108,10 +122,30 @@ export default function Payments() {
   const handleDeletePayment = useCallback(
     (paymentId) => {
       if (!selectedStudent) return;
+
       deletePayment(paymentId, selectedStudent.id);
     },
     [deletePayment, selectedStudent],
   );
+
+  const handleOpenRegisterPayment = useCallback(() => {
+    setSelectedLessonId(null);
+    setSelectedMonth("");
+    setModalMode("register");
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    setModalMode(null);
+    setSelectedStudent(null);
+    setSelectedLessonId(null);
+    setSelectedMonth("");
+  }, []);
+
+  const handleBackToStudent = useCallback(() => {
+    setSelectedLessonId(null);
+    setSelectedMonth("");
+    setModalMode("student");
+  }, []);
 
   const handleConfirmPayment = useCallback(
     async (data) => {
@@ -122,7 +156,8 @@ export default function Payments() {
         ...data,
       });
 
-      setShowPaymentModal(false);
+      setModalMode(null);
+      setSelectedStudent(null);
       setSelectedMonth("");
       setSelectedLessonId(null);
     },
@@ -136,11 +171,11 @@ export default function Payments() {
 
   return (
     <View style={style.container}>
-      <Text style={style.title}>Students</Text>
+      <Text style={style.title}>{t("payments.students")}</Text>
 
       <View style={style.searchBox}>
         <TextInput
-          placeholder="Search students..."
+          placeholder={t("payments.searchStudents")}
           placeholderTextColor={colors.textSubtle}
           style={style.searchInput}
           value={search}
@@ -149,30 +184,28 @@ export default function Payments() {
       </View>
 
       {loadingStudents ? (
-        <Text style={style.loadingText}>Loading students...</Text>
+        <Text style={style.loadingText}>{t("payments.loadingStudents")}</Text>
       ) : (
         <FlatList
           data={filteredStudents}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderStudent}
-          ListEmptyComponent={<Text style={style.empty}>No students</Text>}
+          ListEmptyComponent={
+            <Text style={style.empty}>{t("payments.noStudents")}</Text>
+          }
         />
       )}
 
-      <StudentPaymentsModal
+      <PaymentModal
+        key={modalMode ?? "closed"}
+        visible={modalMode !== null}
+        mode={modalMode}
         student={selectedStudent}
         payments={payments}
         onDelete={handleDeletePayment}
-        onRegister={() => setShowPaymentModal(true)}
-        onClose={() => {
-          setSelectedStudent(null);
-        }}
+        onRegister={handleOpenRegisterPayment}
+        onBack={handleBackToStudent}
         loadingPayments={loadingPayments}
-      />
-
-      <PaymentModal
-        visible={showPaymentModal}
-        student={selectedStudent}
         lessons={lessons}
         months={months}
         paidMonths={paidMonths}
@@ -182,7 +215,7 @@ export default function Payments() {
         setSelectedMonth={setSelectedMonth}
         onConfirm={handleConfirmPayment}
         registering={registeringPayment}
-        onClose={() => setShowPaymentModal(false)}
+        onClose={handleCloseModal}
       />
     </View>
   );

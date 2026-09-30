@@ -1,9 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import { memo, useCallback } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
-import styles from "../../Styles/LessonStyles.jsx";
-import { colors } from "../../Styles/theme";
-import defaultProfileImg from "../../app/assets/images/white_logo_circle.png";
+import { createLessonStyles } from "../../Styles/LessonStyles.jsx";
+import { useTheme } from "../../context/ThemeContext";
 
 const ClassItem = ({
   item,
@@ -12,6 +11,9 @@ const ClassItem = ({
   onDeleteClass,
   onTakeAttendance,
 }) => {
+  const { theme, colors } = useTheme();
+  const styles = createLessonStyles(colors);
+  
   const handleEnroll = useCallback(() => {
     onEnroll(item.id, item.isException);
   }, [item.id, item.isException, onEnroll]);
@@ -94,7 +96,9 @@ const ClassItem = ({
               source={
                 s.profileImageUrl
                   ? { uri: s.profileImageUrl }
-                  : defaultProfileImg
+                  : theme === "light"
+                    ? require("../../app/assets/images/black_logo_circle.png")
+                    : require("../../app/assets/images/white_logo_circle.png")
               }
               style={styles.studentAvatar}
             />

@@ -1,10 +1,15 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { useUser } from "../../context/UserContext";
-import { colors } from "../../Styles/theme";
+import { useTranslation } from "../../hooks/useTranslation";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function TabLayout() {
+  const { t } = useTranslation();
+
   const { user, loading } = useUser();
+
+  const { colors } = useTheme();
 
   if (loading) return null;
 
@@ -15,8 +20,8 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: colors.black,
-          borderTopColor: colors.surface,
+          backgroundColor: colors.surface,
+          borderTopColor: colors.border,
           borderTopWidth: 1,
         },
         tabBarActiveTintColor: colors.text,
@@ -26,7 +31,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="news"
         options={{
-          title: "Noticias",
+          title: t("tabs.news"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="newspaper" size={size} color={color} />
           ),
@@ -35,7 +40,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          title: t("tabs.calendar"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="calendar" size={size} color={color} />
           ),
@@ -44,7 +49,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="sessions"
         options={{
-          title: "Clases",
+          title: t("tabs.sessions"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="list" size={size} color={color} />
           ),
@@ -53,7 +58,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="ranking"
         options={{
-          title: "Ranking",
+          title: t("tabs.ranking"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="podium" size={size} color={color} />
           ),
@@ -62,7 +67,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="payments"
         options={{
-          title: "Pagos",
+          title: t("tabs.payments"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="card" size={size} color={color} />
           ),
@@ -72,7 +77,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: "Perfil",
+          title: t("tabs.profile"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person" size={size} color={color} />
           ),

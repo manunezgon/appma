@@ -1,14 +1,17 @@
 import { Ionicons } from "@expo/vector-icons";
 import {
   ActivityIndicator,
+  Modal,
+  Pressable,
   ScrollView,
+  StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import Modal from "react-native-modal";
-import styles from "../../Styles/LessonStyles.jsx";
-import { colors } from "../../Styles/theme";
+import { useTranslation } from "../../hooks/useTranslation";
+import { createLessonStyles } from "../../Styles/LessonStyles.jsx";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function AttendanceModal({
   visible,
@@ -21,25 +24,35 @@ export default function AttendanceModal({
   onToggle,
   onSave,
 }) {
-  return (
-    <Modal isVisible={visible} onBackdropPress={onClose}>
-      <View style={styles.modalContainer}>
-        {/* HEADER */}
-        <View style={styles.modalHeader}>
-          <Text style={styles.title}>{selectedClass?.lessonName}</Text>
-          <Ionicons
-            name="close"
-            size={26}
-            color={colors.text}
-            onPress={onClose}
-          />
-        </View>
+  const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = createLessonStyles(colors);
 
-        {/* CONTENT */}
-        {loading ? (
-          <ActivityIndicator size="large" color={colors.primary} />
-        ) : (
-          <ScrollView style={styles.list}>
+  return (
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      presentationStyle="overFullScreen"
+      onRequestClose={onClose}
+    >
+      <View style={styles.modalOverlay}>
+        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.title}>{selectedClass?.lessonName}</Text>
+            <Ionicons
+              name="close"
+              size={26}
+              color={colors.text}
+              onPress={onClose}
+            />
+          </View>
+
+          {loading ? (
+            <ActivityIndicator size="large" color={colors.primary} />
+          ) : (
+            <ScrollView style={styles.list}>
             {(students ?? []).map((student) => (
               <TouchableOpacity
                 key={student.id}
@@ -57,21 +70,21 @@ export default function AttendanceModal({
             ))}
 
             {(students ?? []).length === 0 && (
-              <Text style={styles.empty}>No students enrolled</Text>
+              <Text style={styles.empty}>{t("attendance.noStudents")}</Text>
             )}
-          </ScrollView>
-        )}
+            </ScrollView>
+          )}
 
-        {/* FOOTER */}
-        <TouchableOpacity
-          style={styles.saveBtn}
-          onPress={onSave}
-          disabled={saving}
-        >
-          <Text style={styles.saveText}>
-            {saving ? "Saving..." : "Save attendance"}
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.saveBtn}
+            onPress={onSave}
+            disabled={saving}
+          >
+            <Text style={styles.saveText}>
+              {saving ? t("attendance.saving") : t("attendance.save")}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </Modal>
   );

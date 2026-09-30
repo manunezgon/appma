@@ -1,5 +1,7 @@
 import { Text, TouchableOpacity, View } from "react-native";
-import style from "../../Styles/ScheduleStyles.jsx";
+import { useTranslation } from "../../hooks/useTranslation";
+import { createScheduleStyles } from "../../Styles/ScheduleStyles.jsx";
+import { useTheme } from "../../context/ThemeContext";
 import SelectableList from "./SelectableList.jsx";
 
 export default function Step2Select({
@@ -22,6 +24,10 @@ export default function Step2Select({
   setNewProfessorName,
   setNewAmountMonthly,
 }) {
+  const { t } = useTranslation();
+  const { colors } = useTheme();
+  const style = createScheduleStyles(colors);
+
   const weekOrder = [
     "MONDAY",
     "TUESDAY",
@@ -35,7 +41,9 @@ export default function Step2Select({
   if (mode === "create") {
     return (
       <>
-        <Text style={style.subtitle}>Which type of lesson do you want?</Text>
+        <Text style={style.subtitle}>
+          {t("scheduleManagement.whichLessonType")}
+        </Text>
 
         <TouchableOpacity
           style={style.button}
@@ -44,7 +52,9 @@ export default function Step2Select({
             setStep(3);
           }}
         >
-          <Text style={style.buttonText}>Create New Lesson</Text>
+          <Text style={style.buttonText}>
+            {t("scheduleManagement.createNewLesson")}
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -54,15 +64,17 @@ export default function Step2Select({
             setStep(3);
           }}
         >
-          <Text style={style.buttonText}>Use Existing Lesson</Text>
+          <Text style={style.buttonText}>
+            {t("scheduleManagement.useExistingLesson")}
+          </Text>
         </TouchableOpacity>
       </>
     );
   }
 
   if (mode === "editSchedule") {
-    if (loadingSchedules) return <Text>Loading schedules...</Text>;
-    if (!schedules.length) return <Text>No schedules available</Text>;
+    if (loadingSchedules) return <Text>{t("scheduleManagement.loadingSchedules")}</Text>;
+    if (!schedules.length) return <Text>{t("scheduleManagement.noSchedules")}</Text>;
 
     const schedulesByDay = schedules.reduce((acc, s) => {
       acc[s.dayOfWeek] = acc[s.dayOfWeek] || [];
@@ -85,7 +97,9 @@ export default function Step2Select({
           )
           .map(([day, daySchedules]) => (
             <View key={day}>
-              <Text style={style.subtitle}>{day}</Text>
+              <Text style={style.subtitle}>
+                {t(`scheduleManagement.days.${day}`)}
+              </Text>
               <SelectableList
                 items={daySchedules}
                 selectedId={selectedScheduleId}
@@ -127,10 +141,12 @@ export default function Step2Select({
   if (mode === "editLesson") {
     return (
       <>
-        <Text style={style.subtitle}>Select a lesson to edit</Text>
+        <Text style={style.subtitle}>
+          {t("scheduleManagement.selectLessonToEdit")}
+        </Text>
 
         {loadingLessons ? (
-          <Text>Loading lessons...</Text>
+          <Text>{t("scheduleManagement.loadingLessons")}</Text>
         ) : (
           <SelectableList
             items={lessons}

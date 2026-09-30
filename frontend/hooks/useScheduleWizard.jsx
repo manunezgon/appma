@@ -2,15 +2,24 @@ import { useState } from "react";
 import { Alert } from "react-native";
 import { useLessons } from "../context/LessonsContext";
 import { useSchedules } from "../context/SchedulesContext";
+import { useTranslation } from "../hooks/useTranslation";
 
 export function useScheduleWizard(onClose) {
-  const { lessons, loadingLessons, createLesson, updateLesson, deleteLesson } = useLessons();
-  const { schedules, loadingSchedules, createSchedule, updateSchedule, deleteSchedule } = useSchedules();
+  const { t } = useTranslation();
 
+  const { lessons, loadingLessons, createLesson, updateLesson, deleteLesson } =
+    useLessons();
+  const {
+    schedules,
+    loadingSchedules,
+    createSchedule,
+    updateSchedule,
+    deleteSchedule,
+  } = useSchedules();
 
   const [step, setStep] = useState(1);
-  const [mode, setMode] = useState(null); 
-  const [lessonMode, setLessonMode] = useState(null); 
+  const [mode, setMode] = useState(null);
+  const [lessonMode, setLessonMode] = useState(null);
 
   const [selectedLessonId, setSelectedLessonId] = useState(null);
   const [selectedScheduleId, setSelectedScheduleId] = useState(null);
@@ -41,11 +50,12 @@ export function useScheduleWizard(onClose) {
     onClose();
   };
 
-  const showError = (message) => Alert.alert(message || "An error occurred");
+  const showError = (message) =>
+    Alert.alert(message || t("scheduleManagement.error"));
 
   const handleSaveSchedule = async () => {
     if (!selectedDay || !startTime || !endTime) {
-      Alert.alert("Please complete day, start time, and end time");
+      Alert.alert(t("scheduleManagement.completeDayTime"));
       return;
     }
 
@@ -54,13 +64,13 @@ export function useScheduleWizard(onClose) {
 
       if (lessonMode === "new") {
         if (!newLessonName || !newProfessorName || !newAmountMonthly) {
-          Alert.alert("Please complete all lesson fields");
+          Alert.alert(t("scheduleManagement.completeLessonFields"));
           return;
         }
 
         const amount = parseFloat(newAmountMonthly);
         if (isNaN(amount)) {
-          Alert.alert("Monthly amount must be a valid number");
+          Alert.alert(t("scheduleManagement.invalidAmount"));
           return;
         }
 
@@ -74,11 +84,21 @@ export function useScheduleWizard(onClose) {
       }
 
       if (mode === "editSchedule") {
-        await updateSchedule(selectedScheduleId, { lessonId, dayOfWeek: selectedDay, startTime, endTime });
-        Alert.alert("Schedule updated successfully");
+        await updateSchedule(selectedScheduleId, {
+          lessonId,
+          dayOfWeek: selectedDay,
+          startTime,
+          endTime,
+        });
+        Alert.alert(t("scheduleManagement.scheduleUpdated"));
       } else {
-        await createSchedule({ lessonId, dayOfWeek: selectedDay, startTime, endTime });
-        Alert.alert("Schedule created successfully");
+        await createSchedule({
+          lessonId,
+          dayOfWeek: selectedDay,
+          startTime,
+          endTime,
+        });
+        Alert.alert(t("scheduleManagement.scheduleCreated"));
       }
 
       handleClose();
@@ -88,33 +108,37 @@ export function useScheduleWizard(onClose) {
   };
 
   const handleDeleteSchedule = () => {
-    Alert.alert("Delete schedule", "Are you sure?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await deleteSchedule(selectedScheduleId);
-            Alert.alert("Schedule deleted successfully");
-            handleClose();
-          } catch (error) {
-            showError(error.message);
-          }
+    Alert.alert(
+      t("scheduleManagement.deleteSchedule"),
+      t("scheduleManagement.confirmDeleteSchedule"),
+      [
+        { text: t("scheduleManagement.cancel"), style: "cancel" },
+        {
+          text: t("scheduleManagement.delete"),
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteSchedule(selectedScheduleId);
+              Alert.alert(t("scheduleManagement.scheduleDeleted"));
+              handleClose();
+            } catch (error) {
+              showError(error.message);
+            }
+          },
         },
-      },
-    ]);
+      ],
+    );
   };
 
   const handleUpdateLesson = async () => {
     if (!newLessonName || !newProfessorName || !newAmountMonthly) {
-      Alert.alert("Please complete all fields");
+      Alert.alert(t("scheduleManagement.completeAllFields"));
       return;
     }
 
     const amount = parseFloat(newAmountMonthly);
     if (isNaN(amount)) {
-      Alert.alert("Monthly amount must be a valid number");
+      Alert.alert(t("scheduleManagement.invalidAmount"));
       return;
     }
 
@@ -125,7 +149,7 @@ export function useScheduleWizard(onClose) {
         amountMonthly: amount,
       });
 
-      Alert.alert("Lesson updated successfully");
+      Alert.alert(t("scheduleManagement.lessonUpdated"));
       handleClose();
     } catch (error) {
       showError(error.message);
@@ -134,17 +158,17 @@ export function useScheduleWizard(onClose) {
 
   const handleDeleteLesson = () => {
     Alert.alert(
-      "Delete lesson",
-      "All associated schedules will also be deleted. Are you sure?",
+      t("scheduleManagement.deleteLesson"),
+      t("scheduleManagement.confirmDeleteLesson"),
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t("scheduleManagement.cancel"), style: "cancel" },
         {
-          text: "Delete",
+          text: t("scheduleManagement.delete"),
           style: "destructive",
           onPress: async () => {
             try {
               await deleteLesson(selectedLessonId);
-              Alert.alert("Lesson deleted successfully");
+              Alert.alert(t("scheduleManagement.lessonDeleted"));
               handleClose();
             } catch (error) {
               showError(error.message);
@@ -159,7 +183,11 @@ export function useScheduleWizard(onClose) {
 
   const selectedLessonObj =
     lessonMode === "new"
-      ? { lessonName: newLessonName, professorName: newProfessorName, amountMonthly: parseFloat(newAmountMonthly) }
+      ? {
+          lessonName: newLessonName,
+          professorName: newProfessorName,
+          amountMonthly: parseFloat(newAmountMonthly),
+        }
       : lessons.find((l) => l.id === selectedLessonId);
 
   return {

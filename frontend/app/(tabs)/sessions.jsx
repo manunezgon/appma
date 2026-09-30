@@ -11,11 +11,15 @@ import {
 import ScheduleWizardModal from "../../components/ScheduleWizard/ScheduleWizardModal.jsx";
 import { useEnrollments } from "../../context/EnrollmentsContext";
 import { useUser } from "../../context/UserContext";
-import styles from "../../Styles/SessionStyle.jsx";
-import { colors } from "../../Styles/theme";
+import { useTranslation } from "../../hooks/useTranslation";
+import { createSessionStyles } from "../../Styles/SessionStyle.jsx";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function Sessions() {
+  const { t } = useTranslation();
   const { user } = useUser();
+ const { colors } = useTheme();
+ const styles = createSessionStyles(colors);
   const { enrollments, deleteEnrollment, fetchMyEnrollments } =
     useEnrollments();
 
@@ -56,12 +60,21 @@ export default function Sessions() {
 
     const sectionsData = [];
     if (todayClasses.length)
-      sectionsData.push({ title: "Today", data: todayClasses });
+      sectionsData.push({
+        key: "today",
+        title: t("sessions.today"),
+        data: todayClasses,
+      });
+
     if (nextClasses.length)
-      sectionsData.push({ title: "Upcoming classes", data: nextClasses });
+      sectionsData.push({
+        key: "upcoming",
+        title: t("sessions.upcomingClasses"),
+        data: nextClasses,
+      });
 
     return sectionsData;
-  }, [user, enrollments]);
+  }, [user, enrollments, t]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -87,7 +100,7 @@ export default function Sessions() {
   };
 
   const renderItem = ({ item, section }) => {
-    const isUpcoming = section.title === "Upcoming classes";
+    const isUpcoming = section.key === "upcoming";
 
     return (
       <View style={[styles.classCard, isUpcoming && styles.upcomingCard]}>
@@ -132,7 +145,7 @@ export default function Sessions() {
     </View>
   );
 
-  if (!user) return <Text style={styles.loading}>Loading...</Text>;
+  if (!user) return <Text style={styles.loading}>{t("sessions.loading")}</Text>;
 
   return (
     <View style={styles.container}>
@@ -144,9 +157,7 @@ export default function Sessions() {
             renderItem={renderItem}
             renderSectionHeader={renderSectionHeader}
             ListEmptyComponent={
-              <Text style={styles.noClasses}>
-                No classes today or upcoming.
-              </Text>
+              <Text style={styles.noClasses}>{t("sessions.noClasses")}</Text>
             }
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -157,7 +168,7 @@ export default function Sessions() {
             <View style={styles.modalOverlay}>
               <View style={styles.modalContent}>
                 <Text style={styles.modalText}>
-                  Are you sure you want to unenroll from this class?
+                  {t("sessions.confirmUnenroll")}
                 </Text>
                 <View style={styles.modalButtons}>
                   <TouchableOpacity

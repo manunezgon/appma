@@ -1,182 +1,332 @@
 import { StyleSheet } from "react-native";
-import { colors, layout, radii, spacing, typography } from "./theme";
+import {
+  colors,
+  createLayout,
+  createTypography,
+  radii,
+  spacing,
+} from "./theme";
 
-const styles = StyleSheet.create({
-  container: {
-    ...layout.screen,
-    paddingTop: spacing.xl,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+export const createProfileStyles = (colors) => {
+  const layout = createLayout(colors);
+  const typography = createTypography(colors);
 
-  title: {
-    fontSize: 18,
-    color: colors.textMuted,
-  },
+  return StyleSheet.create({
+    container: {
+      ...layout.screen,
+      paddingTop: spacing.xl,
+      alignItems: "center",
+      justifyContent: "center",
+    },
 
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: spacing.xxl,
-    gap: spacing.md,
-  },
+    title: {
+      fontSize: 18,
+      color: colors.textMuted,
+    },
 
-  profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    borderWidth: 2,
-    borderColor: colors.primary,
-  },
+    profileHeaderBox: {
+      width: "80%",
+      borderRadius: radii.md,
+      backgroundColor: colors.surfaceAlt,
+      padding: spacing.lg,
+      marginBottom: spacing.xxl,
+    },
 
-  profileImageBadge: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    backgroundColor: colors.primary,
-    borderRadius: radii.lg,
-    padding: spacing.xs,
-  },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: spacing.md,
+    },
 
-  headerText: {
-    marginLeft: 10,
-  },
+    profileImage: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      borderWidth: 3,
+      borderColor: colors.primary,
+    },
 
-  name: {
-    ...typography.screenTitle,
-    textTransform: "uppercase",
-  },
+    profileImageBadge: {
+      position: "absolute",
+      bottom: 0,
+      right: 0,
+      backgroundColor: colors.primary,
+      borderRadius: radii.lg,
+      padding: spacing.xs,
+    },
 
-  infoBox: {
-    width: "80%",
-    borderRadius: radii.md,
-    backgroundColor: colors.surfaceAlt,
-    padding: spacing.lg,
-    marginBottom: spacing.xxl,
-  },
+    headerText: {
+      marginLeft: 10,
+    },
 
-  infoRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: spacing.sm,
-  },
+    name: {
+      ...typography.screenTitle,
+      textTransform: "uppercase",
+    },
 
-  label: {
-    fontSize: 15,
-    color: colors.textSubtle,
-  },
+    infoBox: {
+      width: "80%",
+      borderRadius: radii.md,
+      backgroundColor: colors.surfaceAlt,
+      padding: spacing.lg,
+      marginBottom: spacing.xxl,
+    },
 
-  value: {
-    fontSize: 15,
-    color: colors.textMuted,
-  },
+    infoRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      paddingVertical: spacing.sm,
+    },
 
-  buttonContainer: {
-    flexDirection: "row",
-    gap: spacing.xl,
-    width: "80%",
-    marginBottom: 50,
-  },
+    label: {
+      fontSize: 15,
+      color: colors.textSubtle,
+    },
 
-  button: {
-    flex: 1,
-    padding: spacing.md,
-    borderRadius: radii.md,
-    backgroundColor: colors.primary,
-  },
+    value: {
+      fontSize: 15,
+      color: colors.textMuted,
+    },
 
-  buttonText: {
-    textAlign: "center",
-    color: colors.textMuted,
-    paddingVertical: spacing.xs,
-  },
+    buttonContainer: {
+      width: "80%",
+      marginBottom: 50,
+    },
 
-  saveButton: {
-    backgroundColor: colors.primary,
-  },
+    profileButtonRow: {
+      flexDirection: "row",
+      gap: spacing.xl,
+      width: "100%",
+      marginBottom: spacing.md,
+    },
 
-  cancelButton: {
-    backgroundColor: colors.surfaceMuted,
-  },
+    profileLogoutButton: {
+      padding: spacing.md,
+      borderRadius: radii.md,
+    },
 
-  logoutButton: {
-    backgroundColor: colors.surfaceMuted,
-  },
+    button: {
+      flex: 1,
+      padding: spacing.md,
+      borderRadius: radii.md,
+      backgroundColor: colors.primary,
+    },
 
-  modalOverlay: {
-    ...layout.modalOverlay,
-  },
+    buttonText: {
+      textAlign: "center",
+      color: colors.textMuted,
+      paddingVertical: spacing.xs,
+    },
 
-  modalContent: {
-    width: "90%",
-    maxHeight: "85%",
-    backgroundColor: colors.surface,
-    borderRadius: radii.md,
-    padding: spacing.xl,
-  },
+    primaryButtonText: {
+      textAlign: "center",
+      color: colors.grey,
+      paddingVertical: spacing.xs,
+      
+    },
 
-  tabsContainer: {
-    flexDirection: "row",
-    marginBottom: spacing.xl,
-    backgroundColor: colors.surfaceAlt,
-    borderRadius: radii.sm,
-    overflow: "hidden",
-  },
+    saveButton: {
+      backgroundColor: colors.primary,
+    },
 
-  tabButton: {
-    flex: 1,
-    paddingVertical: spacing.md,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+    cancelButton: {
+      backgroundColor: colors.surfaceMuted,
+    },
 
-  tabActive: {
-    backgroundColor: colors.primary,
-    borderRadius: radii.sm,
-  },
+    logoutButton: {
+      backgroundColor: colors.surfaceMuted,
+    },
 
-  tabText: {
-    fontSize: 14,
-    color: colors.textMuted,
-  },
+    modalOverlay: {
+      ...layout.modalOverlay,
+    },
 
-  modalScroll: {
-    flexGrow: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+    modalContent: {
+      width: "90%",
+      maxHeight: "85%",
+      backgroundColor: colors.surface,
+      borderRadius: radii.md,
+      padding: spacing.xl,
+    },
 
-  modalTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: colors.textMuted,
-    marginBottom: spacing.lg,
-    textAlign: "center",
-    textTransform: "uppercase",
-  },
+    tabsContainer: {
+      flexDirection: "row",
+      marginBottom: spacing.xl,
+      backgroundColor: colors.surfaceAlt,
+      borderRadius: radii.sm,
+      overflow: "hidden",
+    },
 
-  input: {
-    width: "100%",
-    backgroundColor: colors.surfaceAlt,
-    color: colors.white,
-    padding: spacing.md,
-    borderRadius: radii.sm,
-    marginBottom: spacing.md,
-  },
+    tabButton: {
+      flex: 1,
+      paddingVertical: spacing.md,
+      alignItems: "center",
+      justifyContent: "center",
+    },
 
-  separator: {
-    height: 1,
-    width: "100%",
-    backgroundColor: colors.surfaceMuted,
-    marginVertical: spacing.lg,
-  },
+    tabActive: {
+      backgroundColor: colors.primary,
+      borderRadius: radii.sm,
+    },
 
-  buttonRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: spacing.lg,
-    gap: spacing.xl,
-  },
-});
+    tabText: {
+      fontSize: 14,
+      color: colors.textMuted,
+    },
+    activeTabText: {
+      color: colors.grey,
+      fontWeight: "600",
+    },
+
+    modalScroll: {
+      flexGrow: 1,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+
+    modalTitle: {
+      fontSize: 16,
+      fontWeight: "bold",
+      color: colors.textMuted,
+      marginBottom: spacing.lg,
+      textAlign: "center",
+      textTransform: "uppercase",
+    },
+
+    input: {
+      width: "100%",
+      backgroundColor: colors.surfaceAlt,
+      color: colors.text,
+      padding: spacing.md,
+      borderRadius: radii.sm,
+      marginBottom: spacing.md,
+    },
+
+    separator: {
+      height: 1,
+      width: "100%",
+      backgroundColor: colors.surfaceMuted,
+      marginVertical: spacing.lg,
+    },
+
+    buttonRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginTop: spacing.lg,
+      gap: spacing.xl,
+    },
+
+    settingsHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: spacing.xl,
+    },
+
+    settingsOption: {
+      flexDirection: "row",
+      alignItems: "center",
+      width: "100%",
+      paddingVertical: spacing.xs,
+      backgroundColor: colors.surfaceAlt,
+      marginBottom: spacing.md,
+      borderRadius: radii.sm,
+    },
+
+    settingsOptionIcon: {
+      width: 42,
+      height: 42,
+      borderRadius: radii.round,
+      backgroundColor: colors.surfaceAlt,
+      alignItems: "center",
+      justifyContent: "center",
+      marginRight: spacing.md,
+    },
+
+    settingsOptionContent: {
+      flex: 1,
+    },
+
+    settingsOptionTitle: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: colors.textMuted,
+      marginBottom: spacing.xs,
+    },
+
+    settingsOptionSubtitle: {
+      fontSize: 13,
+      color: colors.textSubtle,
+    },
+
+    paymentBox: {
+      width: "80%",
+      borderRadius: radii.md,
+      backgroundColor: colors.surfaceAlt,
+      padding: spacing.lg,
+      marginBottom: spacing.xxl,
+    },
+
+    paymentStatusIcon: {
+      width: 26,
+      height: 26,
+      borderRadius: radii.round,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+
+    paymentStatusPaid: {
+      backgroundColor: colors.success,
+    },
+
+    paymentStatusPending: {
+      backgroundColor: colors.danger,
+    },
+
+    paymentInfo: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingVertical: spacing.sm,
+    },
+
+    paymentMonth: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: colors.textMuted,
+      marginBottom: spacing.xs,
+    },
+
+    paymentModality: {
+      fontSize: 15,
+    },
+
+    paymentModalityPaid: {
+      color: colors.success,
+    },
+
+    paymentModalityPending: {
+      color: colors.danger,
+    },
+
+    paymentHistoryButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      marginTop: spacing.md,
+      paddingTop: spacing.md,
+    },
+
+    paymentHistoryText: {
+      fontSize: 14,
+      color: colors.textMuted,
+    },
+  });
+};
+
+const styles = createProfileStyles(colors);
 
 export default styles;

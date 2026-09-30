@@ -2,30 +2,26 @@ import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useRef, useState } from "react";
 import { Image, TouchableOpacity, View } from "react-native";
 import PagerView from "react-native-pager-view";
-import style from "../../Styles/NewsStyles";
-import { colors } from "../../Styles/theme";
+import { createNewsStyles } from "../../Styles/NewsStyles";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function Carousel({ images, interval = 3000, onEdit, isAdmin }) {
+    const { colors } = useTheme();
+    const style = createNewsStyles(colors);
   const pagerRef = useRef(null);
   const pageRef = useRef(0);
   const [page, setPage] = useState(0);
-  const [localImages, setLocalImages] = useState(images);
-
   useEffect(() => {
-    setLocalImages(images);
-  }, [images]);
-
-  useEffect(() => {
-    if (!localImages.length) return;
+    if (!images.length) return;
     const timer = setInterval(() => {
-      const nextPage = (pageRef.current + 1) % localImages.length;
+      const nextPage = (pageRef.current + 1) % images.length;
       pagerRef.current?.setPage(nextPage);
       pageRef.current = nextPage;
       setPage(nextPage);
     }, interval);
 
     return () => clearInterval(timer);
-  }, [interval, localImages.length]);
+  }, [interval, images.length]);
 
   return (
     <View style={style.carruselWrapper}>
@@ -40,7 +36,7 @@ export default function Carousel({ images, interval = 3000, onEdit, isAdmin }) {
             setPage(e.nativeEvent.position);
           }}
         >
-          {localImages.map((img, idx) => (
+          {images.map((img, idx) => (
             <View key={idx} style={style.page}>
               <Image
                 source={{ uri: img.imageUrl }}
@@ -58,7 +54,7 @@ export default function Carousel({ images, interval = 3000, onEdit, isAdmin }) {
       )}
 
       <View style={style.indicatorContainer}>
-        {localImages.map((_, idx) => (
+        {images.map((_, idx) => (
           <View
             key={idx}
             style={[style.indicator, { opacity: page === idx ? 1 : 0.3 }]}

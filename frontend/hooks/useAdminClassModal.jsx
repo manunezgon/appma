@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { useTranslation } from "../hooks/useTranslation";
 
 export default function useAdminClassModal({
   createLessonException,
   createCustomException,
 }) {
+  const { t } = useTranslation();
+
   const [visible, setVisible] = useState(false);
 
   const [createMode, setCreateMode] = useState(null);
@@ -50,8 +53,7 @@ export default function useAdminClassModal({
 
   const handleCreateNew = async () => {
     if (!newDescription || !newStartTime || !newEndTime) {
-      alert("Please fill in all required fields");
-
+      alert(t("adminClassModal.requiredFields"));
       return;
     }
 

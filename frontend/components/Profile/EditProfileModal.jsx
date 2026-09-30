@@ -1,13 +1,15 @@
 import { useState } from "react";
 import {
-    Modal,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Modal,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import styles from "../../Styles/ProfileStyles.jsx";
+import { createProfileStyles } from "../../Styles/ProfileStyles.jsx";
+import { useTranslation } from "../../hooks/useTranslation";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function EditProfileModal({
   visible,
@@ -29,6 +31,11 @@ export default function EditProfileModal({
 }) {
   const [activeTab, setActiveTab] = useState("profile");
 
+  const { t } = useTranslation();
+
+  const { colors } = useTheme();
+  const styles = createProfileStyles(colors);
+
   return (
     <Modal
       visible={visible}
@@ -46,7 +53,14 @@ export default function EditProfileModal({
               ]}
               onPress={() => setActiveTab("profile")}
             >
-              <Text style={styles.tabText}>Profile</Text>
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === "profile" && styles.activeTabText,
+                ]}
+              >
+                {t("profile.editProfileTab")}
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[
@@ -55,7 +69,14 @@ export default function EditProfileModal({
               ]}
               onPress={() => setActiveTab("password")}
             >
-              <Text style={styles.tabText}>Password</Text>
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === "password" && styles.activeTabText,
+                ]}
+              >
+                {t("profile.passwordTab")}
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -66,10 +87,13 @@ export default function EditProfileModal({
           >
             {activeTab === "profile" && (
               <>
-                <Text style={styles.modalTitle}>Edit Profile</Text>
+                <Text style={styles.modalTitle}>
+                  {t("profile.editProfile")}
+                </Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="Name"
+                  placeholder={t("profile.name")}
+                  placeholderTextColor={colors.textMuted}
                   value={editName}
                   onChangeText={setEditName}
                   autoCapitalize="words"
@@ -78,7 +102,8 @@ export default function EditProfileModal({
                 />
                 <TextInput
                   style={styles.input}
-                  placeholder="Email"
+                  placeholder={t("profile.email")}
+                  placeholderTextColor={colors.textMuted}
                   value={editEmail}
                   keyboardType="email-address"
                   autoCapitalize="none"
@@ -90,7 +115,8 @@ export default function EditProfileModal({
                 />
                 <TextInput
                   style={styles.input}
-                  placeholder="Phone"
+                  placeholder={t("profile.phone")}
+                  placeholderTextColor={colors.textMuted}
                   value={editPhone}
                   onChangeText={setEditPhone}
                   keyboardType="phone-pad"
@@ -99,26 +125,28 @@ export default function EditProfileModal({
                 />
                 <TextInput
                   style={styles.input}
-                  placeholder="Current Password"
+                  placeholder={t("profile.currentPassword")}
+                  placeholderTextColor={colors.textMuted}
                   value={currentPassword}
                   onChangeText={setCurrentPassword}
                   secureTextEntry
                   autoComplete="current-password"
                   returnKeyType="done"
                 />
-
                 <View style={styles.buttonRow}>
                   <TouchableOpacity
                     onPress={handleSaveProfile}
                     style={[styles.button, styles.saveButton]}
                   >
-                    <Text style={styles.buttonText}>Save changes</Text>
+                    <Text style={styles.primaryButtonText}>
+                      {t("profile.saveChanges")}
+                    </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={onClose}
                     style={[styles.button, styles.cancelButton]}
                   >
-                    <Text style={styles.buttonText}>Cancel</Text>
+                    <Text style={styles.buttonText}>{t("profile.cancel")}</Text>
                   </TouchableOpacity>
                 </View>
               </>
@@ -126,10 +154,13 @@ export default function EditProfileModal({
 
             {activeTab === "password" && (
               <>
-                <Text style={styles.modalTitle}>Change Password</Text>
+                <Text style={styles.modalTitle}>
+                  {t("profile.changePassword")}
+                </Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="Current Password"
+                  placeholder={t("profile.currentPassword")}
+                  placeholderTextColor={colors.textMuted}
                   value={oldPassword}
                   onChangeText={setOldPassword}
                   secureTextEntry
@@ -138,26 +169,28 @@ export default function EditProfileModal({
                 />
                 <TextInput
                   style={styles.input}
-                  placeholder="New Password"
+                  placeholder={t("profile.newPassword")}
+                  placeholderTextColor={colors.textMuted}
                   value={newPassword}
                   onChangeText={setNewPassword}
                   secureTextEntry
                   autoComplete="new-password"
                   returnKeyType="done"
                 />
-
                 <View style={styles.buttonRow}>
                   <TouchableOpacity
                     onPress={handleChangePassword}
                     style={[styles.button, styles.saveButton]}
                   >
-                    <Text style={styles.buttonText}>Update Password</Text>
+                    <Text style={styles.primaryButtonText}>
+                      {t("profile.updatePassword")}
+                    </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={onClose}
                     style={[styles.button, styles.cancelButton]}
                   >
-                    <Text style={styles.buttonText}>Cancel</Text>
+                    <Text style={styles.buttonText}>{t("profile.cancel")}</Text>
                   </TouchableOpacity>
                 </View>
               </>

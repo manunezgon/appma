@@ -1,5 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Alert,
   Image,
@@ -8,8 +8,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import style from "../../Styles/NewsStyles";
-import { colors } from "../../Styles/theme";
+import { useTranslation } from "../../hooks/useTranslation";
+import { createNewsStyles } from "../../Styles/NewsStyles";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function CarouselEditorModal({
   visible,
@@ -19,11 +20,10 @@ export default function CarouselEditorModal({
   onDelete,
   onReorder,
 }) {
+  const { t } = useTranslation();
+  const { colors } = useTheme();
+  const style = createNewsStyles(colors);
   const [localImages, setLocalImages] = useState(images);
-
-  useEffect(() => {
-    setLocalImages(images ?? []);
-  }, [images]);
 
   const moveImage = (index, direction) => {
     const newIndex = index + direction;
@@ -37,10 +37,10 @@ export default function CarouselEditorModal({
   };
 
   const handleDelete = (index) => {
-    Alert.alert("Delete Image", "Are you sure you want to delete this image?", [
-      { text: "Cancel", style: "cancel" },
+    Alert.alert(t("news.deleteImage"), t("news.confirmDeleteImage"), [
+      { text: t("news.cancel"), style: "cancel" },
       {
-        text: "Delete",
+        text: t("news.delete"),
         style: "destructive",
         onPress: () => {
           const newImages = [...localImages];
@@ -120,7 +120,7 @@ export default function CarouselEditorModal({
               onClose();
             }}
           >
-            <Text style={style.text}>Save</Text>
+            <Text style={style.text}>{t("news.save")}</Text>
           </TouchableOpacity>
         </View>
       </View>

@@ -1,6 +1,9 @@
-import { Picker } from "@react-native-picker/picker";
+import RNPickerSelect from "react-native-picker-select";
+import { Ionicons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
-import styles from "../../Styles/RankingStyles";
+import { createRankingStyles } from "../../Styles/RankingStyles";
+import { useTheme } from "../../context/ThemeContext";
+import { useTranslation } from "../../hooks/useTranslation";
 
 export default function RankingFilters({
   selectedType,
@@ -9,6 +12,10 @@ export default function RankingFilters({
   setSelectedLesson,
   lessons,
 }) {
+  const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = createRankingStyles(colors);
+
   return (
     <>
       <View style={styles.segmentedControl}>
@@ -25,7 +32,7 @@ export default function RankingFilters({
               selectedType === "month" && styles.segmentTextActive,
             ]}
           >
-            Month
+            {t("ranking.month")}
           </Text>
         </TouchableOpacity>
 
@@ -42,27 +49,40 @@ export default function RankingFilters({
               selectedType === "year" && styles.segmentTextActive,
             ]}
           >
-            Year
+            {t("ranking.year")}
           </Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={selectedLesson}
-          dropdownIconColor="white"
-          onValueChange={(itemValue) => setSelectedLesson(itemValue)}
-          style={styles.picker}
-        >
-          <Picker.Item label="All lessons" value={null} />
-          {lessons.map((lesson) => (
-            <Picker.Item
-              key={lesson.id}
-              label={lesson.lessonName}
-              value={lesson.id}
-            />
-          ))}
-        </Picker>
+        <RNPickerSelect
+          value={selectedLesson}
+          itemKey={selectedLesson}
+          onValueChange={setSelectedLesson}
+          items={lessons.map((lesson) => ({
+            label: lesson.lessonName,
+            value: lesson.id,
+          }))}
+          placeholder={{
+            label: t("ranking.allLessons"),
+            value: null,
+          }}
+          useNativeAndroidPickerStyle={false}
+          Icon={() => (
+            <Ionicons name="chevron-down" size={20} color={colors.text} />
+          )}
+          style={{
+            inputIOS: styles.picker,
+            inputAndroid: styles.picker,
+            placeholder: {
+              color: colors.textSubtle,
+            },
+            iconContainer: {
+              top: 14,
+              right: 12,
+            },
+          }}
+        />
       </View>
     </>
   );

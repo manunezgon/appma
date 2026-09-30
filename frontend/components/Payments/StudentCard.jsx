@@ -1,10 +1,13 @@
 import { Ionicons } from "@expo/vector-icons";
 import { memo } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
-import style from "../../Styles/PaymentStyle";
-import { colors } from "../../Styles/theme";
+import { createPaymentStyles } from "../../Styles/PaymentStyle";
+import { useTheme } from "../../context/ThemeContext";
 
 const StudentCardComponent = ({ student, onPress }) => {
+  const { theme, colors } = useTheme();
+  const style = createPaymentStyles(colors);
+
   return (
     <TouchableOpacity style={style.card} onPress={() => onPress(student)}>
       <View style={style.infoContainer}>
@@ -12,7 +15,9 @@ const StudentCardComponent = ({ student, onPress }) => {
           source={
             student.profileImageUrl
               ? { uri: student.profileImageUrl }
-              : require("../../app/assets/images/white_logo_circle.png")
+              : theme === "light"
+                ? require("../../app/assets/images/black_logo_circle.png")
+                : require("../../app/assets/images/white_logo_circle.png")
           }
           style={style.avatar}
         />

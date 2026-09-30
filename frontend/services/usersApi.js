@@ -1,4 +1,5 @@
 import { apiRequest } from "./apiClient";
+import { File } from "expo-file-system";
 
 export const getUsers = (token) => apiRequest("/users", { token });
 
@@ -32,11 +33,8 @@ export const updatePasswordRequest = (userId, passwordData, token) =>
 
 export const uploadProfileImageRequest = (userId, file, token) => {
   const formData = new FormData();
-  formData.append("file", {
-    uri: file.uri,
-    name: "profile.jpg",
-    type: "image/jpeg",
-  });
+  const imageFile = file.file ?? new File(file.uri);
+  formData.append("file", imageFile);
 
   return apiRequest(`/users/${userId}/upload-image`, {
     method: "POST",

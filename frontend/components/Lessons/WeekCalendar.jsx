@@ -6,12 +6,22 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import styles from "../../Styles/LessonStyles.jsx";
+import { useTranslation } from "../../hooks/useTranslation";
+import { createLessonStyles } from "../../Styles/LessonStyles.jsx";
+import { useTheme } from "../../context/ThemeContext";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 export default function WeekCalendar({ selectedDay, setSelectedDay }) {
-  const daysShort = ["M", "T", "W", "T", "F", "S", "S"];
+  const { t, language } = useTranslation();
+  const { colors } = useTheme();
+  const styles = createLessonStyles(colors);
+
+  const daysShort =
+    language === "es"
+      ? ["L", "M", "X", "J", "V", "S", "D"]
+      : ["M", "T", "W", "T", "F", "S", "S"];
+
   const flatListRef = useRef(null);
 
   const today = new Date();
@@ -35,14 +45,9 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
 
   const [currentWeekIndex, setCurrentWeekIndex] = useState(10);
 
-  const [currentMonthName, setCurrentMonthName] = useState(
-    weeks[currentWeekIndex][0]
-      .toLocaleDateString("en-US", {
-        month: "long",
-        year: "numeric",
-      })
-      .replace(" ", " · "),
-  );
+  const currentMonthName = `${t(
+    `paymentHistory.months.${weeks[currentWeekIndex][0].getMonth()}`,
+  )} · ${weeks[currentWeekIndex][0].getFullYear()}`;
 
   const formatDate = (date) => date.toISOString().split("T")[0];
 
@@ -50,21 +55,12 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
     setSelectedDay(today);
     setCurrentWeekIndex(10);
     flatListRef.current?.scrollToIndex({ index: 10, animated: true });
-    setCurrentMonthName(
-      today.toLocaleDateString("en-US", { month: "long", year: "numeric" }),
-    );
   };
 
   const handleMomentumScrollEnd = (event) => {
     const index = Math.round(event.nativeEvent.contentOffset.x / SCREEN_WIDTH);
     setCurrentWeekIndex(index);
 
-    const firstDayOfWeek = weeks[index][0];
-    const newMonthName = firstDayOfWeek.toLocaleDateString("en-US", {
-      month: "long",
-      year: "numeric",
-    });
-    setCurrentMonthName(newMonthName);
   };
 
   return (
@@ -72,7 +68,7 @@ export default function WeekCalendar({ selectedDay, setSelectedDay }) {
       <View style={styles.header}>
         <Text style={styles.monthTitle}>{currentMonthName}</Text>
         <TouchableOpacity style={styles.todayButton} onPress={goToToday}>
-          <Text style={styles.todayText}>Today</Text>
+          <Text style={styles.todayText}>{t("sessions.today")}</Text>
         </TouchableOpacity>
       </View>
 

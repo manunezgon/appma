@@ -14,11 +14,15 @@ import {
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useUser } from "../context/UserContext";
-import styles from "../Styles/GlobalStyles";
-import { colors } from "../Styles/theme";
+import { useTranslation } from "../hooks/useTranslation";
+import { createGlobalStyles } from "../Styles/GlobalStyles";
+import { useTheme } from "../context/ThemeContext";
 import { registerRequest } from "../services/usersApi";
 
 export default function Register() {
+  const { t } = useTranslation();
+  const { theme, colors } = useTheme();
+  const styles = createGlobalStyles(colors);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -34,7 +38,7 @@ export default function Register() {
   const handleRegister = async () => {
     Keyboard.dismiss();
     if (!name || !email || !password) {
-      Alert.alert("Error", "Name, email and password are required");
+      Alert.alert(t("register.error"), t("register.credentialsRequired"));
       return;
     }
 
@@ -49,7 +53,10 @@ export default function Register() {
       });
     } catch (error) {
       console.error(error);
-      Alert.alert("Error", error?.message || "Unable to connect to the server");
+      Alert.alert(
+        t("register.error"),
+        error?.message || t("register.connectionError"),
+      );
     } finally {
       setLoading(false);
     }
@@ -74,19 +81,25 @@ export default function Register() {
       keyboardShouldPersistTaps="handled"
     >
       <Image
-        source={require("./assets/images/white_logo.png")}
+        source={
+          theme === "light"
+            ? require("./assets/images/black_logo_circle.png")
+            : require("./assets/images/white_logo_circle.png")
+        }
         style={styles.logo}
         resizeMode="contain"
       />
 
       <TextInput
-        placeholder="Name"
+        placeholder={t("register.name")}
+        placeholderTextColor={colors.textSubtle}
         value={name}
         onChangeText={setName}
         style={styles.input}
       />
       <TextInput
-        placeholder="Email"
+        placeholder={t("register.email")}
+        placeholderTextColor={colors.textSubtle}
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
@@ -95,14 +108,16 @@ export default function Register() {
         style={styles.input}
       />
       <TextInput
-        placeholder="Password"
+        placeholder={t("register.password")}
+        placeholderTextColor={colors.textSubtle}
         value={password}
         onChangeText={setPassword}
         secureTextEntry
         style={styles.input}
       />
       <TextInput
-        placeholder="Phone"
+        placeholder={t("register.phone")}
+        placeholderTextColor={colors.textSubtle}
         value={phone}
         onChangeText={setPhone}
         style={styles.input}
@@ -116,12 +131,12 @@ export default function Register() {
         {loading ? (
           <ActivityIndicator color={colors.text} />
         ) : (
-          <Text style={styles.buttonText}>REGISTER</Text>
+          <Text style={styles.buttonText}>{t("register.register")}</Text>
         )}
       </TouchableOpacity>
 
       <Text style={styles.linkText} onPress={goToLogin}>
-        Already have an account? Log in
+        {t("register.alreadyAccount")}
       </Text>
     </KeyboardAwareScrollView>
   );

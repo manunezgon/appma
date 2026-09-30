@@ -11,21 +11,30 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import EditProfileModal from "../../components/Profile/EditProfileModal.jsx";
+import SettingsModal from "../../components/Profile/SettingsModal.jsx";
 import { useUser } from "../../context/UserContext";
-import styles from "../../Styles/ProfileStyles.jsx";
-import { colors } from "../../Styles/theme";
-import profilePic from "../assets/images/white_logo_circle.png";
+import { createProfileStyles,  } from "../../Styles/ProfileStyles.jsx";
 import {
   getCurrentUser,
   updatePasswordRequest,
   updateUserRequest,
 } from "../../services/usersApi";
+import PaymentStatusCard from "../../components/Profile/PaymentStatusCard.jsx";
+import PaymentHistoryModal from "../../components/Profile/PaymentHistoryModal.jsx";
+import { usePayments } from "../../context/PaymentsContext";
+import { useTheme } from "../../context/ThemeContext";
+import { useTranslation } from "../../hooks/useTranslation";
 
 export default function Profile() {
   const { user, setUser, logout, token, updateProfileImage } = useUser();
   const router = useRouter();
+  const { t } = useTranslation();
+
+  const { theme, colors } = useTheme();
+  const styles = createProfileStyles(colors);
 
   const [modalVisible, setModalVisible] = useState(false);
+  const [settingsVisible, setSettingsVisible] = useState(false);
 
   const [editName, setEditName] = useState(user?.name || "");
   const [editEmail, setEditEmail] = useState(user?.email || "");
@@ -35,17 +44,25 @@ export default function Profile() {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
 
+  const { payments, fetchPaymentsByUser } = usePayments();
+  const [paymentHistoryVisible, setPaymentHistoryVisible] = useState(false);
+
   useEffect(() => {
-    if (user) {
-      setEditName(user.name || "");
-      setEditEmail(user.email || "");
-      setEditPhone(user.phone || "");
+    if (user?.id) {
+      void Promise.resolve().then(() => fetchPaymentsByUser(user.id));
     }
-  }, [user]);
+  }, [user?.id, fetchPaymentsByUser]);
 
   const handleLogout = async () => {
     await logout();
     router.replace("/login");
+  };
+
+  const handleOpenEditProfile = () => {
+    setEditName(user?.name || "");
+    setEditEmail(user?.email || "");
+    setEditPhone(user?.phone || "");
+    setModalVisible(true);
   };
 
   const refreshUser = async () => {
@@ -59,9 +76,7 @@ export default function Profile() {
 
   const handleSaveProfile = async () => {
     if (!currentPassword || currentPassword.length < 6) {
-      Alert.alert(
-        "You must enter your current password (minimum 6 characters) to save changes",
-      );
+      Alert.alert(t("profile.currentPasswordRequired"));
       return;
     }
 
@@ -81,33 +96,31 @@ export default function Profile() {
       setModalVisible(false);
     } catch (error) {
       console.error(error);
-      Alert.alert("Error updating profile");
+      Alert.alert(t("profile.updateProfileError"));
     }
   };
 
   const handleChangePassword = async () => {
     if (!oldPassword || !newPassword || newPassword.length < 6) {
-      Alert.alert(
-        "Please fill in the current password and a new password with at least 6 characters",
-      );
+      Alert.alert(t("profile.passwordRequirements"));
       return;
     }
 
     try {
       await updatePasswordRequest(user.id, { oldPassword, newPassword }, token);
-      Alert.alert("Password updated");
+      Alert.alert(t("profile.passwordUpdated"));
       setOldPassword("");
       setNewPassword("");
       setModalVisible(false);
     } catch (error) {
       console.error(error);
-      Alert.alert("Error updating password");
+      Alert.alert(t("profile.updatePasswordError"));
     }
   };
 
   const pickProfileImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ["images"],
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
@@ -122,59 +135,100 @@ export default function Profile() {
   if (!user)
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>Loading profile...</Text>
+        <Text style={styles.title}>{t("profile.loading")}</Text>
       </View>
     );
+
+  const now = new Date();
+
+  const currentMonth = `${now.getFullYear()}-${String(
+    now.getMonth() + 1,
+  ).padStart(2, "0")}`;
+
+  const currentMonthPayment = payments.find(
+    (payment) => payment.monthPaid === currentMonth,
+  );
+
   return (
     <>
       <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={pickProfileImage}>
-            <View style={{ position: "relative" }}>
-              <Image
-                source={
-                  user.profileImageUrl
-                    ? { uri: user.profileImageUrl }
-                    : profilePic
-                }
-                style={styles.profileImage}
-              />
-              <View
-                style={styles.profileImageBadge}
-              >
-                <Ionicons name="add" size={16} color={colors.text} />
+        <View style={styles.profileHeaderBox}>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={pickProfileImage}>
+              <View style={{ position: "relative" }}>
+                <Image
+                  source={
+                    user.profileImageUrl
+                      ? { uri: user.profileImageUrl }
+                      : theme === "light"
+                        ? require("../assets/images/black_logo_circle.png")
+                        : require("../assets/images/white_logo_circle.png")
+                  }
+                  style={styles.profileImage}
+                />
+                <View style={styles.profileImageBadge}>
+                  <Ionicons name="add" size={16} color={colors.grey} />
+                </View>
               </View>
+            </TouchableOpacity>
+
+            <View style={styles.headerText}>
+              <Text style={styles.name}>{user.name}</Text>
             </View>
-          </TouchableOpacity>
-          <View style={styles.headerText}>
-            <Text style={styles.name}>{user.name}</Text>
           </View>
         </View>
 
         <View style={styles.infoBox}>
           <View style={styles.infoRow}>
-            <Text style={styles.label}>Email:</Text>
+            <Text style={styles.label}>{t("profile.email")}:</Text>
             <Text style={styles.value}>{user.email}</Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.label}>Phone:</Text>
+            <Text style={styles.label}>{t("profile.phone")}:</Text>
             <Text style={styles.value}>{user.phone || "-"}</Text>
           </View>
         </View>
 
+        {user.role !== "ADMIN" && (
+          <PaymentStatusCard
+            payment={currentMonthPayment}
+            month={currentMonth}
+            onHistoryPress={() => setPaymentHistoryVisible(true)}
+          />
+        )}
+
+        {user.role !== "ADMIN" && (
+          <PaymentHistoryModal
+            visible={paymentHistoryVisible}
+            onClose={() => setPaymentHistoryVisible(false)}
+          />
+        )}
         <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            onPress={() => setModalVisible(true)}
-            style={styles.button}
-          >
-            <Text style={styles.buttonText}>Edit profile</Text>
-          </TouchableOpacity>
+          <View style={styles.profileButtonRow}>
+            <TouchableOpacity
+              onPress={handleOpenEditProfile}
+              style={styles.button}
+            >
+              <Text style={styles.primaryButtonText}>
+                {t("profile.editProfile")}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => setSettingsVisible(true)}
+              style={styles.button}
+            >
+              <Text style={styles.primaryButtonText}>
+                {t("profile.settings")}
+              </Text>
+            </TouchableOpacity>
+          </View>
 
           <TouchableOpacity
             onPress={handleLogout}
-            style={[styles.button, styles.logoutButton]}
+            style={[styles.logoutButton, styles.profileLogoutButton]}
           >
-            <Text style={styles.buttonText}>Logout</Text>
+            <Text style={styles.buttonText}>{t("profile.logout")}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -196,6 +250,9 @@ export default function Profile() {
         setNewPassword={setNewPassword}
         handleChangePassword={handleChangePassword}
       />
+      {settingsVisible && (
+        <SettingsModal visible onClose={() => setSettingsVisible(false)} />
+      )}
     </>
   );
 }

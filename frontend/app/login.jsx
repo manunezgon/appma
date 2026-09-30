@@ -15,11 +15,15 @@ import {
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useUser } from "../context/UserContext";
-import styles from "../Styles/GlobalStyles";
-import { colors } from "../Styles/theme";
+import { useTranslation } from "../hooks/useTranslation";
+import { createGlobalStyles } from "../Styles/GlobalStyles";
+import { useTheme } from "../context/ThemeContext";
 import { loginRequest } from "../services/usersApi";
 
 export default function Login() {
+  const { t } = useTranslation();
+  const { theme, colors } = useTheme();
+  const styles = createGlobalStyles(colors);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loggingIn, setLoggingIn] = useState(false);
@@ -32,7 +36,7 @@ export default function Login() {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert("Error", "Email and password are required");
+      Alert.alert(t("login.error"), t("login.credentialsRequired"));
       return;
     }
 
@@ -51,7 +55,10 @@ export default function Login() {
     } catch (error) {
       console.error(error);
       setPassword("");
-      Alert.alert("Error", error?.message || "Unable to connect to the server");
+      Alert.alert(
+        t("login.error"),
+        error?.message || t("login.connectionError"),
+      );
     } finally {
       setLoggingIn(false);
     }
@@ -76,12 +83,17 @@ export default function Login() {
       keyboardShouldPersistTaps="handled"
     >
       <Image
-        source={require("./assets/images/white_logo.png")}
+        source={
+          theme === "light"
+            ? require("./assets/images/black_logo_circle.png")
+            : require("./assets/images/white_logo_circle.png")
+        }
         style={styles.logo}
         resizeMode="contain"
       />
       <TextInput
-        placeholder="Email"
+        placeholder={t("login.email")}
+        placeholderTextColor={colors.textSubtle}
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
@@ -91,7 +103,8 @@ export default function Login() {
         style={styles.input}
       />
       <TextInput
-        placeholder="Password"
+        placeholder={t("login.password")}
+        placeholderTextColor={colors.textSubtle}
         value={password}
         onChangeText={setPassword}
         secureTextEntry
@@ -104,13 +117,13 @@ export default function Login() {
         disabled={loggingIn || !email || !password}
       >
         {loggingIn ? (
-          <ActivityIndicator color={colors.text} />
+          <ActivityIndicator color={colors.grey} />
         ) : (
-          <Text style={styles.buttonText}>LOG IN</Text>
+          <Text style={styles.buttonText}>{t("login.login")}</Text>
         )}
       </TouchableOpacity>
       <Text style={styles.linkText} onPress={goToRegister}>
-        Don&apos;t have an account? Sign up
+        {t("login.noAccount")}
       </Text>
     </KeyboardAwareScrollView>
   );

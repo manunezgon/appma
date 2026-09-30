@@ -1,7 +1,9 @@
 package com.backend.controller;
 
 import com.backend.model.Announcement;
+import com.backend.dto.AnnouncementRequestDTO;
 import com.backend.service.AnnouncementService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,9 +30,11 @@ public class AnnouncementController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<Announcement> createAnnouncement(@RequestParam @NotBlank String message) {
+    public ResponseEntity<Announcement> createAnnouncement(
+            @Valid @RequestBody AnnouncementRequestDTO request
+    ) {
         return ResponseEntity.status(201).body(
-                announcementService.createAnnouncement(message, false)
+                announcementService.createAnnouncement(request.getMessage(), false)
         );
     }
 

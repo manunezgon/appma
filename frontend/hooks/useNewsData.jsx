@@ -81,15 +81,16 @@ export function useNewsData() {
 
   const addImage = useCallback(async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ["images"],
       allowsEditing: true,
-      aspect: [16, 9], 
+      aspect: [3, 2],
       quality: 0.8,
     });
 
     if (result.canceled) return;
 
-    const localUri = result.assets[0].uri;
+    const asset = result.assets[0];
+    const localUri = asset.uri;
 
     const tempId = Date.now();
 
@@ -103,7 +104,7 @@ export function useNewsData() {
     ]);
 
     try {
-      await uploadCarouselImageRequest(localUri, token);
+      await uploadCarouselImageRequest(asset, token);
       await fetchCarouselImages();
     } catch (err) {
       console.error(err);
