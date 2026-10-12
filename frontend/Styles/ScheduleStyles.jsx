@@ -74,9 +74,15 @@ export const createScheduleStyles = (colors) => {
       flex: 1,
       backgroundColor: colors.primary,
     },
+   saveButtonText: {
+             fontSize: 15,
+             fontWeight: "bold",
+             color: colors.grey,
+             textAlign: "center",
+    },
     inputField: {
       backgroundColor: colors.cardLight,
-      color: colors.background,
+      color: colors.black,
       padding: spacing.md,
       borderRadius: radii.sm,
       marginVertical: spacing.xs,
@@ -90,7 +96,7 @@ export const createScheduleStyles = (colors) => {
     selectableItemText: {
       color: colors.text,
     },
-    selectedItem: { backgroundColor: colors.primary },
+    selectedItem: { backgroundColor: colors.primary, color: colors.grey },
     classContainer: {
       flexDirection: "row",
       justifyContent: "space-between",

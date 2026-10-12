@@ -270,11 +270,11 @@ export const createLessonStyles = (colors) => {
       alignItems: "center",
     },
     saveText: {
-      color: colors.text,
+      color: colors.grey,
       fontWeight: "bold",
     },
     saveButtonText: {
-      color: colors.text,
+      color: colors.grey,
       fontWeight: "bold",
       textAlign: "center",
     },

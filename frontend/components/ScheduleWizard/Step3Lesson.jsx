@@ -83,7 +83,7 @@ export default function Step3Lesson({
             style={[style.button, style.saveButton]}
             onPress={handleUpdateLesson}
           >
-            <Text style={style.buttonText}>
+            <Text style={style.saveButtonText}>
               {t("scheduleManagement.saveChanges")}
             </Text>
           </TouchableOpacity>
