@@ -43,7 +43,6 @@ export default function AdminInput({ value, onChange, onSend }) {
 
   return (
     <View style={style.inputContainer}>
-      {/* Editor */}
       <View style={style.editorContainer}>
         <RichEditor
           ref={editorRef}
@@ -70,7 +69,6 @@ export default function AdminInput({ value, onChange, onSend }) {
         />
       </View>
 
-      {/* Toolbar + enviar */}
       <View style={style.editorActions}>
         <RichToolbar
           editor={editorRef}
