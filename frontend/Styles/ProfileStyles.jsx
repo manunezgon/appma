@@ -115,15 +115,16 @@ export const createProfileStyles = (colors) => {
 
     buttonText: {
       textAlign: "center",
+      fontWeight: "bold",
       color: colors.textMuted,
       paddingVertical: spacing.xs,
     },
 
     primaryButtonText: {
       textAlign: "center",
+      fontWeight: "bold",
       color: colors.grey,
       paddingVertical: spacing.xs,
-      
     },
 
     saveButton: {

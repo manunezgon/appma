@@ -103,7 +103,7 @@ export default function CarouselEditorModal({
                   <Ionicons
                     name="trash-outline"
                     size={16}
-                    color={colors.text}
+                    color={colors.grey}
                   />
                 </TouchableOpacity>
               </View>
