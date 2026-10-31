@@ -43,6 +43,12 @@ export const createScheduleStyles = (colors) => {
       color: colors.textMuted,
       textAlign: "center",
     },
+    buttonCancelText: {
+      fontSize: 15,
+      fontWeight: "bold",
+      color: colors.grey,
+      textAlign: "center",
+    },
     bottomButtons: {
       flexDirection: "row",
       justifyContent: "space-between",
@@ -74,11 +80,11 @@ export const createScheduleStyles = (colors) => {
       flex: 1,
       backgroundColor: colors.primary,
     },
-   saveButtonText: {
-             fontSize: 15,
-             fontWeight: "bold",
-             color: colors.grey,
-             textAlign: "center",
+    saveButtonText: {
+      fontSize: 15,
+      fontWeight: "bold",
+      color: colors.grey,
+      textAlign: "center",
     },
     inputField: {
       backgroundColor: colors.cardLight,

@@ -168,11 +168,29 @@ export default function Step3Lesson({
               renderItem={(l, isSelected) => (
                 <View style={style.classContainer}>
                   <View style={style.classNameContainer}>
-                    <Text style={[style.className, isSelected && { color: colors.grey }]}>{l.lessonName}</Text>
-                    <Text style={[style.professorName, isSelected && { color: colors.grey }]}>{l.professorName}</Text>
+                    <Text
+                      style={[
+                        style.className,
+                        isSelected && { color: colors.grey },
+                      ]}
+                    >
+                      {l.lessonName}
+                    </Text>
+                    <Text
+                      style={[
+                        style.professorName,
+                        isSelected && { color: colors.grey },
+                      ]}
+                    >
+                      {l.professorName}
+                    </Text>
                   </View>
 
-                  <Text style={[style.amount, isSelected && { color: colors.grey }]}>{l.amountMonthly}€</Text>
+                  <Text
+                    style={[style.amount, isSelected && { color: colors.grey }]}
+                  >
+                    {l.amountMonthly}€
+                  </Text>
                 </View>
               )}
             />
@@ -206,7 +224,7 @@ export default function Step3Lesson({
           style={[style.button, style.deleteButton]}
           onPress={handleDeleteSchedule}
         >
-          <Text style={style.buttonText}>
+          <Text style={style.buttonCancelText}>
             {t("scheduleManagement.deleteSchedule")}
           </Text>
         </TouchableOpacity>
