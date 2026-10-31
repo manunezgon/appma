@@ -57,6 +57,10 @@ export const createNewsStyles = (colors) => {
       fontSize: 16,
       color: colors.textMuted,
     },
+    textButton: {
+      fontSize: 16,
+      color: colors.grey,
+    },
     carruselWrapper: {
       position: "relative",
       marginTop: spacing.xl,
@@ -172,6 +176,7 @@ export const createNewsStyles = (colors) => {
       paddingVertical: 10,
       paddingHorizontal: 10,
       backgroundColor: colors.primary,
+      color: colors.grey,
       borderRadius: radii.md,
       alignSelf: "center",
     },
