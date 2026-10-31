@@ -81,7 +81,7 @@ export default function CarouselEditorModal({
                     <Ionicons
                       name="arrow-up-outline"
                       size={16}
-                      color={colors.text}
+                      color={colors.grey}
                     />
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -91,7 +91,7 @@ export default function CarouselEditorModal({
                     <Ionicons
                       name="arrow-down-outline"
                       size={16}
-                      color={colors.text}
+                      color={colors.grey}
                     />
                   </TouchableOpacity>
                 </View>
@@ -103,7 +103,7 @@ export default function CarouselEditorModal({
                   <Ionicons
                     name="trash-outline"
                     size={16}
-                    color={colors.text}
+                    color={colors.grey}
                   />
                 </TouchableOpacity>
               </View>
@@ -120,7 +120,7 @@ export default function CarouselEditorModal({
               onClose();
             }}
           >
-            <Text style={style.text}>{t("news.save")}</Text>
+            <Text style={style.textButton}>{t("news.save")}</Text>
           </TouchableOpacity>
         </View>
       </View>

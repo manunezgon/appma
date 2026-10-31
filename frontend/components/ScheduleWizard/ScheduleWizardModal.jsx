@@ -56,7 +56,7 @@ export default function ScheduleWizardModal({ onClose }) {
                 style={[style.button, style.cancelButton]}
                 onPress={handleClose}
               >
-                <Text style={style.buttonText}>
+                <Text style={style.buttonCancelText}>
                   {t("scheduleManagement.cancel")}
                 </Text>
               </TouchableOpacity>

@@ -66,11 +66,8 @@ export default function HomeScreen() {
   return (
 
     <View style={styles.container}>
-      {/* CALENDAR */}
 
       <Calendar selectedDay={selectedDay} setSelectedDay={setSelectedDay} />
-
-      {/* ADMIN FAB */}
 
       {user?.role === "ADMIN" && (
         <TouchableOpacity
@@ -81,7 +78,6 @@ export default function HomeScreen() {
         </TouchableOpacity>
       )}
 
-      {/* LOADING */}
 
       {loading ? (
         <ActivityIndicator size="large" color={colors.primary} />
@@ -113,8 +109,6 @@ export default function HomeScreen() {
         />
       )}
 
-      {/* PAYMENT ERROR MODAL */}
-
       {enrollmentActions.errorModalVisible && (
         <PaymentErrorModal
           visible
@@ -122,8 +116,6 @@ export default function HomeScreen() {
           onClose={enrollmentActions.closeErrorModal}
         />
       )}
-
-      {/* ADMIN CREATE CLASS MODAL */}
 
       {adminModal.visible && (
         <AdminCreateClassModal

@@ -49,7 +49,7 @@ export default function Carousel({ images, interval = 3000, onEdit, isAdmin }) {
 
       {isAdmin && onEdit && (
         <TouchableOpacity style={style.editButton} onPress={onEdit}>
-          <Ionicons name="albums-outline" size={25} color={colors.text} />
+          <Ionicons name="albums-outline" size={25} color={colors.grey} />
         </TouchableOpacity>
       )}
 

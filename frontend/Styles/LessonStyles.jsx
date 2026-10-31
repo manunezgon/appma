@@ -44,6 +44,7 @@ export const createLessonStyles = (colors) => {
       backgroundColor: colors.surface,
       borderRadius: radii.lg,
       padding: spacing.xl,
+      width: "85%",
     },
 
     titleCenter: {
@@ -164,7 +165,7 @@ export const createLessonStyles = (colors) => {
       backgroundColor: colors.cardLight,
       padding: spacing.xl,
       borderRadius: radii.md,
-      width: "80%",
+      width: "85%",
     },
 
     modalText: {
@@ -242,6 +243,7 @@ export const createLessonStyles = (colors) => {
       borderRadius: radii.xl,
       padding: spacing.lg,
       maxHeight: "80%",
+      width: "85%",
     },
     list: {
       marginVertical: 10,
@@ -270,11 +272,11 @@ export const createLessonStyles = (colors) => {
       alignItems: "center",
     },
     saveText: {
-      color: colors.text,
+      color: colors.grey,
       fontWeight: "bold",
     },
     saveButtonText: {
-      color: colors.text,
+      color: colors.grey,
       fontWeight: "bold",
       textAlign: "center",
     },

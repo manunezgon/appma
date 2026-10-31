@@ -25,7 +25,7 @@ export const createProfileStyles = (colors) => {
     },
 
     profileHeaderBox: {
-      width: "80%",
+      width: "85%",
       borderRadius: radii.md,
       backgroundColor: colors.surfaceAlt,
       padding: spacing.lg,
@@ -66,7 +66,7 @@ export const createProfileStyles = (colors) => {
     },
 
     infoBox: {
-      width: "80%",
+      width: "85%",
       borderRadius: radii.md,
       backgroundColor: colors.surfaceAlt,
       padding: spacing.lg,
@@ -90,7 +90,7 @@ export const createProfileStyles = (colors) => {
     },
 
     buttonContainer: {
-      width: "80%",
+      width: "85%",
       marginBottom: 50,
     },
 
@@ -115,15 +115,16 @@ export const createProfileStyles = (colors) => {
 
     buttonText: {
       textAlign: "center",
+      fontWeight: "bold",
       color: colors.textMuted,
       paddingVertical: spacing.xs,
     },
 
     primaryButtonText: {
       textAlign: "center",
+      fontWeight: "bold",
       color: colors.grey,
       paddingVertical: spacing.xs,
-      
     },
 
     saveButton: {
@@ -143,7 +144,7 @@ export const createProfileStyles = (colors) => {
     },
 
     modalContent: {
-      width: "90%",
+      width: "85%",
       maxHeight: "85%",
       backgroundColor: colors.surface,
       borderRadius: radii.md,
@@ -261,7 +262,7 @@ export const createProfileStyles = (colors) => {
     },
 
     paymentBox: {
-      width: "80%",
+      width: "85%",
       borderRadius: radii.md,
       backgroundColor: colors.surfaceAlt,
       padding: spacing.lg,

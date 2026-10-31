@@ -83,7 +83,7 @@ export default function Step3Lesson({
             style={[style.button, style.saveButton]}
             onPress={handleUpdateLesson}
           >
-            <Text style={style.buttonText}>
+            <Text style={style.saveButtonText}>
               {t("scheduleManagement.saveChanges")}
             </Text>
           </TouchableOpacity>
@@ -165,14 +165,32 @@ export default function Step3Lesson({
 
                 setStep(3);
               }}
-              renderItem={(l) => (
+              renderItem={(l, isSelected) => (
                 <View style={style.classContainer}>
                   <View style={style.classNameContainer}>
-                    <Text style={style.className}>{l.lessonName}</Text>
-                    <Text style={style.professorName}>{l.professorName}</Text>
+                    <Text
+                      style={[
+                        style.className,
+                        isSelected && { color: colors.grey },
+                      ]}
+                    >
+                      {l.lessonName}
+                    </Text>
+                    <Text
+                      style={[
+                        style.professorName,
+                        isSelected && { color: colors.grey },
+                      ]}
+                    >
+                      {l.professorName}
+                    </Text>
                   </View>
 
-                  <Text style={style.amount}>{l.amountMonthly}€</Text>
+                  <Text
+                    style={[style.amount, isSelected && { color: colors.grey }]}
+                  >
+                    {l.amountMonthly}€
+                  </Text>
                 </View>
               )}
             />
@@ -206,7 +224,7 @@ export default function Step3Lesson({
           style={[style.button, style.deleteButton]}
           onPress={handleDeleteSchedule}
         >
-          <Text style={style.buttonText}>
+          <Text style={style.buttonCancelText}>
             {t("scheduleManagement.deleteSchedule")}
           </Text>
         </TouchableOpacity>

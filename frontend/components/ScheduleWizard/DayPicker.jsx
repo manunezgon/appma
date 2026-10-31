@@ -16,7 +16,11 @@ export default function DayPicker({ days, selectedDay, onSelect }) {
             style={[style.button, isSelected && style.selectedItem]}
             onPress={() => onSelect(day.value)}
           >
-            <Text style={style.buttonText}>{day.label}</Text>
+            <Text
+              style={[style.buttonText, isSelected && { color: colors.grey }]}
+            >
+              {day.label}
+            </Text>
           </TouchableOpacity>
         );
       })}

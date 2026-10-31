@@ -106,7 +106,6 @@ export const EnrollmentsProvider = ({ children }) => {
 
       return enrollment;
     } catch (err) {
-      // rollback
       setClassStudentsByDay((prev) => ({
         ...prev,
         [classKey]: (prev[classKey] || []).filter((s) => s.id !== user.id),
