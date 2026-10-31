@@ -285,7 +285,7 @@ export const createNewsStyles = (colors) => {
       backgroundColor: colors.cardLight,
       padding: spacing.xl,
       borderRadius: radii.md,
-      width: "80%",
+      width: "85%",
     },
     modalText: {
       fontSize: 16,

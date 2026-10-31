@@ -44,7 +44,7 @@ export const createPaymentStyles = (colors) => {
       backgroundColor: colors.surface,
       padding: spacing.xl,
       borderRadius: radii.md,
-      width: "90%",
+      width: "85%",
       alignItems: "center",
       position: "relative",
       maxHeight: "80%",
