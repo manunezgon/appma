@@ -165,14 +165,14 @@ export default function Step3Lesson({
 
                 setStep(3);
               }}
-              renderItem={(l) => (
+              renderItem={(l, isSelected) => (
                 <View style={style.classContainer}>
                   <View style={style.classNameContainer}>
-                    <Text style={style.className}>{l.lessonName}</Text>
-                    <Text style={style.professorName}>{l.professorName}</Text>
+                    <Text style={[style.className, isSelected && { color: colors.grey }]}>{l.lessonName}</Text>
+                    <Text style={[style.professorName, isSelected && { color: colors.grey }]}>{l.professorName}</Text>
                   </View>
 
-                  <Text style={style.amount}>{l.amountMonthly}€</Text>
+                  <Text style={[style.amount, isSelected && { color: colors.grey }]}>{l.amountMonthly}€</Text>
                 </View>
               )}
             />

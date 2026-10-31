@@ -15,19 +15,20 @@ export default function SelectableList({
 
   return (
     <View>
-      {items.map((item) => (
-        <TouchableOpacity
-          key={item.id}
-          style={[
-            style.selectableItem,
-            selectedId === item.id && style.selectedItem,
-          ]}
-          onPress={() => onSelect(item.id)}
-          accessibilityRole="button"
-        >
-          <View>{renderItem(item)}</View>
-        </TouchableOpacity>
-      ))}
+      {items.map((item) => {
+        const isSelected = selectedId === item.id;
+
+        return (
+          <TouchableOpacity
+            key={item.id}
+            style={[style.selectableItem, isSelected && style.selectedItem]}
+            onPress={() => onSelect(item.id)}
+            accessibilityRole="button"
+          >
+            <View>{renderItem(item, isSelected)}</View>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 }
